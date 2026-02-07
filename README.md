@@ -264,6 +264,7 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [Cursor IDE](https://cursor.sh)
 - [Anthropic Claude](https://anthropic.com)
 - [Img Shields](https://shields.io)
+- [Antigravity](https://deepmind.google/technologies/gemini/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
