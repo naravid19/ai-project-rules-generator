@@ -114,7 +114,7 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 
 1. Download the workflow file to your project:
    ```sh
-   curl -o .agent/workflows/create-project-rules.md https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/.agent/workflows/create-project-rules.md
+   curl -o .agent/workflows/create-project-rules.md https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/workflows/create-project-rules.md
    ```
    _(Ensure you have an `.agent/workflows` directory first)_
 
