@@ -575,8 +575,6 @@ chrome.storage.local.get(["key"], (result) => {
 ```
 ````
 
-````
-
 ### Condensed AGENTS.md Output
 
 ```markdown
@@ -591,11 +589,11 @@ chrome.storage.local.get(["key"], (result) => {
 
 ### How to Find Skills
 
-| If You Find | Search Method |
-|-------------|--------------|
-| `CATALOG.md` | Search table by keywords |
-| `SKILL.md` folders | Browse folder names |
-| `search.py` | Run with `--keywords` |
+| If You Find        | Search Method            |
+| ------------------ | ------------------------ |
+| `CATALOG.md`       | Search table by keywords |
+| `SKILL.md` folders | Browse folder names      |
+| `search.py`        | Run with `--keywords`    |
 
 ### Helpful Keywords
 
@@ -613,12 +611,12 @@ chrome.storage.local.get(["key"], (result) => {
 
 ### Anti-Patterns
 
-| ❌ Anti-Pattern | ✅ Instead Do |
-|----------------|--------------|
-| `localStorage.setItem()` | `chrome.storage.local.set()` |
-| Persistent background page | Event-driven service worker |
+| ❌ Anti-Pattern             | ✅ Instead Do                    |
+| --------------------------- | -------------------------------- |
+| `localStorage.setItem()`    | `chrome.storage.local.set()`     |
+| Persistent background page  | Event-driven service worker      |
 | `chrome.tabs.executeScript` | `chrome.scripting.executeScript` |
-````
+```
 
 ---
 

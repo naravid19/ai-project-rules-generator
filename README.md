@@ -11,11 +11,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/naravid19/ai-project-rules-generator">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
-  <h3 align="center">AI Project Rules Generator</h3>
+  <h1>🤖 AI Project Rules Generator</h1>
 
   <p align="center">
     🚀 Generate .cursorrules and AGENTS.md with automatic, format-based skill discovery from 1000+ curated AI skills

@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyword table expanded from 5 to 12 categories
 - Example output updated with severity levels and anti-patterns table
 - `README.md` updated with Format-Based Skill Discovery section and Multi-Platform Support table
+- All `example/` directory references replaced with GitHub links (example/ excluded from git)
 
 ### Removed
 
