@@ -1,10 +1,10 @@
 ---
-description: Create professional project rules (.cursorrules and AGENTS.md) with skills integration
+description: Create professional project rules (.cursorrules and AGENTS.md) with automatic, format-based skill discovery from any skill source
 ---
 
 # Create Professional Project Rules
 
-Use this workflow when you need to establish coding standards, AI guidelines, and best practices for a new or existing project.
+Generate tailored `.cursorrules` and `AGENTS.md` files for any software project. This workflow automatically discovers and integrates relevant AI skills — users never manually browse or select skills.
 
 **Estimated Total Time**: 30-60 minutes (depending on project complexity)
 
@@ -14,7 +14,14 @@ Before starting, ensure you have:
 
 - Access to the project's source code
 - Understanding of the project's purpose
-- `.agent/skills/CATALOG.md` available for skill lookup
+- At least one AI skill source installed in `.agent/` directory
+
+> [!TIP]
+> **Don't have skills yet?** Clone one of these recommended collections into your `.agent/` directory:
+>
+> - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 968+ skills with `CATALOG.md`
+> - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 30+ curated skills
+> - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
 
 ---
 
@@ -22,89 +29,174 @@ Before starting, ensure you have:
 
 **⏱️ Time: 10-15 minutes**
 
-### 1.1 Understand Project Structure
+> [!IMPORTANT]
+> This stage should be **autonomous**. Scan the project yourself — don't ask the user for information you can discover by reading files.
 
-Analyze the project to gather essential information:
+### 1.1 Autonomous Codebase Discovery
 
-| Aspect           | What to Look For                                                      |
-| ---------------- | --------------------------------------------------------------------- |
-| **Config Files** | `package.json`, `manifest.json`, `pyproject.toml`, `Cargo.toml`, etc. |
-| **Entry Points** | Main files like `index.js`, `main.py`, `App.tsx`                      |
-| **Architecture** | Folder structure, component organization, layers                      |
-| **Dependencies** | Key libraries and frameworks used                                     |
+Scan the project automatically:
 
-### 1.2 Identify Tech Stack
+| Step | Action                    | How                                                                                                      |
+| ---- | ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 1    | **Read config files**     | Look for `package.json`, `manifest.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `pom.xml`, `Gemfile` |
+| 2    | **Identify entry points** | Find `index.js`, `main.py`, `App.tsx`, `main.go`, `lib.rs`, etc.                                         |
+| 3    | **Map architecture**      | Scan folder structure, component organization, layers                                                    |
+| 4    | **List dependencies**     | Extract from config files (key libraries and frameworks)                                                 |
 
-Document the following:
+### 1.2 Document Tech Stack
 
-- **Primary Language(s)**: JavaScript, TypeScript, Python, etc.
-- **Frameworks**: React, Vue, Django, Express, etc.
-- **Build Tools**: Webpack, Vite, Rollup, etc.
-- **Testing**: Jest, Pytest, Mocha, etc.
-- **Styling**: CSS, Tailwind, SCSS, etc.
+Create a profile:
 
-### 1.3 Understand Design Patterns
+```
+Primary Language(s): ___
+Frameworks:          ___
+Build Tools:         ___
+Testing:             ___
+Styling:             ___
+Database:            ___
+Deployment:          ___
+```
 
-Look for patterns already in use:
+### 1.3 Detect Design Patterns
 
-- Error handling approach
-- Async/await patterns
-- State management
-- API communication
-- Authentication flow
+Look for patterns already used in the codebase:
+
+- Error handling approach (try/catch, Result type, error codes)
+- Async patterns (callbacks, promises, async/await, goroutines)
+- State management (Redux, Zustand, Context, Pinia)
+- API communication (REST, GraphQL, gRPC, WebSocket)
+- Authentication flow (JWT, OAuth, session-based)
+- Dependency injection / IoC patterns
+- Component patterns (atomic design, compound components, HOC)
+
+### 1.4 Detect Target AI Tools
+
+Scan the project root for existing AI configuration files to determine which tools the user uses:
+
+| If You Find                             | User Likely Uses                           |
+| --------------------------------------- | ------------------------------------------ |
+| `.cursorrules` or `.cursor/`            | 🟠 Cursor                                  |
+| `CLAUDE.md` or `.claude/`               | 🟣 Claude Code                             |
+| `.agent/skills/` or `.agent/workflows/` | 🔴 Antigravity IDE                         |
+| `GEMINI.md`                             | 🔵 Gemini CLI                              |
+| `AGENTS.md`                             | 🟢 Codex / 🟠 Kiro / ⚪ OpenCode / 🌸 AdaL |
+| `.kiro/`                                | 🟠 Kiro IDE/CLI                            |
+| `.github/copilot-instructions.md`       | 🩵 GitHub Copilot                          |
+
+> If none found, default to generating `.cursorrules` + `AGENTS.md` (most universal).
 
 ---
 
-## Stage 2: Skill Discovery
+## Stage 2: Skill Discovery (Format-Based Auto-Detect)
 
 **⏱️ Time: 5-10 minutes**
 
 > [!IMPORTANT]
-> **Skills are constantly updated!** Always check CATALOG.md before proceeding.
-> Never rely on memorized skill names as new, better skills may be available.
+> **Never hardcode skill names!** Skills are constantly updated. Always use keyword-based search.
+> **Never hardcode skill source names!** Detect what's available by scanning directories.
 
-### 2.1 Search CATALOG.md
+### 2.1 Auto-Detect Available Skill Sources
 
-Open and search `.agent/skills/CATALOG.md` for:
+Scan the user's `.agent/` directory and classify each source by **format**:
 
-1. **Language-specific skills** (e.g., `typescript`, `python`, `rust`)
-2. **Framework skills** (e.g., `react`, `angular`, `nestjs`)
-3. **Project type skills** (e.g., `browser-extension-builder`, `api-design`)
-4. **Best practice skills** (e.g., `error-handling-patterns`, `testing-patterns`)
+```
+Scan .agent/ directory
+  │
+  ├── Found CATALOG.md?
+  │     → Format: CATALOG (keyword search in table)
+  │
+  ├── Found folders with SKILL.md inside?
+  │     → Format: FOLDER (browse folder names + read descriptions)
+  │
+  ├── Found search.py or search engine?
+  │     → Format: SEARCH_ENGINE (run search with keywords)
+  │
+  └── Found README.md with skill listing?
+        → Format: README (browse categorized list)
+```
 
-### 2.2 Read Relevant SKILL.md Files
+#### Format Detection Rules
 
-For each relevant skill:
+| Format            | How to Detect                                                                                      | How to Search                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **CATALOG**       | Directory contains `CATALOG.md` with a table of skills (columns: Name, Description, Tags/Triggers) | Search CATALOG.md by keyword in Tags/Description columns                   |
+| **FOLDER**        | Directory contains subfolders, each with `SKILL.md` or similar instruction file                    | Browse folder names for relevant terms, then read matched `SKILL.md` files |
+| **SEARCH_ENGINE** | Directory contains `search.py` or similar executable search tool                                   | Run `search.py --keywords <terms>`                                         |
+| **README**        | Directory contains `README.md` with categorized skill links/descriptions                           | Browse README sections for relevant categories                             |
 
-1. Navigate to `.agent/skills/skills/{skill-name}/SKILL.md`
-2. Study the best practices and patterns
-3. Extract applicable guidelines for the project
-4. Note any code examples or patterns to include
+#### Example Auto-Detection
 
-### 2.3 Keyword Reference Table
+```
+.agent/
+├── skills/                    ← Has CATALOG.md → Format: CATALOG
+│   ├── CATALOG.md
+│   └── skills/
+│       ├── clean-code/SKILL.md
+│       ├── api-design/SKILL.md
+│       └── ...
+├── awesome-claude-skills/     ← Has README.md with list → Format: README
+│   ├── README.md
+│   ├── skill-creator/
+│   ├── webapp-testing/
+│   └── ...
+├── ui-ux-pro-max-skill/       ← Has search.py → Format: SEARCH_ENGINE
+│   ├── README.md
+│   └── search.py
+└── my-custom-skills/          ← Has SKILL.md folders → Format: FOLDER
+    ├── my-react-rules/SKILL.md
+    └── my-python-rules/SKILL.md
+```
 
-Use these keywords to search CATALOG.md:
+### 2.2 Extract Keywords from Project
 
-| Project Type     | Keywords                                                                 |
-| ---------------- | ------------------------------------------------------------------------ |
-| Web Frontend     | `react`, `vue`, `angular`, `frontend`, `ui`, `css`, `tailwind`, `nextjs` |
-| Backend API      | `api`, `backend`, `rest`, `graphql`, `database`, `sql`, `prisma`         |
-| Chrome Extension | `browser`, `extension`, `chrome`, `manifest`                             |
-| Mobile App       | `react-native`, `flutter`, `mobile`, `ios`, `android`                    |
-| CLI Tool         | `cli`, `terminal`, `bash`, `powershell`                                  |
-| AI/ML            | `ai`, `ml`, `llm`, `agent`, `rag`, `prompt`                              |
-| Game Dev         | `game`, `unity`, `godot`, `unreal`                                       |
+Map the detected tech stack (from Stage 1) to search keywords:
 
-| Category       | Keywords                                                  |
-| -------------- | --------------------------------------------------------- |
-| Testing        | `testing`, `jest`, `pytest`, `unit`, `integration`, `tdd` |
-| Error Handling | `error`, `handling`, `exception`, `sentry`                |
-| Code Quality   | `refactor`, `clean`, `audit`, `review`, `production`      |
-| Documentation  | `docs`, `documentation`, `readme`, `coauthoring`          |
-| Performance    | `performance`, `optimization`, `caching`                  |
-| Security       | `security`, `auth`, `oauth`, `jwt`                        |
-| DevOps         | `docker`, `ci`, `cd`, `deployment`, `kubernetes`          |
-| Architecture   | `architecture`, `monorepo`, `microservices`, `ddd`        |
+**By Project Type:**
+
+| Type                 | Keywords                                                                               |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| 🌐 Web Frontend      | `react`, `vue`, `angular`, `svelte`, `frontend`, `ui`, `css`, `tailwind`, `nextjs`     |
+| ⚙️ Backend API       | `api`, `backend`, `rest`, `graphql`, `database`, `sql`, `prisma`, `express`, `fastapi` |
+| 🧩 Browser Extension | `browser`, `extension`, `chrome`, `manifest`, `content-script`                         |
+| 📱 Mobile App        | `react-native`, `flutter`, `mobile`, `ios`, `android`, `swiftui`, `jetpack`            |
+| 💻 CLI Tool          | `cli`, `terminal`, `bash`, `powershell`, `commander`                                   |
+| 🤖 AI/ML             | `ai`, `ml`, `llm`, `agent`, `rag`, `prompt`, `langchain`, `embedding`                  |
+| 🎮 Game Dev          | `game`, `unity`, `godot`, `unreal`, `bevy`, `ecs`                                      |
+
+**By Quality Domain:**
+
+| Domain           | Keywords                                                                |
+| ---------------- | ----------------------------------------------------------------------- |
+| 🧪 Testing       | `testing`, `jest`, `pytest`, `unit`, `integration`, `tdd`, `playwright` |
+| 🔒 Security      | `security`, `auth`, `oauth`, `jwt`, `encryption`, `owasp`               |
+| 📝 Documentation | `docs`, `documentation`, `readme`, `api-docs`, `architecture`           |
+| 🏗️ Architecture  | `architecture`, `design-patterns`, `refactoring`, `clean-code`, `solid` |
+| ☁️ DevOps        | `docker`, `ci`, `cd`, `deployment`, `kubernetes`, `terraform`           |
+| ⚡ Performance   | `performance`, `optimization`, `caching`, `bundle`, `lazy-loading`      |
+
+### 2.3 Search All Detected Sources
+
+For each detected source, use the appropriate search method:
+
+| Source Format     | Search Action                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------- |
+| **CATALOG**       | Open `CATALOG.md`, search for rows matching extracted keywords in Tags/Description columns  |
+| **FOLDER**        | List all subdirectories, match folder names against keywords, read matched `SKILL.md` files |
+| **SEARCH_ENGINE** | Run the search tool with extracted keywords as arguments                                    |
+| **README**        | Open `README.md`, scan category headings and descriptions for relevant entries              |
+
+### 2.4 Read and Extract Best Practices
+
+For each matched skill:
+
+1. Open the skill's instruction file (`SKILL.md`, `README.md`, etc.)
+2. Study the "When to Use" section — confirm it applies
+3. Extract applicable best practices, patterns, and rules
+4. Note any code examples worth including
+5. Skip skills that don't match the project context
+
+> [!CAUTION]
+> **Don't include every skill you find!** Only include skills that are directly relevant to the project's tech stack and patterns. Quality over quantity.
 
 ---
 
@@ -112,340 +204,290 @@ Use these keywords to search CATALOG.md:
 
 **⏱️ Time: 10-20 minutes**
 
-Create `.cursorrules` at the project root with these sections:
+Create `.cursorrules` at the project root. Structure using **progressive disclosure** (overview → details):
 
 ### 3.1 Required Sections
 
 ```markdown
 # Project Rules: {PROJECT_NAME}
 
-## Project Overview
+> One-line project description.
 
-- Brief description of the project
-- Primary purpose and use case
+## Project Identity
 
-## Tech Stack
+- **Type**: {project type}
+- **Purpose**: {what it does}
+- **Tech Stack**: {languages, frameworks}
+- **License**: {license}
 
-- Language(s):
-- Framework(s):
-- Build Tools:
-- Testing:
+---
 
-## Architecture
+## Project Structure
 
-### File Structure
+### Key Files
 
-(Document key directories and their purposes)
+| Path     | Purpose   | When to Modify |
+| -------- | --------- | -------------- |
+| `{file}` | {purpose} | {when}         |
 
-### Component Responsibilities
-
-(Document key files/modules and what they do)
+---
 
 ## Coding Standards
 
 ### Naming Conventions
 
-(Variable, function, class, file naming rules)
-
-### Code Style
-
-(Formatting preferences, line length, etc.)
+| Element   | Convention | Example     |
+| --------- | ---------- | ----------- |
+| Variables | {style}    | `{example}` |
+| Functions | {style}    | `{example}` |
+| Classes   | {style}    | `{example}` |
+| Files     | {style}    | `{example}` |
 
 ### Error Handling
 
-(Required error handling patterns)
+{Describe the project's error handling pattern with code example}
 
 ### Async Patterns
 
-(How to handle async operations)
+{Describe how async operations should be handled}
 
-## Critical Rules
+---
 
-(Non-negotiable rules that must be followed)
+## Critical Rules (Severity: 🔴)
+
+{Non-negotiable rules with code examples}
+
+### Rule 1: {rule name}
+
+{description with ❌ BAD / ✅ GOOD examples}
+
+---
+
+## Important Guidelines (Severity: 🟠)
+
+{Important but slightly flexible guidelines}
+
+---
 
 ## Code Smells to Avoid
 
-(Anti-patterns and bad practices)
+| ❌ Smell      | ✅ Instead Do  |
+| ------------- | -------------- |
+| {bad pattern} | {good pattern} |
+
+---
 
 ## Testing Guidelines
 
-(Testing requirements and patterns)
-
-## Documentation Standards
-
-(Comment style, JSDoc/docstring requirements)
+{Testing requirements and patterns}
 ```
 
 ### 3.2 Optional Sections (Add as Needed)
 
-- **Security Considerations**: For apps handling sensitive data
-- **Performance Guidelines**: For performance-critical applications
-- **Internationalization (i18n)**: For multi-language support
-- **Accessibility (a11y)**: For web/mobile applications
-- **Git Workflow**: Commit message format, branching strategy
-- **Debugging Strategies**: Project-specific debugging tips
+| Section                         | When to Include                                       |
+| ------------------------------- | ----------------------------------------------------- |
+| **Security Considerations**     | Apps handling sensitive data, auth, payments          |
+| **Performance Guidelines**      | High-traffic, real-time, or resource-constrained apps |
+| **Accessibility (a11y)**        | Web or mobile applications                            |
+| **Internationalization (i18n)** | Multi-language support                                |
+| **Git Workflow**                | Team projects with branching strategy                 |
+| **Debugging Strategies**        | Complex debugging scenarios                           |
+| **API Design**                  | Projects that expose APIs                             |
 
-### 3.3 Incorporate Best Practices from Skills
+### 3.3 Integrate Skills
 
-For each relevant skill you identified in Stage 2:
+For each relevant skill from Stage 2:
 
-1. Extract key patterns and rules
-2. Adapt them to your project's context
-3. Include code examples where helpful
-4. Mark critical rules with emphasis
+1. Extract **key patterns and rules** from the skill
+2. **Adapt** them to the project's context and conventions
+3. Include **concrete code examples** (not abstract principles)
+4. Mark critical rules with 🔴, important with 🟠
+5. **Don't credit the skill** — integrate naturally into the rules file
 
 ---
 
 ## Stage 4: Create AGENTS.md
 
-**⏱️ Time: 5-10 minutes**
+**⏱️ Time: 10-15 minutes**
 
-Create `AGENTS.md` at the project root to guide AI assistants.
+Create `AGENTS.md` (or the appropriate file for the target AI tool) at the project root.
 
-### 4.1 Skills Section (CRITICAL)
+### 4.1 Determine Output Files
 
-> [!CAUTION]
-> **DO NOT hardcode skill names!** Skills are constantly updated.
-> Always instruct AIs to check CATALOG.md dynamically.
+Based on AI tools detected in Stage 1.4:
 
-Include this pattern:
+| Detected Tool      | Primary File                      | Additional Files                 |
+| ------------------ | --------------------------------- | -------------------------------- |
+| 🟠 Cursor          | `.cursorrules`                    | `.cursor/rules/*.mdc` (optional) |
+| 🟣 Claude Code     | `CLAUDE.md`                       | `.claude/skills/*/SKILL.md`      |
+| 🔴 Antigravity IDE | `.agent/skills/*/SKILL.md`        | `.agent/workflows/*.md`          |
+| 🔵 Gemini CLI      | `GEMINI.md`                       | —                                |
+| 🟢 Codex CLI       | `AGENTS.md`                       | —                                |
+| 🟠 Kiro IDE/CLI    | `AGENTS.md` + `.kiro/steering/`   | `.kiro/workflows/*.md`           |
+| 🩵 GitHub Copilot  | `.github/copilot-instructions.md` | `.github/prompts/*.prompt.md`    |
+| ⚪ OpenCode        | `AGENTS.md`                       | —                                |
+| 🌸 AdaL CLI        | `AGENTS.md`                       | —                                |
+
+> **Default**: If unknown, generate `.cursorrules` + `AGENTS.md` (most universal).
+
+### 4.2 Required Sections
 
 ```markdown
+# AI Agent Guidelines — {PROJECT_NAME}
+
+> One-line project description.
+
+## Quick Context
+
+| Key       | Value          |
+| --------- | -------------- |
+| **What**  | {description}  |
+| **Type**  | {project type} |
+| **Stack** | {tech stack}   |
+
+### Key Files
+
+| File     | Purpose       |
+| -------- | ------------- |
+| `{file}` | {description} |
+
+---
+
 ## 🎯 Available Skills
 
 > [!IMPORTANT]
 > **Skills are constantly updated!** Before any task:
 >
-> 1. Open `.agent/skills/CATALOG.md`
-> 2. Search for skills matching your current task
-> 3. Read the relevant `SKILL.md` files
+> 1. Scan the skills directory for available sources
+> 2. Search for skills matching your current task keywords
+> 3. Read the relevant skill instruction files
 > 4. Follow the best practices described
 
-### How to Find Skills
+### Skill Discovery
 
-1. **By keyword search**: Search CATALOG.md for relevant terms
-2. **By category**: Browse the categorized skill list
-3. **By trigger**: Look at the "Triggers" column for matching keywords
+{Auto-detected skill sources and how to search them — populated from Stage 2.1}
 
 ### Helpful Keywords for This Project
 
-(List project-relevant keywords here - NOT skill names)
+- {category}: `keyword1`, `keyword2`, `keyword3`
 
-Examples:
+---
 
-- For Chrome Extension work: `browser`, `extension`, `chrome`, `manifest`
-- For error handling: `error`, `handling`, `exception`
-- For testing: `testing`, `jest`, `unit`, `tdd`
-```
-
-### 4.2 Project Context Section
-
-```markdown
-## Project Context
-
-### Overview
-
-(Brief project description)
-
-### Key Files
-
-| File  | Purpose |
-| ----- | ------- |
-| `...` | ...     |
-
-### Architecture Diagram (Optional)
-
-(ASCII art or mermaid diagram)
-```
-
-### 4.3 Common Patterns Section
-
-```markdown
 ## Common Patterns
 
-### Pattern 1: [Name]
+### Pattern 1: {name}
 
-(Description and code example)
+{Description and code example}
 
-### Pattern 2: [Name]
+---
 
-(Description and code example)
+## Constraints
+
+### 🔴 Critical
+
+1. {Must-follow constraint}
+
+### 🟠 Important
+
+1. {Should-follow guideline}
+
+### Known Gotchas
+
+| Gotcha  | Explanation   |
+| ------- | ------------- |
+| {issue} | {explanation} |
+
+### Anti-Patterns
+
+| ❌ Anti-Pattern | ✅ Instead Do |
+| --------------- | ------------- |
+| {bad}           | {good}        |
 ```
 
-### 4.4 Important Constraints Section
+### 4.3 Dynamic Skill Section (Critical)
+
+> [!CAUTION]
+> **This is the most important section.** The skill discovery instructions must be dynamic, format-based, and never reference specific repositories by name.
+
+Generate the skill section based on what was discovered in Stage 2.1:
 
 ```markdown
-## Important Constraints
+## 🎯 Available Skills
 
-### Known Limitations
+> [!IMPORTANT]
+> Skills are constantly updated. Always check before starting work.
 
-- ...
+### How to Find Skills
 
-### Gotchas
+Scan your `.agent/` directory. For each subdirectory:
 
-- ...
-
-### Avoid
-
-- ...
+| If You Find                   | Search Method                                   |
+| ----------------------------- | ----------------------------------------------- |
+| A `CATALOG.md` file           | Search the table by keywords matching your task |
+| Folders containing `SKILL.md` | Browse folder names, read descriptions          |
+| A `search.py` or search tool  | Run with `--keywords <your task terms>`         |
+| A `README.md` with skill list | Browse categories for relevant entries          |
 ```
 
 ---
 
 ## Stage 5: Verification
 
-**⏱️ Time: 5 minutes**
+**⏱️ Time: 5-10 minutes**
 
-### 5.1 Checklist
+### 5.1 Quality Scoring
 
-- [ ] `.cursorrules` created at project root
-- [ ] `.cursorrules` includes all required sections
-- [ ] `.cursorrules` rules match actual project patterns
-- [ ] `AGENTS.md` created at project root
-- [ ] `AGENTS.md` has Skills section with dynamic lookup instructions
-- [ ] `AGENTS.md` does NOT contain hardcoded skill names
-- [ ] Both files are well-formatted and readable
-- [ ] Examples match the project's coding style
+Rate each generated file on these dimensions (0-10):
 
-### 5.2 Reader Test
+| Dimension                                            | .cursorrules | AGENTS.md | Minimum |
+| ---------------------------------------------------- | :----------: | :-------: | :-----: |
+| **Completeness** — all required sections present     |    \_/10     |   \_/10   |    7    |
+| **Accuracy** — matches actual project patterns       |    \_/10     |   \_/10   |    8    |
+| **Specificity** — concrete examples, not vague rules |    \_/10     |   \_/10   |    7    |
+| **Scannability** — headers, tables, bullet points    |    \_/10     |   \_/10   |    7    |
+| **Consistency** — no contradictions between files    |    \_/10     |   \_/10   |    9    |
+| **Total**                                            |    \_/50     |   \_/50   | **38**  |
 
-Ask yourself (or a fresh AI):
+> **Pass criteria**: Both files must score ≥ 38/50. If below, revisit the weakest dimension.
 
-1. Can an AI reading only `.cursorrules` write correct code?
-2. Can an AI reading only `AGENTS.md` find relevant skills?
-3. Are the critical rules clearly emphasized?
-4. Are there any ambiguous instructions?
+### 5.2 Content Smell Detection
 
-### 5.3 Final Review
+Check for these common problems:
 
-- Read through both files completely
-- Verify all paths and references are correct
-- Ensure consistency between the two files
-- Check for typos and formatting issues
+| Smell                     | How to Check                                          | Fix                                      |
+| ------------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| ❌ Hardcoded skill names  | Search for `@skill-name` patterns                     | Replace with keyword search instructions |
+| ❌ Hardcoded source names | Search for specific repo names                        | Replace with format-based detection      |
+| ❌ Vague rules            | Look for "write good code" type phrases               | Make specific with examples and metrics  |
+| ❌ Wall of text           | Sections longer than 10 lines without headers/bullets | Break into tables, lists, subsections    |
+| ❌ Duplicated content     | Same info in both files                               | Assign clear ownership per file          |
+| ❌ Missing time estimates | Stages without ⏱️                                     | Add estimates to every stage             |
+| ❌ Abstract examples      | "e.g., do X" without code                             | Add project-specific code snippets       |
+| ❌ Platform assumptions   | Only references one AI tool                           | Add multi-platform note or table         |
 
----
+### 5.3 Cross-File Consistency Check
 
-## Example Output (Minimal)
+| Check                                                       | Pass? |
+| ----------------------------------------------------------- | ----- |
+| `.cursorrules` and `AGENTS.md` don't contradict each other  | ☐     |
+| `.cursorrules` focuses on **code standards** (for the code) | ☐     |
+| `AGENTS.md` focuses on **AI guidance** (for the AI agent)   | ☐     |
+| Both files consistent with `README.md` if it exists         | ☐     |
+| Skill references use keywords, not hardcoded names          | ☐     |
+| Skill source references use formats, not hardcoded repos    | ☐     |
+| Multi-platform table present if multiple AI tools used      | ☐     |
+| All file paths and references are correct                   | ☐     |
 
-### Example .cursorrules (condensed)
+### 5.4 Reader Test
 
-```markdown
-# Project Rules: My Chrome Extension
+Ask yourself (or a fresh AI instance):
 
-## Project Overview
+1. Can an AI reading **only** `.cursorrules` write correct, idiomatic code for this project?
+2. Can an AI reading **only** `AGENTS.md` discover and use relevant skills?
+3. Are the critical rules clearly distinguishable from nice-to-haves?
+4. Are there any ambiguous instructions that could be misinterpreted?
 
-A Chrome Extension (Manifest V3) that exports NotebookLM chats to PDF.
-
-## Tech Stack
-
-- Language: JavaScript (ES2020+)
-- Platform: Chrome Extension (Manifest V3)
-- Build: None (vanilla JS)
-
-## Architecture
-
-- `background.js` - Service worker, handles PDF generation
-- `content.js` - DOM manipulation, chat parsing
-- `popup.html/js` - Extension popup UI
-
-## Coding Standards
-
-### Naming
-
-- Variables/functions: camelCase
-- Constants: SCREAMING_SNAKE_CASE
-- Files: kebab-case
-
-### Error Handling
-
-Always check `chrome.runtime.lastError` after Chrome API calls:
-
-\`\`\`javascript
-chrome.storage.local.get(['key'], (result) => {
-if (chrome.runtime.lastError) {
-console.error('Storage error:', chrome.runtime.lastError);
-return;
-}
-// proceed with result
-});
-\`\`\`
-
-## Critical Rules
-
-1. ❌ Never use `localStorage` - use `chrome.storage` instead
-2. ❌ Never mutate DOM directly without null checks
-3. ✅ Always handle async errors with try/catch
-```
-
-### Example AGENTS.md (condensed)
-
-```markdown
-# AI Agent Guidelines
-
-## 🎯 Available Skills
-
-> [!IMPORTANT]
-> Always check `.agent/skills/CATALOG.md` before starting any task!
-
-### Helpful Keywords
-
-- Extension: `browser`, `extension`, `chrome`, `manifest`
-- PDF: `pdf`, `export`, `document`
-- Testing: `testing`, `jest`
-
-## Project Context
-
-Chrome Extension for exporting NotebookLM conversations to PDF format.
-
-### Key Files
-
-| File            | Purpose                   |
-| --------------- | ------------------------- |
-| `background.js` | Service worker, PDF gen   |
-| `content.js`    | DOM parsing, UI injection |
-| `manifest.json` | Extension configuration   |
-
-## Common Patterns
-
-### Chrome Message Passing
-
-\`\`\`javascript
-// Send from content script
-chrome.runtime.sendMessage({ action: 'exportPDF', data }, (response) => {
-if (chrome.runtime.lastError) {
-console.error(chrome.runtime.lastError);
-return;
-}
-// handle response
-});
-\`\`\`
-
-## Important Constraints
-
-- Must support Manifest V3 (no MV2 patterns)
-- Service worker may be terminated - no persistent state
-- Content scripts run in isolated world
-```
-
----
-
-## Tips for Effective Rules
-
-### Do's ✅
-
-- **Be specific**: Give concrete examples, not abstract principles
-- **Be consistent**: Use the same terminology throughout
-- **Be practical**: Focus on rules that prevent real problems
-- **Keep updated**: Review and update as the project evolves
-- **Use examples**: Show don't tell - code examples are powerful
-
-### Don'ts ❌
-
-- **Don't over-constrain**: Too many rules lead to ignoring them
-- **Don't hardcode skill names**: They change over time
-- **Don't duplicate**: If it's in .cursorrules, don't repeat in AGENTS.md
-- **Don't be vague**: "Write good code" is not actionable
-- **Don't forget context**: Rules without context are confusing
+> If any answer is **no**, revisit the relevant stage and fix.
 
 ---
 
@@ -453,43 +495,138 @@ return;
 
 After completing this workflow, you should have:
 
-1. **`.cursorrules`** (~200-500 lines)
-   - Comprehensive coding standards
-   - Project-specific patterns
-   - Critical rules and anti-patterns
+| File           | Lines   | Audience        | Content                                                        |
+| -------------- | ------- | --------------- | -------------------------------------------------------------- |
+| `.cursorrules` | 150-400 | AI writing code | Coding standards, architecture, patterns, anti-patterns        |
+| `AGENTS.md`    | 100-250 | AI agent        | Project context, skill discovery, constraints, common patterns |
 
-2. **`AGENTS.md`** (~100-200 lines)
-   - Dynamic skills reference
-   - Project context for AI
-   - Common patterns and constraints
+> Additional files may be generated based on detected AI tools (see Stage 4.1).
 
 ---
 
 ## Quick Reference Card
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│           CREATE PROJECT RULES - QUICK REF              │
-├─────────────────────────────────────────────────────────┤
-│ Stage 1: Analyze         │ Config, Tech Stack, Patterns │
-│ Stage 2: Skills          │ Search CATALOG.md + Read     │
-│ Stage 3: .cursorrules    │ Standards, Rules, Examples   │
-│ Stage 4: AGENTS.md       │ Skills section (dynamic!)    │
-│ Stage 5: Verify          │ Checklist + Reader Test      │
-├─────────────────────────────────────────────────────────┤
-│ ⚠️  DO NOT hardcode skill names - always use keywords   │
-│ ✅  Include code examples for critical patterns         │
-│ ✅  Keep .cursorrules 200-500 lines                     │
-│ ✅  Keep AGENTS.md 100-200 lines                        │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│              CREATE PROJECT RULES v2.0 - QUICK REF           │
+├──────────────────────────────────────────────────────────────┤
+│ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
+│                           │ patterns, detect AI tools        │
+│ Stage 2: Skill Discovery  │ Auto-detect sources by FORMAT,   │
+│                           │ search all by keywords           │
+│ Stage 3: .cursorrules     │ Progressive disclosure,          │
+│                           │ severity levels, code examples   │
+│ Stage 4: AGENTS.md        │ Multi-platform output,           │
+│                           │ dynamic skill section            │
+│ Stage 5: Verify           │ Quality scoring (≥38/50),        │
+│                           │ smell detection, reader test     │
+├──────────────────────────────────────────────────────────────┤
+│ ⚠️  Skills: search by KEYWORDS, never hardcode names         │
+│ ⚠️  Sources: detect by FORMAT, never hardcode repo names     │
+│ ✅  Scan .agent/ for: CATALOG.md / SKILL.md / search.py     │
+│ ✅  Use severity: 🔴 Critical / 🟠 Important / 🟡 Note      │
+│ ✅  Always include concrete code examples                    │
+└──────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Example: Chrome Extension Project
+
+### Condensed .cursorrules Output
+
+````markdown
+# Project Rules: NotebookLM PDF Exporter
+
+> Chrome Extension (Manifest V3) that exports NotebookLM conversations to PDF.
+
+## Project Identity
+
+- **Type**: Browser Extension
+- **Language**: JavaScript (ES2020+)
+- **Platform**: Chrome Extension (Manifest V3)
+- **Build**: None (vanilla JS)
+
+## Key Files
+
+| Path            | Purpose                        |
+| --------------- | ------------------------------ |
+| `background.js` | Service worker, PDF generation |
+| `content.js`    | DOM manipulation, chat parsing |
+| `popup.html/js` | Extension popup UI             |
+| `manifest.json` | Extension configuration        |
+
+## Critical Rules (🔴)
+
+1. ❌ Never use `localStorage` — use `chrome.storage` instead
+2. ❌ Never use Manifest V2 APIs — MV3 only
+3. ✅ Always check `chrome.runtime.lastError` after Chrome API calls
+
+## Error Handling
+
+```javascript
+chrome.storage.local.get(["key"], (result) => {
+  if (chrome.runtime.lastError) {
+    console.error("Storage error:", chrome.runtime.lastError);
+    return;
+  }
+  // proceed with result
+});
+```
+````
+
+````
+
+### Condensed AGENTS.md Output
+
+```markdown
+# AI Agent Guidelines — NotebookLM PDF Exporter
+
+> Chrome Extension for exporting NotebookLM conversations to PDF.
+
+## 🎯 Available Skills
+
+> [!IMPORTANT]
+> Always scan `.agent/` for skill sources before starting work!
+
+### How to Find Skills
+
+| If You Find | Search Method |
+|-------------|--------------|
+| `CATALOG.md` | Search table by keywords |
+| `SKILL.md` folders | Browse folder names |
+| `search.py` | Run with `--keywords` |
+
+### Helpful Keywords
+
+- Extension: `browser`, `extension`, `chrome`, `manifest`
+- PDF: `pdf`, `export`, `document`
+- Testing: `testing`, `jest`, `unit`
+
+## Constraints
+
+### 🔴 Critical
+
+1. Must support Manifest V3 only (no MV2 patterns)
+2. Service worker may be terminated — no persistent state
+3. Content scripts run in isolated world
+
+### Anti-Patterns
+
+| ❌ Anti-Pattern | ✅ Instead Do |
+|----------------|--------------|
+| `localStorage.setItem()` | `chrome.storage.local.set()` |
+| Persistent background page | Event-driven service worker |
+| `chrome.tabs.executeScript` | `chrome.scripting.executeScript` |
+````
 
 ---
 
 ## Version History
 
-| Version | Date       | Changes                                                                          |
-| ------- | ---------- | -------------------------------------------------------------------------------- |
-| 1.0     | 2026-02-07 | Initial workflow structure                                                       |
-| 1.1     | 2026-02-07 | Added skill integration and verification steps                                   |
-| 1.2     | 2026-02-07 | Added time estimates, mini examples, quick reference card, Architecture keywords |
+| Version | Date       | Changes                                                                                                                                                                                        |
+| ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-02-07 | Initial workflow structure                                                                                                                                                                     |
+| 1.1     | 2026-02-07 | Added skill integration and verification steps                                                                                                                                                 |
+| 1.2     | 2026-02-07 | Added time estimates, examples, quick reference card                                                                                                                                           |
+| 2.0     | 2026-03-03 | **Major rewrite**: Format-based auto-detect, multi-platform output, quality scoring, severity levels, progressive disclosure, content smell detection, expanded keyword tables (12 categories) |
