@@ -1,0 +1,95 @@
+# Project Rules: React TypeScript App
+
+> Single-Page Application built with React, TypeScript, and Vite.
+
+## Project Identity
+
+- **Type**: Web Frontend (SPA)
+- **Language**: TypeScript (strict mode)
+- **Framework**: React 18+ with Vite
+- **Styling**: Tailwind CSS
+- **State**: Zustand
+- **Testing**: Vitest + React Testing Library
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Components | PascalCase | `UserProfile.tsx` |
+| Hooks | camelCase with `use` prefix | `useAuth.ts` |
+| Utils | camelCase | `formatDate.ts` |
+| Types/Interfaces | PascalCase with `I` or `T` prefix | `IUser`, `TApiResponse` |
+| Constants | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
+| Directories | kebab-case | `user-profile/` |
+
+### File Organization
+
+```
+src/
+├── components/     # Reusable UI components
+│   └── Button/
+│       ├── Button.tsx
+│       ├── Button.test.tsx
+│       └── index.ts
+├── pages/          # Route-level components
+├── hooks/          # Custom React hooks
+├── stores/         # Zustand stores
+├── types/          # TypeScript type definitions
+├── utils/          # Utility functions
+└── services/       # API client functions
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never use `any`
+
+```typescript
+// ❌ BAD
+const fetchData = async (): Promise<any> => { ... }
+
+// ✅ GOOD
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+}
+const fetchData = async (): Promise<ApiResponse<User[]>> => { ... }
+```
+
+### Rule 2: ✅ Always use functional components with hooks
+
+```typescript
+// ❌ BAD — class component
+class UserList extends React.Component { ... }
+
+// ✅ GOOD — functional with hooks
+const UserList: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  // ...
+};
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Prefer named exports over default exports
+- Co-locate tests with components (`Component.test.tsx`)
+- Use `React.memo()` only when profiling shows re-render issues
+- Extract logic into custom hooks when a component exceeds 100 lines
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| Props drilling > 2 levels | Use Zustand store or Context |
+| `useEffect` for derived state | Use `useMemo` |
+| Inline styles | Use Tailwind classes |
+| Giant component (> 200 lines) | Extract into smaller components + hooks |

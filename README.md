@@ -74,6 +74,8 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 - ✅ **Time-Saving** — Complete in 30-60 minutes
 - ✅ **Never Outdated** — Dynamic skill discovery, no hardcoded skill names
 
+> Release details are tracked in [CHANGELOG.md](CHANGELOG.md).
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
@@ -143,11 +145,27 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 
 ### Installation
 
+#### Option A: Quick Start Script (recommended)
+
+**Linux/macOS:**
+
+```sh
+curl -sL https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.ps1 | iex
+```
+
+#### Option B: Manual
+
 1. Download the workflow file to your project:
    ```sh
+   mkdir -p .agent/workflows
    curl -o .agent/workflows/create-project-rules.md https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/workflows/create-project-rules.md
    ```
-   _(Ensure you have an `.agent/workflows` directory first)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -181,7 +199,7 @@ Or simply ask:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│              CREATE PROJECT RULES v2.0 - QUICK REF           │
+│              CREATE PROJECT RULES - QUICK REF           │
 ├──────────────────────────────────────────────────────────────┤
 │ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
 │                           │ patterns, detect AI tools        │
@@ -197,6 +215,8 @@ Or simply ask:
 │ ⏱️  Total Time: 30-60 minutes                                │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+> **Update note:** Includes WORKFLOW format support, Quick Start scripts, Template Gallery, and the Python FastAPI example refresh.
 
 | Stage                      | Time      | Description                                                         |
 | -------------------------- | --------- | ------------------------------------------------------------------- |
@@ -220,36 +240,40 @@ The key innovation: instead of hardcoding specific skill repositories, the workf
 Scan .agent/ directory
   │
   ├── Found CATALOG.md?
-  │     → Format: CATALOG (search table by keywords)
+  │     → Format: CATALOG (keyword search in table)
   │
-  ├── Found folders with SKILL.md?
+  ├── Found folders with SKILL.md inside?
   │     → Format: FOLDER (browse folder names + read descriptions)
   │
-  ├── Found search.py?
+  ├── Found search.py or search engine?
   │     → Format: SEARCH_ENGINE (run search with keywords)
   │
-  └── Found README.md with skill list?
-        → Format: README (browse categories)
+  ├── Found README.md with skill listing?
+  │     → Format: README (browse categorized list)
+  │
+  └── Found .agent/workflows/*.md referencing .shared/ scripts?
+        → Format: WORKFLOW (read workflow file, run referenced scripts)
 ```
 
 ### Supported Formats
 
-| Format            | Detection Signal                           | Search Method                           |
-| ----------------- | ------------------------------------------ | --------------------------------------- |
-| **CATALOG**       | Contains `CATALOG.md` with skill table     | Search table rows by keywords           |
-| **FOLDER**        | Contains subdirectories with `SKILL.md`    | Browse folder names, read matched files |
-| **SEARCH_ENGINE** | Contains `search.py` or similar tool       | Run search tool with keywords           |
-| **README**        | Contains `README.md` with categorized list | Browse category headings                |
+| Format            | Detection Signal                               | Search Method                           |
+| ----------------- | ---------------------------------------------- | --------------------------------------- |
+| **CATALOG**       | Contains `CATALOG.md` with skill table         | Search table rows by keywords           |
+| **FOLDER**        | Contains subdirectories with `SKILL.md`        | Browse folder names, read matched files |
+| **SEARCH_ENGINE** | Contains `search.py` or similar tool           | Run search tool with keywords           |
+| **README**        | Contains `README.md` with categorized list     | Browse category headings                |
+| **WORKFLOW**      | `.agent/workflows/*.md` referencing `.shared/` | Read workflow, follow its instructions  |
 
 ### Recommended Skill Sources
 
 Clone these into your `.agent/` directory:
 
-| Source                     | Format        | Count             | Link                                                              |
-| -------------------------- | ------------- | ----------------- | ----------------------------------------------------------------- |
-| antigravity-awesome-skills | CATALOG       | 968+              | [GitHub](https://github.com/sickn33/antigravity-awesome-skills)   |
-| awesome-claude-skills      | README        | 30+               | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
-| ui-ux-pro-max-skill        | SEARCH_ENGINE | 1 (comprehensive) | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
+| Source                     | Format   | Count             | Link                                                              |
+| -------------------------- | -------- | ----------------- | ----------------------------------------------------------------- |
+| antigravity-awesome-skills | CATALOG  | 968+              | [GitHub](https://github.com/sickn33/antigravity-awesome-skills)   |
+| awesome-claude-skills      | README   | 30+               | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
+| ui-ux-pro-max-skill        | WORKFLOW | 1 (comprehensive) | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
 
@@ -262,33 +286,33 @@ Clone these into your `.agent/` directory:
 ### .cursorrules (excerpt)
 
 ```markdown
-# Project Rules: My Chrome Extension
+# Project Rules: TaskFlow API
 
-> Chrome Extension (Manifest V3) that exports NotebookLM conversations to PDF.
+> RESTful API for task management with FastAPI.
 
 ## Project Identity
 
-- **Type**: Browser Extension
-- **Language**: JavaScript (ES2020+)
-- **Platform**: Chrome Extension (Manifest V3)
+- **Type**: Backend API
+- **Language**: Python 3.11+
+- **Framework**: FastAPI + SQLAlchemy + Alembic
 
 ## Critical Rules (🔴)
 
-1. ❌ Never use `localStorage` — use `chrome.storage` instead
-2. ✅ Always check `chrome.runtime.lastError` after API calls
+1. ❌ Never commit `.env` — use `app/core/config.py` with `pydantic-settings`
+2. ✅ Always validate input with Pydantic schemas
 
 ## Code Smells to Avoid
 
-| ❌ Smell                   | ✅ Instead Do                |
-| -------------------------- | ---------------------------- |
-| `localStorage.setItem()`   | `chrome.storage.local.set()` |
-| Persistent background page | Event-driven service worker  |
+| ❌ Smell                 | ✅ Instead Do                          |
+| ------------------------ | -------------------------------------- |
+| `db = SessionLocal()`    | `Depends(get_db)` injection            |
+| `import os; os.getenv()` | `from app.core.config import settings` |
 ```
 
 ### AGENTS.md (excerpt)
 
 ```markdown
-# AI Agent Guidelines — NotebookLM PDF Exporter
+# AI Agent Guidelines — TaskFlow API
 
 ## 🎯 Available Skills
 
@@ -297,17 +321,29 @@ Clone these into your `.agent/` directory:
 
 ### How to Find Skills
 
-| If You Find        | Search Method            |
-| ------------------ | ------------------------ |
-| `CATALOG.md`       | Search table by keywords |
-| `SKILL.md` folders | Browse folder names      |
-| `search.py`        | Run with `--keywords`    |
+| If You Find         | Search Method                |
+| ------------------- | ---------------------------- |
+| `CATALOG.md`        | Search table by keywords     |
+| `SKILL.md` folders  | Browse folder names          |
+| Workflow `.md` file | Read and follow instructions |
 
 ### Helpful Keywords
 
-- Extension: `browser`, `extension`, `chrome`, `manifest`
-- Testing: `testing`, `jest`, `unit`
+- Backend: `api`, `fastapi`, `rest`, `backend`
+- Testing: `testing`, `pytest`, `unit`, `tdd`
 ```
+
+### 📝 Template Gallery
+
+Pre-made `.cursorrules` examples for common project types are available in [`templates/`](templates/):
+
+| Template           | Directory                     |
+| ------------------ | ----------------------------- |
+| React + TypeScript | `templates/react-typescript/` |
+| Python FastAPI     | `templates/python-fastapi/`   |
+| Flutter Mobile     | `templates/flutter-mobile/`   |
+
+> These are **references only** — the workflow generates custom versions tailored to your specific project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -325,9 +361,11 @@ Clone these into your `.agent/` directory:
 - [x] Content smell detection
 - [x] Severity levels (🔴/🟠/🟡)
 - [x] 12 keyword categories
-- [ ] More project type examples (Python API, React app, etc.)
+- [x] WORKFLOW format support
+- [x] Quick Start Scripts (`setup.sh` / `setup.ps1`)
+- [x] Template Gallery (React, Python, Flutter)
+- [x] Python FastAPI example (replacing Chrome Extension)
 - [ ] Interactive mode (ask user preferences during generation)
-- [ ] Skill source auto-installer
 - [ ] Multi-language README support
 
 See the [open issues](https://github.com/naravid19/ai-project-rules-generator/issues) for a full list of proposed features (and known issues).
@@ -404,3 +442,4 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 [license-url]: https://github.com/naravid19/ai-project-rules-generator/blob/master/LICENSE
 [Markdown-badge]: https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white
 [Markdown-url]: https://www.markdownguide.org/
+

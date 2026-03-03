@@ -111,8 +111,11 @@ Scan .agent/ directory
   ├── Found search.py or search engine?
   │     → Format: SEARCH_ENGINE (run search with keywords)
   │
-  └── Found README.md with skill listing?
-        → Format: README (browse categorized list)
+  ├── Found README.md with skill listing?
+  │     → Format: README (browse categorized list)
+  │
+  └── Found .agent/workflows/*.md referencing .shared/ scripts?
+        → Format: WORKFLOW (read workflow file, run referenced scripts)
 ```
 
 #### Format Detection Rules
@@ -123,6 +126,7 @@ Scan .agent/ directory
 | **FOLDER**        | Directory contains subfolders, each with `SKILL.md` or similar instruction file                    | Browse folder names for relevant terms, then read matched `SKILL.md` files |
 | **SEARCH_ENGINE** | Directory contains `search.py` or similar executable search tool                                   | Run `search.py --keywords <terms>`                                         |
 | **README**        | Directory contains `README.md` with categorized skill links/descriptions                           | Browse README sections for relevant categories                             |
+| **WORKFLOW**      | `.agent/workflows/*.md` file that references scripts in `.shared/`                                 | Read workflow file, follow its instructions to run search scripts          |
 
 #### Example Auto-Detection
 
@@ -137,14 +141,17 @@ Scan .agent/ directory
 ├── awesome-claude-skills/     ← Has README.md with list → Format: README
 │   ├── README.md
 │   ├── skill-creator/
-│   ├── webapp-testing/
 │   └── ...
-├── ui-ux-pro-max-skill/       ← Has search.py → Format: SEARCH_ENGINE
-│   ├── README.md
-│   └── search.py
+├── workflows/
+│   └── ui-ux-pro-max.md       ← Workflow referencing .shared/ → Format: WORKFLOW
 └── my-custom-skills/          ← Has SKILL.md folders → Format: FOLDER
     ├── my-react-rules/SKILL.md
     └── my-python-rules/SKILL.md
+
+.shared/
+└── ui-ux-pro-max/             ← Scripts/data referenced by workflow
+    ├── scripts/search.py
+    └── data/
 ```
 
 ### 2.2 Extract Keywords from Project
@@ -184,6 +191,7 @@ For each detected source, use the appropriate search method:
 | **FOLDER**        | List all subdirectories, match folder names against keywords, read matched `SKILL.md` files |
 | **SEARCH_ENGINE** | Run the search tool with extracted keywords as arguments                                    |
 | **README**        | Open `README.md`, scan category headings and descriptions for relevant entries              |
+| **WORKFLOW**      | Read `.agent/workflows/*.md`, follow instructions to run scripts from `.shared/`            |
 
 ### 2.4 Read and Extract Best Practices
 
@@ -508,7 +516,7 @@ After completing this workflow, you should have:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│              CREATE PROJECT RULES v2.0 - QUICK REF           │
+│              CREATE PROJECT RULES v1.3 - QUICK REF           │
 ├──────────────────────────────────────────────────────────────┤
 │ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
 │                           │ patterns, detect AI tools        │
@@ -531,56 +539,61 @@ After completing this workflow, you should have:
 
 ---
 
-## Example: Chrome Extension Project
+## Example: Python FastAPI Project
 
 ### Condensed .cursorrules Output
 
 ````markdown
-# Project Rules: NotebookLM PDF Exporter
+# Project Rules: TaskFlow API
 
-> Chrome Extension (Manifest V3) that exports NotebookLM conversations to PDF.
+> RESTful API for task management with user authentication and real-time notifications.
 
 ## Project Identity
 
-- **Type**: Browser Extension
-- **Language**: JavaScript (ES2020+)
-- **Platform**: Chrome Extension (Manifest V3)
-- **Build**: None (vanilla JS)
+- **Type**: Backend API
+- **Language**: Python 3.11+
+- **Framework**: FastAPI + SQLAlchemy + Alembic
+- **Database**: PostgreSQL
 
 ## Key Files
 
-| Path            | Purpose                        |
-| --------------- | ------------------------------ |
-| `background.js` | Service worker, PDF generation |
-| `content.js`    | DOM manipulation, chat parsing |
-| `popup.html/js` | Extension popup UI             |
-| `manifest.json` | Extension configuration        |
+| Path                 | Purpose                          |
+| -------------------- | -------------------------------- |
+| `app/main.py`        | FastAPI app entry point, routers |
+| `app/models/`        | SQLAlchemy ORM models            |
+| `app/routers/`       | API route handlers               |
+| `app/schemas/`       | Pydantic request/response models |
+| `app/core/config.py` | Settings and environment config  |
+| `alembic/`           | Database migrations              |
 
 ## Critical Rules (🔴)
 
-1. ❌ Never use `localStorage` — use `chrome.storage` instead
-2. ❌ Never use Manifest V2 APIs — MV3 only
-3. ✅ Always check `chrome.runtime.lastError` after Chrome API calls
+1. ❌ Never commit `.env` — use `app/core/config.py` with `pydantic-settings`
+2. ❌ Never use raw SQL — always use SQLAlchemy ORM or Core
+3. ✅ Always validate input with Pydantic schemas
 
 ## Error Handling
 
-```javascript
-chrome.storage.local.get(["key"], (result) => {
-  if (chrome.runtime.lastError) {
-    console.error("Storage error:", chrome.runtime.lastError);
-    return;
-  }
-  // proceed with result
-});
+```python
+from fastapi import HTTPException, status
+
+async def get_task(task_id: int, db: AsyncSession):
+    task = await db.get(Task, task_id)
+    if not task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task {task_id} not found"
+        )
+    return task
 ```
 ````
 
 ### Condensed AGENTS.md Output
 
 ```markdown
-# AI Agent Guidelines — NotebookLM PDF Exporter
+# AI Agent Guidelines — TaskFlow API
 
-> Chrome Extension for exporting NotebookLM conversations to PDF.
+> RESTful API for task management built with FastAPI.
 
 ## 🎯 Available Skills
 
@@ -589,33 +602,35 @@ chrome.storage.local.get(["key"], (result) => {
 
 ### How to Find Skills
 
-| If You Find        | Search Method            |
-| ------------------ | ------------------------ |
-| `CATALOG.md`       | Search table by keywords |
-| `SKILL.md` folders | Browse folder names      |
-| `search.py`        | Run with `--keywords`    |
+| If You Find         | Search Method                |
+| ------------------- | ---------------------------- |
+| `CATALOG.md`        | Search table by keywords     |
+| `SKILL.md` folders  | Browse folder names          |
+| `search.py`         | Run with `--keywords`        |
+| Workflow `.md` file | Read and follow instructions |
 
 ### Helpful Keywords
 
-- Extension: `browser`, `extension`, `chrome`, `manifest`
-- PDF: `pdf`, `export`, `document`
-- Testing: `testing`, `jest`, `unit`
+- Backend: `api`, `fastapi`, `rest`, `backend`
+- Database: `database`, `sql`, `prisma`, `orm`
+- Auth: `security`, `auth`, `jwt`, `oauth`
+- Testing: `testing`, `pytest`, `unit`, `tdd`
 
 ## Constraints
 
 ### 🔴 Critical
 
-1. Must support Manifest V3 only (no MV2 patterns)
-2. Service worker may be terminated — no persistent state
-3. Content scripts run in isolated world
+1. All endpoints must use async/await
+2. Database sessions must use dependency injection
+3. Secrets must come from environment variables, never hardcoded
 
 ### Anti-Patterns
 
-| ❌ Anti-Pattern             | ✅ Instead Do                    |
-| --------------------------- | -------------------------------- |
-| `localStorage.setItem()`    | `chrome.storage.local.set()`     |
-| Persistent background page  | Event-driven service worker      |
-| `chrome.tabs.executeScript` | `chrome.scripting.executeScript` |
+| ❌ Anti-Pattern                  | ✅ Instead Do                             |
+| -------------------------------- | ----------------------------------------- |
+| `db = SessionLocal()`            | `db: AsyncSession = Depends(get_db)`      |
+| `import os; os.getenv("SECRET")` | `from app.core.config import settings`    |
+| `@app.get("/tasks")`             | `@router.get("/tasks")` in dedicated file |
 ```
 
 ---
@@ -627,4 +642,5 @@ chrome.storage.local.get(["key"], (result) => {
 | 1.0     | 2026-02-07 | Initial workflow structure                                                                                                                                                                     |
 | 1.1     | 2026-02-07 | Added skill integration and verification steps                                                                                                                                                 |
 | 1.2     | 2026-02-07 | Added time estimates, examples, quick reference card                                                                                                                                           |
-| 2.0     | 2026-03-03 | **Major rewrite**: Format-based auto-detect, multi-platform output, quality scoring, severity levels, progressive disclosure, content smell detection, expanded keyword tables (12 categories) |
+| 1.3     | 2026-03-03 | **Major update**: Format-based auto-detect, Python FastAPI example, quality scoring, severity levels, progressive disclosure, content smell detection, expanded keyword tables (12 categories) |
+| 1.4     | 2026-03-03 | WORKFLOW format support, Quick Start Scripts (`setup.sh`/`setup.ps1`), Template Gallery (React, Python, Flutter)                                                                               |

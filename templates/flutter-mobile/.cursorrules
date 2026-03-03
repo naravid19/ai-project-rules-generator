@@ -1,0 +1,89 @@
+# Project Rules: Flutter Mobile App
+
+> Cross-platform mobile application built with Flutter and Dart.
+
+## Project Identity
+
+- **Type**: Mobile App (iOS + Android)
+- **Language**: Dart 3.0+
+- **Framework**: Flutter 3.x
+- **State**: Riverpod 2.0
+- **Navigation**: GoRouter
+- **Testing**: flutter_test + integration_test
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Files | snake_case | `user_profile_screen.dart` |
+| Classes | PascalCase | `UserProfileScreen` |
+| Variables | camelCase | `userName` |
+| Constants | camelCase with `k` prefix | `kDefaultPadding` |
+| Providers | camelCase with `Provider` suffix | `userProvider` |
+
+### File Organization
+
+```
+lib/
+├── main.dart
+├── app/
+│   ├── app.dart           # MaterialApp configuration
+│   └── router.dart        # GoRouter setup
+├── features/
+│   └── auth/
+│       ├── data/           # Repository, data sources
+│       ├── domain/         # Entities, use cases
+│       └── presentation/   # Screens, widgets, providers
+├── shared/
+│   ├── widgets/            # Reusable widgets
+│   ├── theme/              # ThemeData, colors, typography
+│   └── utils/              # Helpers
+└── l10n/                   # Localization
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never use setState for complex state
+
+```dart
+// ❌ BAD — setState for anything beyond simple local UI
+class _MyWidgetState extends State<MyWidget> {
+  List<User> users = [];
+  void _loadUsers() async {
+    users = await api.getUsers();
+    setState(() {});
+  }
+}
+
+// ✅ GOOD — Riverpod for state management
+final usersProvider = FutureProvider<List<User>>((ref) async {
+  return ref.read(userRepositoryProvider).getUsers();
+});
+```
+
+### Rule 2: ✅ Always use const constructors
+
+```dart
+// ❌ BAD
+return Padding(padding: EdgeInsets.all(16));
+
+// ✅ GOOD
+return const Padding(padding: EdgeInsets.all(16));
+```
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| Widget tree > 100 lines | Extract into smaller widgets |
+| Hardcoded strings | Use `l10n` for all user-facing text |
+| Hardcoded colors | Use `Theme.of(context)` |
+| `Navigator.push()` | Use GoRouter for type-safe navigation |

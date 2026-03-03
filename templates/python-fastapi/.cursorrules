@@ -1,0 +1,94 @@
+# Project Rules: Python FastAPI App
+
+> RESTful API built with FastAPI, SQLAlchemy, and PostgreSQL.
+
+## Project Identity
+
+- **Type**: Backend API
+- **Language**: Python 3.11+
+- **Framework**: FastAPI + SQLAlchemy 2.0 + Alembic
+- **Database**: PostgreSQL
+- **Testing**: pytest + httpx
+- **Linting**: ruff + mypy
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Modules | snake_case | `user_service.py` |
+| Classes | PascalCase | `UserSchema` |
+| Functions | snake_case | `get_user_by_id` |
+| Constants | UPPER_SNAKE_CASE | `DATABASE_URL` |
+| Routers | snake_case with prefix | `router = APIRouter(prefix="/users")` |
+
+### File Organization
+
+```
+app/
+├── main.py           # FastAPI app, router mounting
+├── core/
+│   ├── config.py     # Settings (pydantic-settings)
+│   ├── database.py   # Engine, session factory
+│   └── security.py   # Auth utilities
+├── models/           # SQLAlchemy ORM models
+├── schemas/          # Pydantic request/response
+├── routers/          # API route handlers
+├── services/         # Business logic
+└── utils/            # Helpers
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never hardcode secrets
+
+```python
+# ❌ BAD
+SECRET_KEY = "my-super-secret"
+
+# ✅ GOOD
+from app.core.config import settings
+SECRET_KEY = settings.secret_key
+```
+
+### Rule 2: ✅ Always use dependency injection for DB
+
+```python
+# ❌ BAD
+@router.get("/users")
+async def get_users():
+    db = SessionLocal()
+    users = await db.execute(select(User))
+    return users.scalars().all()
+
+# ✅ GOOD
+@router.get("/users")
+async def get_users(db: AsyncSession = Depends(get_db)):
+    users = await db.execute(select(User))
+    return users.scalars().all()
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use `async def` for all route handlers
+- Validate ALL input with Pydantic schemas (never trust raw input)
+- Use Alembic for all database schema changes (never modify DB manually)
+- Return proper HTTP status codes (201 for create, 204 for delete)
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| Raw SQL strings | SQLAlchemy ORM or Core |
+| `os.getenv()` everywhere | Centralized `config.py` with pydantic-settings |
+| Business logic in routers | Extract to `services/` layer |
+| No input validation | Pydantic schemas for all request bodies |
