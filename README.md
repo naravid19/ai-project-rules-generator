@@ -1,34 +1,36 @@
-<a id="readme-top"></a>
+`<a id="readme-top"></a>`
 
 <!-- PROJECT SHIELDS -->
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[Contributors][contributors-url]
+[Forks][forks-url]
+[Stargazers][stars-url]
+[Issues][issues-url]
+[MIT License][license-url]
 
 <!-- PROJECT LOGO -->
+
 <br />
 <div align="center">
 
-  <h1>🤖 AI Project Rules Generator</h1>
+<h1>🤖 AI Project Rules Generator</h1>
 
-  <p align="center">
+<p align="center">
     🚀 Generate .cursorrules and AGENTS.md with automatic, format-based skill discovery from 1000+ curated AI skills
     <br />
     <a href="#usage"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="#example-output">View Example</a>
-    &middot;
+    ·
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
+    ·
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
 <!-- TABLE OF CONTENTS -->
+
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -80,7 +82,7 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 
 ### Built With
 
-- [![Markdown][Markdown-badge]][Markdown-url]
+- [Markdown][Markdown-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -199,7 +201,7 @@ Or simply ask:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│              CREATE PROJECT RULES - QUICK REF           │
+│              CREATE PROJECT RULES - QUICK REF                │
 ├──────────────────────────────────────────────────────────────┤
 │ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
 │                           │ patterns, detect AI tools        │
@@ -442,4 +444,3 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 [license-url]: https://github.com/naravid19/ai-project-rules-generator/blob/master/LICENSE
 [Markdown-badge]: https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white
 [Markdown-url]: https://www.markdownguide.org/
-
