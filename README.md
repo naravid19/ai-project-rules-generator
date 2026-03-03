@@ -380,10 +380,13 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 ## Acknowledgments
 
 - [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
+- [Keep a Changelog](https://keepachangelog.com/)
+- [Img Shields](https://shields.io)
 - [Cursor IDE](https://cursor.sh)
 - [Anthropic Claude](https://anthropic.com)
-- [Antigravity](https://deepmind.google/technologies/gemini/)
-- [Img Shields](https://shields.io)
+- [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills)
+- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills)
+- [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
