@@ -246,7 +246,7 @@ Scan .agent/ directory
 
 ### Recommended Skill Sources
 
-These are included in the `example/` directory for reference:
+Clone these into your `.agent/` directory:
 
 | Source                     | Format        | Count             | Link                                                              |
 | -------------------------- | ------------- | ----------------- | ----------------------------------------------------------------- |
