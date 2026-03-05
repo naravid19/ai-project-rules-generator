@@ -1,0 +1,112 @@
+# Project Rules: Node.js Express API
+
+> RESTful API built with Express.js, TypeScript, and Prisma ORM.
+
+## Project Identity
+
+- **Type**: Backend API
+- **Language**: TypeScript (Node.js 20+)
+- **Framework**: Express.js 4.x
+- **ORM**: Prisma
+- **Testing**: Jest + Supertest
+- **Validation**: Zod
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Controllers | PascalCase | `UserController.ts` |
+| Routes | kebab-case | `user-routes.ts` |
+| Middleware | camelCase | `authMiddleware.ts` |
+| Models | PascalCase (singular) | `User.ts` |
+| Env vars | UPPER_SNAKE_CASE | `DATABASE_URL` |
+| Directories | kebab-case | `user-management/` |
+
+### File Organization
+
+```
+src/
+├── controllers/    # Request handlers
+├── routes/         # Express route definitions
+├── middleware/      # Custom middleware
+├── services/       # Business logic
+├── repositories/   # Data access layer
+├── types/          # TypeScript types/interfaces
+├── utils/          # Utility functions
+├── validators/     # Zod schemas
+└── prisma/         # Prisma schema + migrations
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never put business logic in controllers
+
+```typescript
+// ❌ BAD — controller does too much
+app.post('/users', async (req, res) => {
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const user = await prisma.user.create({ data: { ...req.body, password: hashedPassword } });
+  res.json(user);
+});
+
+// ✅ GOOD — controller delegates to service
+app.post('/users', async (req, res) => {
+  const user = await userService.createUser(req.body);
+  res.status(201).json(user);
+});
+```
+
+### Rule 2: ❌ Never use `req.body` without validation
+
+```typescript
+// ❌ BAD — no validation
+const { email, password } = req.body;
+
+// ✅ GOOD — Zod validation
+const createUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+const data = createUserSchema.parse(req.body);
+```
+
+### Rule 3: ✅ Always use async error handling middleware
+
+```typescript
+// ✅ Wrap async route handlers
+const asyncHandler = (fn: RequestHandler) =>
+  (req: Request, res: Response, next: NextFunction) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
+
+app.get('/users', asyncHandler(async (req, res) => {
+  const users = await userService.getAll();
+  res.json(users);
+}));
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use environment variables via `dotenv` — never hardcode secrets
+- Structure error responses consistently: `{ error: string, code: string, details?: any }`
+- Use HTTP status codes correctly (201 for create, 204 for delete, etc.)
+- Implement request rate limiting for public endpoints
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| `app.use(cors())` without options | Configure specific origins |
+| Raw SQL queries | Use Prisma Client |
+| `console.log` for logging | Use structured logger (Winston/Pino) |
+| Nested callbacks | Use async/await |
+| God routes file | Split into modular route files |

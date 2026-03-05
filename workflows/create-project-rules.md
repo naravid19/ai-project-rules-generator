@@ -25,6 +25,66 @@ Before starting, ensure you have:
 
 ---
 
+## Stage 0: User Preferences (Interactive Mode)
+
+**⏱️ Time: 2-5 minutes** (skippable with config file)
+
+> [!TIP]
+> This stage is **optional**. If a `.rulesrc.yaml` config file exists in the project root, read preferences from it and skip interactive prompts. If no config file and no TTY (CI/CD), use defaults.
+
+### 0.1 Check for Configuration File
+
+Look for `.rulesrc.yaml` (or `.rulesrc.json`) in the project root:
+
+```
+Project Root
+  ├── .rulesrc.yaml   ← If found, read preferences from here
+  └── (no config)     ← Proceed to interactive prompts or use defaults
+```
+
+If found, parse the config and apply settings. See `templates/rulesrc-template.yaml` for all available options.
+
+### 0.2 Interactive Preference Questions
+
+If no config file exists and running interactively, ask the user:
+
+| Question                       | Options                                                                   | Default      |
+| ------------------------------ | ------------------------------------------------------------------------- | ------------ |
+| **Target AI platforms?**       | cursor, claude, antigravity, gemini, codex, kiro, copilot, opencode, adal | Auto-detect  |
+| **Severity level?**            | strict / balanced / relaxed                                               | balanced     |
+| **Output language?**           | en, th, ja, zh, ko, es, fr, de, pt                                        | en           |
+| **Include optional sections?** | security, accessibility, i18n, performance, git-workflow, api-design      | All included |
+| **Preview before writing?**    | yes / no                                                                  | no           |
+| **Existing files action?**     | ask / overwrite / merge / skip                                            | ask          |
+
+> Ask only relevant questions — e.g., don't ask about security sections for a documentation-only project.
+
+### 0.3 Multi-Language Output
+
+If a non-English language is selected:
+
+- Translate section headers (keep English technical term in parentheses)
+- Translate rule descriptions and guidelines
+- Keep code examples in the original programming language
+- Keep emoji/icons unchanged
+- See `i18n/README.md` for detailed translation patterns
+
+### 0.4 Store Preferences
+
+Carry preferences through all subsequent stages:
+
+```
+Preferences:
+  target_platforms: [cursor, codex]
+  severity_level: balanced
+  output_language: en
+  sections: [all]
+  preview_mode: false
+  existing_files: ask
+```
+
+---
+
 ## Stage 1: Project Analysis
 
 **⏱️ Time: 10-15 minutes**
@@ -181,6 +241,16 @@ Map the detected tech stack (from Stage 1) to search keywords:
 | ☁️ DevOps        | `docker`, `ci`, `cd`, `deployment`, `kubernetes`, `terraform`           |
 | ⚡ Performance   | `performance`, `optimization`, `caching`, `bundle`, `lazy-loading`      |
 
+**By Architecture Pattern:**
+
+| Pattern            | Keywords                                                                 |
+| ------------------ | ------------------------------------------------------------------------ |
+| 🏢 Monorepo        | `monorepo`, `turborepo`, `nx`, `lerna`, `workspace`, `pnpm-workspace`    |
+| 🔄 Microservices   | `microservice`, `event-driven`, `saga`, `cqrs`, `message-queue`, `grpc`  |
+| ☁️ Serverless      | `serverless`, `lambda`, `cloud-functions`, `edge`, `vercel`, `netlify`   |
+| 🗄️ Database        | `postgresql`, `mongodb`, `redis`, `migration`, `seeding`, `orm`, `nosql` |
+| 📦 Package/Library | `npm`, `pypi`, `crate`, `gem`, `package`, `library`, `sdk`, `publish`    |
+
 ### 2.3 Search All Detected Sources
 
 For each detected source, use the appropriate search method:
@@ -311,6 +381,48 @@ For each relevant skill from Stage 2:
 3. Include **concrete code examples** (not abstract principles)
 4. Mark critical rules with 🔴, important with 🟠
 5. **Don't credit the skill** — integrate naturally into the rules file
+
+---
+
+## Preview Mode (Optional)
+
+**⏱️ Time: 2-3 minutes**
+
+If `preview_mode: true` in preferences (Stage 0), display a preview before generating files:
+
+### Preview Output Format
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│              📋 GENERATION PREVIEW                           │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Target Files:                                               │
+│    ├── .cursorrules (estimated: ~200 lines)                   │
+│    └── AGENTS.md (estimated: ~150 lines)                     │
+│                                                              │
+│  Sections for .cursorrules:                                  │
+│    ├── Project Identity                                      │
+│    ├── Coding Standards (naming, file org, error handling)    │
+│    ├── Critical Rules (🔴 × 4)                               │
+│    ├── Important Guidelines (🟠 × 6)                         │
+│    ├── Code Smells (8 patterns)                              │
+│    └── Testing Guidelines                                    │
+│                                                              │
+│  Skills to Apply: 5 matched from 3 sources                   │
+│  Language: English                                           │
+│  Severity: Balanced                                          │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│  ⚠️  .cursorrules already exists — Action: ask                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+Ask the user:
+
+> **Proceed with generation?** (yes / no / modify)
+
+If "modify" — return to Stage 0 to adjust preferences.
 
 ---
 
@@ -497,6 +609,71 @@ Ask yourself (or a fresh AI instance):
 
 > If any answer is **no**, revisit the relevant stage and fix.
 
+### 5.5 Generation Statistics
+
+After verification, display a summary dashboard:
+
+```
+📊 Generation Summary
+═══════════════════════════════════════════════════════════════
+   Skill Sources Scanned:    3 (CATALOG, README, FOLDER)
+   Keywords Used:            15
+   Skills Matched:           8 / 968
+   Skills Applied:           5
+   ─────────────────────────────────────────────────────────
+   .cursorrules:             245 lines, 12 sections
+   AGENTS.md:                180 lines, 8 sections
+   ─────────────────────────────────────────────────────────
+   Quality Score (.cursorrules):  42/50 ✅
+   Quality Score (AGENTS.md):     40/50 ✅
+   Content Smells Found:     0 ✅
+   ─────────────────────────────────────────────────────────
+   Total Time:               ~18 minutes
+   Platform(s):              Cursor, Codex CLI
+   Language:                 English
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
+## Incremental Update Mode
+
+**⏱️ Time: 10-15 minutes**
+
+When `.cursorrules` or `AGENTS.md` already exist and the user wants to **update** them (e.g., new skill added, tech stack changed):
+
+### When to Use Update Mode
+
+| Trigger                   | Action                                                        |
+| ------------------------- | ------------------------------------------------------------- |
+| New dependency added      | Re-run Stage 2 → merge new skill rules                        |
+| Tech stack changed        | Re-run Stage 1 → update project identity + re-discover skills |
+| New skill source cloned   | Re-run Stage 2 only                                           |
+| Manual rules need refresh | Re-run Stages 3-5                                             |
+| Version upgrade           | Re-run all stages                                             |
+
+### Update Workflow
+
+1. **Analyze existing files** — read current `.cursorrules` and `AGENTS.md`
+2. **Detect changes** — compare current project state vs what's documented
+3. **Show diff preview** — display what will be added/modified/removed
+4. **Confirm with user** — ask before applying changes
+5. **Apply changes** — merge new content while preserving user customizations
+6. **Re-verify** — run Stage 5 on updated files
+
+### Merge Rules
+
+| Section                    | Merge Strategy                |
+| -------------------------- | ----------------------------- |
+| Project Identity           | Replace with latest           |
+| Coding Standards           | Merge (keep user additions)   |
+| Critical Rules             | Add new, keep existing        |
+| Skills section             | Replace with latest discovery |
+| Custom rules added by user | Always preserve               |
+
+> [!CAUTION]
+> **Never delete rules the user manually added.** Only update auto-generated sections.
+
 ---
 
 ## Output Files Summary
@@ -516,24 +693,28 @@ After completing this workflow, you should have:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│              CREATE PROJECT RULES v1.3 - QUICK REF           │
+│              CREATE PROJECT RULES v1.5 - QUICK REF           │
 ├──────────────────────────────────────────────────────────────┤
+│ Stage 0: Preferences      │ Config file / interactive,       │
+│                           │ language, severity, platforms    │
 │ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
 │                           │ patterns, detect AI tools        │
 │ Stage 2: Skill Discovery  │ Auto-detect sources by FORMAT,   │
-│                           │ search all by keywords           │
+│                           │ search all by 17 categories      │
 │ Stage 3: .cursorrules     │ Progressive disclosure,          │
 │                           │ severity levels, code examples   │
+│ Preview (optional)        │ Show structure before writing    │
 │ Stage 4: AGENTS.md        │ Multi-platform output,           │
 │                           │ dynamic skill section            │
 │ Stage 5: Verify           │ Quality scoring (≥38/50),        │
-│                           │ smell detection, reader test     │
+│                           │ smell detection, statistics      │
 ├──────────────────────────────────────────────────────────────┤
 │ ⚠️  Skills: search by KEYWORDS, never hardcode names         │
 │ ⚠️  Sources: detect by FORMAT, never hardcode repo names     │
 │ ✅  Scan .agent/ for: CATALOG.md / SKILL.md / search.py     │
 │ ✅  Use severity: 🔴 Critical / 🟠 Important / 🟡 Note      │
-│ ✅  Always include concrete code examples                    │
+│ ✅  Config: .rulesrc.yaml for automation / CI/CD             │
+│ ✅  Update: Incremental mode for existing files              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -637,10 +818,11 @@ async def get_task(task_id: int, db: AsyncSession):
 
 ## Version History
 
-| Version | Date       | Changes                                                                                                                                                                                        |
-| ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-02-07 | Initial workflow structure                                                                                                                                                                     |
-| 1.1     | 2026-02-07 | Added skill integration and verification steps                                                                                                                                                 |
-| 1.2     | 2026-02-07 | Added time estimates, examples, quick reference card                                                                                                                                           |
-| 1.3     | 2026-03-03 | **Major update**: Format-based auto-detect, Python FastAPI example, quality scoring, severity levels, progressive disclosure, content smell detection, expanded keyword tables (12 categories) |
-| 1.4     | 2026-03-03 | WORKFLOW format support, Quick Start Scripts (`setup.sh`/`setup.ps1`), Template Gallery (React, Python, Flutter)                                                                               |
+| Version | Date       | Changes                                                                                                                                                                                                                                             |
+| ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-02-07 | Initial workflow structure                                                                                                                                                                                                                          |
+| 1.1     | 2026-02-07 | Added skill integration and verification steps                                                                                                                                                                                                      |
+| 1.2     | 2026-02-07 | Added time estimates, examples, quick reference card                                                                                                                                                                                                |
+| 1.3     | 2026-03-03 | **Major update**: Format-based auto-detect, Python FastAPI example, quality scoring, severity levels, progressive disclosure, content smell detection, expanded keyword tables (12 categories)                                                      |
+| 1.4     | 2026-03-03 | WORKFLOW format support, Quick Start Scripts (`setup.sh`/`setup.ps1`), Template Gallery (React, Python, Flutter)                                                                                                                                    |
+| 1.5     | 2026-03-05 | **Major update**: Stage 0 (Interactive Mode + Config File), Multi-language support, Preview Mode, Incremental Update Mode, Generation Statistics, 7 new templates, Validation Scripts, Extended Keywords (17 categories), Setup Script improvements |

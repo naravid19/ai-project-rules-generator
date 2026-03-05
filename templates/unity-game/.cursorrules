@@ -1,0 +1,118 @@
+# Project Rules: Unity Game
+
+> 3D/2D game built with Unity 2022+ and C#.
+
+## Project Identity
+
+- **Type**: Game Application
+- **Language**: C# (.NET Standard 2.1)
+- **Engine**: Unity 2022 LTS+
+- **Rendering**: URP (Universal Render Pipeline)
+- **Testing**: Unity Test Framework (NUnit)
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| MonoBehaviours | PascalCase | `PlayerController.cs` |
+| ScriptableObjects | PascalCase with `SO` suffix | `WeaponDataSO.cs` |
+| Private fields | `_camelCase` | `_currentHealth` |
+| Public properties | PascalCase | `MaxHealth` |
+| Events | PascalCase with `On` prefix | `OnPlayerDeath` |
+| Coroutines | PascalCase with `Co` prefix | `CoFadeOut()` |
+| Constants | PascalCase | `MaxPlayers` |
+
+### File Organization
+
+```
+Assets/
+├── Scripts/
+│   ├── Player/          # Player-related scripts
+│   ├── Enemy/           # Enemy AI
+│   ├── UI/              # UI controllers
+│   ├── Managers/        # Singleton managers
+│   ├── Data/            # ScriptableObjects
+│   └── Utils/           # Helper utilities
+├── Prefabs/             # Reusable GameObjects
+├── Scenes/              # Game scenes
+├── Materials/           # Materials & shaders
+├── Animations/          # Animation clips & controllers
+├── Audio/               # Sound effects & music
+└── Resources/           # Runtime-loaded assets
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never use `Find()` at runtime
+
+```csharp
+// ❌ BAD — expensive runtime lookup
+void Update() {
+    var player = GameObject.Find("Player");
+}
+
+// ✅ GOOD — cache reference
+[SerializeField] private Transform _player;
+
+void Start() {
+    if (_player == null)
+        _player = GameObject.FindWithTag("Player").transform;
+}
+```
+
+### Rule 2: ❌ Never allocate in Update loops
+
+```csharp
+// ❌ BAD — GC allocation every frame
+void Update() {
+    var enemies = new List<Enemy>();
+    var hits = Physics.RaycastAll(transform.position, transform.forward);
+}
+
+// ✅ GOOD — pre-allocate and reuse
+private readonly List<Enemy> _enemyCache = new();
+private readonly RaycastHit[] _hitBuffer = new RaycastHit[10];
+
+void Update() {
+    _enemyCache.Clear();
+    int hitCount = Physics.RaycastNonAlloc(transform.position, transform.forward, _hitBuffer);
+}
+```
+
+### Rule 3: ✅ Use SerializeField for Inspector references
+
+```csharp
+// ❌ BAD — public fields expose internal state
+public float speed = 5f;
+
+// ✅ GOOD — private with SerializeField
+[SerializeField] private float _speed = 5f;
+public float Speed => _speed;
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use object pooling for frequently spawned/destroyed objects
+- Prefer `CompareTag("Tag")` over `gameObject.tag == "Tag"`
+- Use ScriptableObjects for shared data instead of singletons when possible
+- Implement async operations with UniTask instead of coroutines for complex flows
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| Singletons everywhere | Use ScriptableObject events / DI |
+| String-based messaging | Use C# events or UnityEvents |
+| `Update()` on every script | Use event-driven architecture |
+| Deep MonoBehaviour inheritance | Prefer composition over inheritance |
+| Magic numbers | Use serialized fields or constants |

@@ -1,0 +1,116 @@
+# Project Rules: Next.js Full-Stack App
+
+> Full-stack web application built with Next.js 14+ App Router, TypeScript, and Tailwind CSS.
+
+## Project Identity
+
+- **Type**: Full-Stack Web App
+- **Language**: TypeScript (strict mode)
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Tailwind CSS
+- **ORM**: Prisma / Drizzle
+- **Auth**: NextAuth.js v5
+- **Testing**: Vitest + Playwright
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Pages | `page.tsx` (directory-based) | `app/dashboard/page.tsx` |
+| Layouts | `layout.tsx` | `app/dashboard/layout.tsx` |
+| Server Actions | camelCase with `Action` suffix | `createUserAction.ts` |
+| Components | PascalCase | `UserCard.tsx` |
+| API Routes | `route.ts` | `app/api/users/route.ts` |
+| Utilities | camelCase | `formatDate.ts` |
+
+### File Organization
+
+```
+app/
+├── (auth)/            # Route group for auth pages
+│   ├── login/page.tsx
+│   └── register/page.tsx
+├── dashboard/
+│   ├── page.tsx       # Server Component (default)
+│   ├── layout.tsx
+│   └── loading.tsx
+├── api/               # API Route Handlers
+│   └── users/route.ts
+├── components/        # Shared components
+│   ├── ui/            # Base UI components
+│   └── features/      # Feature-specific components
+├── lib/               # Utilities, config, db client
+├── actions/           # Server Actions
+└── types/             # TypeScript types
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ✅ Default to Server Components
+
+```tsx
+// ❌ BAD — unnecessary client component
+'use client';
+export default function UserList({ users }: Props) {
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+
+// ✅ GOOD — server component (no 'use client' needed)
+export default async function UserList() {
+  const users = await db.user.findMany();
+  return <ul>{users.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
+
+### Rule 2: ❌ Never expose server secrets to client
+
+```typescript
+// ❌ BAD — leaks to client bundle
+const apiKey = process.env.STRIPE_SECRET_KEY;
+
+// ✅ GOOD — server-only import
+import 'server-only';
+const apiKey = process.env.STRIPE_SECRET_KEY;
+```
+
+### Rule 3: ✅ Use Server Actions for mutations
+
+```typescript
+// ❌ BAD — API route for simple mutations
+// app/api/users/route.ts + client fetch
+
+// ✅ GOOD — Server Action
+'use server';
+export async function createUser(formData: FormData) {
+  const name = formData.get('name') as string;
+  await db.user.create({ data: { name } });
+  revalidatePath('/users');
+}
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use `loading.tsx` and `error.tsx` for automatic loading/error states
+- Prefer `<Image>` over `<img>` for automatic optimization
+- Use `<Link>` for client-side navigation
+- Implement proper metadata exports for SEO on every page
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| `'use client'` on every component | Default to Server Components |
+| `useEffect` for data fetching | Fetch in Server Components |
+| `getServerSideProps` | Use App Router `page.tsx` with async |
+| Prop drilling across layouts | Use React Server Components + parallel routes |
+| Manual `<head>` tags | Use `metadata` export or `generateMetadata()` |

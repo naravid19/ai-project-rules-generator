@@ -1,12 +1,19 @@
-`<a id="readme-top"></a>`
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+
+<a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS -->
+<!--
+*** Using markdown "reference style" links for readability.
+*** See the bottom of this document for the declaration of the reference variables.
+*** https://www.markdownguide.org/basic-syntax/#reference-style-links
+-->
 
-[Contributors][contributors-url]
-[Forks][forks-url]
-[Stargazers][stars-url]
-[Issues][issues-url]
-[MIT License][license-url]
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
 
@@ -22,9 +29,9 @@
     <br />
     <br />
     <a href="#example-output">View Example</a>
-    ·
+    &middot;
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    ·
+    &middot;
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
@@ -65,7 +72,7 @@
 
 ## About The Project
 
-A structured 5-stage workflow for creating professional project rules (`.cursorrules`) and AI agent guidelines (`AGENTS.md`). This workflow **automatically discovers and integrates** relevant AI skills from any compatible skill source — users never have to manually browse or select skills.
+A structured 6-stage workflow (Stage 0–5) for creating professional project rules (`.cursorrules`) and AI agent guidelines (`AGENTS.md`). This workflow **automatically discovers and integrates** relevant AI skills from any compatible skill source — users never have to manually browse or select skills.
 
 ### Why Use This?
 
@@ -82,21 +89,26 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 
 ### Built With
 
-- [Markdown][Markdown-url]
+- [![Markdown][Markdown-badge]][Markdown-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Key Features
 
-| Feature                      | Description                                                                         |
-| ---------------------------- | ----------------------------------------------------------------------------------- |
-| **5-Stage Workflow**         | Structured process: Analyze → Discover → .cursorrules → AGENTS.md → Verify          |
-| **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README) |
-| **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more  |
-| **12 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                      |
-| **Quality Scoring**          | Verification with scoring system (≥38/50 to pass) and content smell detection       |
-| **Progressive Disclosure**   | Generated files follow overview → details structure                                 |
-| **Severity Levels**          | Critical rules (🔴) distinguished from important (🟠) and notes (🟡)                |
+| Feature                      | Description                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| **6-Stage Workflow**         | Structured process: Preferences → Analyze → Discover → .cursorrules → AGENTS.md → Verify |
+| **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README)      |
+| **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
+| **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
+| **Quality Scoring**          | Verification with scoring system (≥38/50 to pass) and content smell detection            |
+| **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
+| **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
+| **Preview Mode**             | Review planned output structure before generation begins                                 |
+| **Incremental Update**       | Diff-based update mode for existing files — preserves user customizations                |
+| **Generation Statistics**    | Dashboard showing skills scanned, lines generated, quality scores                        |
+| **10 Template Gallery**      | Pre-made examples for React, Express, Next.js, Go, Unity, CLI, LangChain, and more       |
+| **Validation Scripts**       | Automated output quality checks via `scripts/validate-output.ps1` / `.sh`                |
 
 ### Supported Project Types
 
@@ -112,6 +124,11 @@ A structured 5-stage workflow for creating professional project rules (`.cursorr
 - 🧪 **Testing** — Jest, Pytest, Playwright, TDD
 - ☁️ **DevOps** — Docker, Kubernetes, CI/CD, Terraform
 - 🏗️ **Architecture** — Design patterns, Clean code, SOLID
+- 🏢 **Monorepo** — Turborepo, Nx, Lerna, Workspaces
+- 🔄 **Microservices** — Event-driven, CQRS, gRPC, Saga
+- ☁️ **Serverless** — Lambda, Cloud Functions, Edge
+- 🗄️ **Database** — PostgreSQL, MongoDB, Redis, ORM
+- 📦 **Package/Library** — npm, PyPI, SDK publishing
 
 ### Multi-Platform Support
 
@@ -190,7 +207,7 @@ Or simply ask:
 ### Manual Execution
 
 1. Open `.agent/workflows/create-project-rules.md`
-2. Follow the 5 stages step by step
+2. Follow the 6 stages step by step (Stage 0 is optional)
 3. Get `.cursorrules` and `AGENTS.md` tailored to your project
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -201,32 +218,31 @@ Or simply ask:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│              CREATE PROJECT RULES - QUICK REF                │
+│         CREATE PROJECT RULES v1.5 - QUICK REF              │
 ├──────────────────────────────────────────────────────────────┤
-│ Stage 1: Analyze          │ Autonomous scan, tech stack,     │
-│                           │ patterns, detect AI tools        │
-│ Stage 2: Skill Discovery  │ Auto-detect sources by FORMAT,   │
-│                           │ search all by keywords           │
-│ Stage 3: .cursorrules     │ Progressive disclosure,          │
-│                           │ severity levels, code examples   │
-│ Stage 4: AGENTS.md        │ Multi-platform output,           │
-│                           │ dynamic skill section            │
-│ Stage 5: Verify           │ Quality scoring (≥38/50),        │
-│                           │ smell detection, reader test     │
+│ Stage 0: Preferences      │ Config file / interactive       │
+│ Stage 1: Analyze          │ Autonomous scan, tech stack     │
+│ Stage 2: Skill Discovery  │ Auto-detect by FORMAT & 17 cats │
+│ Stage 3: .cursorrules     │ Progressive disclosure + rules  │
+│ Preview (optional)        │ Review before writing files     │
+│ Stage 4: AGENTS.md        │ Multi-platform output           │
+│ Stage 5: Verify           │ Quality scoring + statistics    │
 ├──────────────────────────────────────────────────────────────┤
 │ ⏱️  Total Time: 30-60 minutes                                │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-> **Update note:** Includes WORKFLOW format support, Quick Start scripts, Template Gallery, and the Python FastAPI example refresh.
+> **v1.5 update:** Interactive mode, multi-language support, preview mode, incremental updates, generation statistics, 7 new templates, validation scripts, extended keywords (17 categories), setup script improvements.
 
 | Stage                      | Time      | Description                                                         |
 | -------------------------- | --------- | ------------------------------------------------------------------- |
+| **0. User Preferences**    | 2-5 min   | Config file or interactive: platforms, severity, language, preview  |
 | **1. Project Analysis**    | 10-15 min | Autonomous scan: structure, tech stack, patterns, AI tool detection |
-| **2. Skill Discovery**     | 5-10 min  | Auto-detect sources by format, search all by keywords               |
+| **2. Skill Discovery**     | 5-10 min  | Auto-detect sources by format, search all by 17 keyword categories  |
 | **3. Create .cursorrules** | 10-20 min | Coding standards with severity levels and progressive disclosure    |
+| **Preview** (optional)     | 2-3 min   | Review planned structure before writing files                       |
 | **4. Create AGENTS.md**    | 10-15 min | AI guidelines with multi-platform output and dynamic skill section  |
-| **5. Verification**        | 5-10 min  | Quality scoring (≥38/50), content smell detection, reader test      |
+| **5. Verification**        | 5-10 min  | Quality scoring (≥38/50), smell detection, generation statistics    |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -344,8 +360,16 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 | React + TypeScript | `templates/react-typescript/` |
 | Python FastAPI     | `templates/python-fastapi/`   |
 | Flutter Mobile     | `templates/flutter-mobile/`   |
+| Node.js Express    | `templates/nodejs-express/`   |
+| Chrome Extension   | `templates/chrome-extension/` |
+| Next.js Full-Stack | `templates/nextjs-fullstack/` |
+| Go Microservice    | `templates/go-microservice/`  |
+| Unity Game         | `templates/unity-game/`       |
+| CLI Tool           | `templates/cli-tool/`         |
+| LangChain RAG      | `templates/langchain-rag/`    |
 
 > These are **references only** — the workflow generates custom versions tailored to your specific project.
+> Use `templates/rulesrc-template.yaml` to configure workflow behavior for your project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -353,7 +377,7 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 
 ## Roadmap
 
-- [x] Core workflow with 5 stages
+- [x] Core workflow with 6 stages (Stage 0–5)
 - [x] Time estimates for each stage
 - [x] Example outputs
 - [x] Quick reference card
@@ -362,13 +386,20 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 - [x] Quality scoring verification (≥38/50)
 - [x] Content smell detection
 - [x] Severity levels (🔴/🟠/🟡)
-- [x] 12 keyword categories
+- [x] 17 keyword categories (expanded from 12)
 - [x] WORKFLOW format support
 - [x] Quick Start Scripts (`setup.sh` / `setup.ps1`)
-- [x] Template Gallery (React, Python, Flutter)
+- [x] Template Gallery (10 templates)
 - [x] Python FastAPI example (replacing Chrome Extension)
-- [ ] Interactive mode (ask user preferences during generation)
-- [ ] Multi-language README support
+- [x] Interactive mode with config file (`.rulesrc.yaml`)
+- [x] Multi-language output support (9 languages)
+- [x] Preview mode (dry run before writing)
+- [x] Incremental update / diff mode
+- [x] Generation statistics dashboard
+- [x] Validation scripts (`scripts/validate-output.ps1` / `.sh`)
+- [x] Setup script improvements (`--non-interactive`, `--uninstall`, `--verbose`)
+- [ ] Plugin system for custom skill formats
+- [ ] Web UI for workflow configuration
 
 See the [open issues](https://github.com/naravid19/ai-project-rules-generator/issues) for a full list of proposed features (and known issues).
 

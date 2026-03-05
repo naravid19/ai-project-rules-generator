@@ -1,0 +1,113 @@
+# Project Rules: CLI Tool
+
+> Command-line tool built with Node.js, TypeScript, and Commander.js.
+
+## Project Identity
+
+- **Type**: CLI Application
+- **Language**: TypeScript (Node.js 20+)
+- **Framework**: Commander.js
+- **Output**: Chalk + ora (spinners)
+- **Config**: cosmiconfig
+- **Testing**: Vitest
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Commands | kebab-case | `generate-rules` |
+| Files | kebab-case | `generate-command.ts` |
+| Options | camelCase (long), single char (short) | `--outputDir`, `-o` |
+| Env vars | UPPER_SNAKE_CASE with prefix | `MYTOOL_API_KEY` |
+| Error codes | UPPER_SNAKE_CASE | `ERR_FILE_NOT_FOUND` |
+
+### File Organization
+
+```
+src/
+├── commands/        # Command implementations
+│   ├── generate.ts
+│   ├── init.ts
+│   └── validate.ts
+├── lib/             # Core business logic
+├── utils/           # Shared utilities
+│   ├── logger.ts
+│   ├── config.ts
+│   └── fs-helpers.ts
+├── types/           # TypeScript types
+└── index.ts         # CLI entry point
+bin/
+└── cli.js           # Shebang entry point
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ✅ Always provide helpful error messages
+
+```typescript
+// ❌ BAD — cryptic error
+throw new Error('Failed');
+
+// ✅ GOOD — actionable error
+throw new Error(
+  `Config file not found at ${configPath}\n` +
+  `Run "mytool init" to create a default config, or specify --config <path>`
+);
+```
+
+### Rule 2: ✅ Always handle exit codes properly
+
+```typescript
+// ❌ BAD — no exit code
+process.exit();
+
+// ✅ GOOD — meaningful exit codes
+const EXIT_CODES = {
+  SUCCESS: 0,
+  GENERAL_ERROR: 1,
+  CONFIG_ERROR: 2,
+  VALIDATION_ERROR: 3,
+} as const;
+
+process.exit(EXIT_CODES.VALIDATION_ERROR);
+```
+
+### Rule 3: ✅ Support both interactive and non-interactive modes
+
+```typescript
+// ✅ Check if running in a TTY
+if (process.stdin.isTTY && !options.nonInteractive) {
+  const answer = await inquirer.prompt([...]);
+} else {
+  // Use defaults or --flags for CI/CD
+  const value = options.output ?? DEFAULT_OUTPUT;
+}
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Always show `--help` with clear descriptions and examples
+- Use spinners (ora) for long operations, progress bars for downloads
+- Support `--json` output format for scripting/piping
+- Respect `NO_COLOR` environment variable
+- Use `--verbose` / `--quiet` flags for output control
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| `console.log` everywhere | Use structured logger with levels |
+| Hardcoded paths | Use `path.resolve` + `os.homedir()` |
+| No `--help` examples | Add `.example()` to commander |
+| Sync file operations | Use async `fs/promises` |
+| No input validation | Validate and sanitize all user input |

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-03-05
+
+### Added
+
+- **Stage 0: User Preferences (Interactive Mode)** — Optional interactive prompts for target platforms, severity level, output language, section selection, preview mode, and existing file action
+- **Configuration File (`.rulesrc.yaml`)** — Persistent config file for workflow customization; auto-detected at project root; template at `templates/rulesrc-template.yaml`
+- **Multi-Language Output Support** — Generate `.cursorrules` and `AGENTS.md` in 9 languages (en, th, ja, zh, ko, es, fr, de, pt); see `i18n/README.md`
+- **Preview Mode (Dry Run)** — Review planned output structure before generating files; shows estimated lines, sections, matched skills
+- **Incremental Update / Diff Mode** — Update existing files without full regeneration; preserves user customizations; shows diff before applying
+- **Generation Statistics Dashboard** — Post-generation summary showing skills scanned/matched/applied, lines generated, quality scores, total time, platforms, language
+- **7 new template examples**: `nodejs-express`, `chrome-extension`, `nextjs-fullstack`, `go-microservice`, `unity-game`, `cli-tool`, `langchain-rag` (total: 10 templates)
+- **Validation Scripts** — `scripts/validate-output.ps1` and `scripts/validate-output.sh` for automated quality checks (file existence, section structure, content smells, cross-file consistency)
+- **5 new keyword categories**: Monorepo, Microservices, Serverless, Database, Package/Library (total: 17 categories)
+- `i18n/README.md` — Multi-language support guidelines with translation patterns
+
+### Changed
+
+- **Workflow expanded to 6 stages** (Stage 0–5) with optional Preview step between Stage 3 and 4
+- **Setup scripts rewritten** (`setup.ps1`, `setup.sh`) with:
+  - Git and internet prerequisite checks
+  - `--NonInteractive` / `--non-interactive` mode for CI/CD
+  - `--SkillSource` / `--skill-source` direct skill selection (antigravity, claude, all)
+  - `--Uninstall` / `--uninstall` cleanup
+  - `--Verbose` / `--verbose` debug output
+  - Better error messages and backup on update
+- **Quick Reference Card** updated to v1.5 with Stage 0, Preview, and update mode entries
+- **README.md** — Updated feature table (13 features), supported project types (17), workflow stages table, template gallery (10), roadmap (all items completed)
+- **AGENTS.md** — Updated to reference 6-stage workflow, added new Key Files entries
+- **`.cursorrules`** — Updated Key Files table with new files
+- **`templates/README.md`** — Expanded to 10 templates with coverage-by-category table
+
 ## [1.4.0] - 2026-03-03
 
 ### Added
@@ -89,7 +120,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
-[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.1.0...v1.2.0

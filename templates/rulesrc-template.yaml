@@ -1,0 +1,87 @@
+# =============================================================================
+# .rulesrc.yaml — Configuration Template
+# =============================================================================
+# Place this file in your project root to customize workflow behavior.
+# The workflow will auto-detect this file during Stage 0 (User Preferences).
+# All fields are optional — defaults are used when omitted.
+# =============================================================================
+
+# ─── Target Platforms ────────────────────────────────────────────────────────
+# Which AI tools to generate files for.
+# Options: cursor, claude, antigravity, gemini, codex, kiro, copilot, opencode, adal
+# Default: auto-detect from existing files, fallback to [cursor, codex]
+target_platforms:
+  - cursor
+  - codex
+
+# ─── Severity Level ──────────────────────────────────────────────────────────
+# How strict should the generated rules be?
+# Options: strict (more 🔴 rules), balanced (default), relaxed (more 🟡 notes)
+severity_level: balanced
+
+# ─── Output Language ─────────────────────────────────────────────────────────
+# Language for generated documentation comments and descriptions.
+# The code examples remain in English regardless of this setting.
+# Options: en, th, ja, zh, ko, es, fr, de, pt (ISO 639-1 codes)
+# Default: en
+output_language: en
+
+# ─── Sections ────────────────────────────────────────────────────────────────
+# Include or exclude specific sections in generated files.
+# Default: all sections included
+sections:
+  include:
+    - project-identity
+    - coding-standards
+    - critical-rules
+    - important-guidelines
+    - code-smells
+    - testing
+  exclude: []
+    # Uncomment to exclude optional sections:
+    # - security
+    # - accessibility
+    # - i18n
+    # - git-workflow
+    # - performance
+    # - api-design
+
+# ─── Skill Sources ───────────────────────────────────────────────────────────
+# Override automatic skill source detection.
+# Default: auto-detect from .agent/ directory
+# skill_sources:
+#   - path: .agent/skills
+#     format: CATALOG
+#   - path: .agent/awesome-claude-skills
+#     format: README
+
+# ─── Custom Keywords ─────────────────────────────────────────────────────────
+# Additional keywords to search for during skill discovery (Stage 2).
+# These are merged with auto-detected keywords from your tech stack.
+custom_keywords:
+  # - microservices
+  # - event-driven
+  # - real-time
+  # - cqrs
+
+# ─── Template Style ──────────────────────────────────────────────────────────
+# How to structure the generated files.
+# Options: progressive (overview→details), flat (all at same level), minimal (essentials only)
+# Default: progressive
+template_style: progressive
+
+# ─── Quality Threshold ───────────────────────────────────────────────────────
+# Minimum quality score to pass verification (Stage 5).
+# Scale: 0-50, Default: 38
+quality_threshold: 38
+
+# ─── Preview Mode ────────────────────────────────────────────────────────────
+# Show a preview of what will be generated before writing files.
+# Default: false
+preview_mode: false
+
+# ─── Overwrite Protection ────────────────────────────────────────────────────
+# What to do if output files already exist.
+# Options: ask (prompt user), overwrite (replace), merge (diff-based update), skip
+# Default: ask
+existing_files: ask

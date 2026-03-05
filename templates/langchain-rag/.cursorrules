@@ -1,0 +1,116 @@
+# Project Rules: LangChain RAG Application
+
+> Retrieval-Augmented Generation (RAG) pipeline built with LangChain, Python, and vector databases.
+
+## Project Identity
+
+- **Type**: AI/ML Application (RAG)
+- **Language**: Python 3.11+
+- **Framework**: LangChain / LangGraph
+- **Vector DB**: ChromaDB / Pinecone / Weaviate
+- **LLM**: OpenAI / Anthropic / Local (Ollama)
+- **Testing**: Pytest + LangSmith (tracing)
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Chains | snake_case with `_chain` suffix | `retrieval_chain.py` |
+| Prompts | snake_case with `_prompt` suffix | `summarize_prompt.py` |
+| Tools | snake_case with `_tool` suffix | `search_tool.py` |
+| Modules | snake_case | `document_loader.py` |
+| Config | UPPER_SNAKE_CASE | `OPENAI_API_KEY` |
+
+### File Organization
+
+```
+src/
+├── chains/            # LangChain chain definitions
+│   ├── retrieval.py
+│   └── conversational.py
+├── prompts/           # Prompt templates
+│   ├── system.py
+│   └── templates/     # Jinja2 / YAML prompts
+├── tools/             # Custom LangChain tools
+├── loaders/           # Document loaders & splitters
+├── vectorstore/       # Vector DB setup & management
+├── agents/            # LangGraph agent definitions
+├── evaluation/        # RAG evaluation metrics
+├── config/            # Settings & environment
+└── utils/             # Shared utilities
+data/
+├── raw/               # Original documents
+├── processed/         # Chunked & embedded data
+└── evaluation/        # Test datasets
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ❌ Never hardcode API keys or model names
+
+```python
+# ❌ BAD — hardcoded
+llm = ChatOpenAI(api_key="sk-...", model="gpt-4")
+
+# ✅ GOOD — configurable
+from config import settings
+llm = ChatOpenAI(
+    api_key=settings.OPENAI_API_KEY,
+    model=settings.LLM_MODEL,
+)
+```
+
+### Rule 2: ✅ Always version your prompts
+
+```python
+# ❌ BAD — inline prompt, no versioning
+response = llm.invoke("Summarize this document: {doc}")
+
+# ✅ GOOD — versioned prompt template
+SUMMARIZE_PROMPT_V2 = ChatPromptTemplate.from_messages([
+    ("system", "You are a document summarizer. Be concise and factual."),
+    ("human", "Summarize this document:\n\n{document}\n\nKey points only."),
+])
+```
+
+### Rule 3: ✅ Always implement chunk overlap in text splitting
+
+```python
+# ❌ BAD — no overlap, context lost at boundaries
+splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
+
+# ✅ GOOD — overlap preserves context
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+    separators=["\n\n", "\n", ". ", " "],
+)
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use LangSmith for tracing and debugging chains
+- Implement RAG evaluation metrics (faithfulness, relevance, recall)
+- Cache embeddings to reduce API costs
+- Use streaming for long-running LLM calls
+- Log token usage and costs per request
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| No evaluation metrics | Implement RAGAS or custom eval |
+| Single giant prompt | Break into modular prompt templates |
+| No document metadata | Always preserve source, page, date |
+| Ignoring retriever scores | Filter by relevance threshold |
+| No rate limiting | Implement backoff and retry logic |

@@ -1,0 +1,100 @@
+# Project Rules: Chrome Extension (Manifest V3)
+
+> Browser extension built with Chrome Manifest V3, TypeScript, and modern web APIs.
+
+## Project Identity
+
+- **Type**: Browser Extension
+- **Language**: TypeScript
+- **Manifest**: Chrome Manifest V3
+- **Bundler**: Vite / Webpack
+- **Testing**: Vitest + Chrome Extension Testing Library
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Content scripts | kebab-case | `content-script.ts` |
+| Background | camelCase | `serviceWorker.ts` |
+| Popup/Options | PascalCase (components) | `Popup.tsx` |
+| Message types | UPPER_SNAKE_CASE | `FETCH_PAGE_DATA` |
+| Storage keys | camelCase | `userSettings` |
+
+### File Organization
+
+```
+src/
+├── background/       # Service worker (MV3)
+│   └── serviceWorker.ts
+├── content/          # Content scripts
+│   └── content-script.ts
+├── popup/            # Popup UI
+│   ├── Popup.tsx
+│   └── popup.css
+├── options/          # Options page
+├── types/            # Shared TypeScript types
+├── utils/            # Shared utilities
+└── manifest.json     # Extension manifest
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ✅ Always use Manifest V3 patterns
+
+```typescript
+// ❌ BAD — MV2 background page (deprecated)
+chrome.browserAction.onClicked.addListener(() => { ... });
+
+// ✅ GOOD — MV3 service worker
+chrome.action.onClicked.addListener((tab) => { ... });
+```
+
+### Rule 2: ❌ Never use `eval()` or inline scripts
+
+```json
+// ❌ BAD — CSP violation
+"content_security_policy": "script-src 'unsafe-eval'"
+
+// ✅ GOOD — strict CSP
+"content_security_policy": {
+  "extension_pages": "script-src 'self'; object-src 'self'"
+}
+```
+
+### Rule 3: ✅ Always request minimum permissions
+
+```json
+// ❌ BAD — over-permissioned
+"permissions": ["<all_urls>", "tabs", "storage", "cookies", "history"]
+
+// ✅ GOOD — minimal permissions
+"permissions": ["storage", "activeTab"],
+"host_permissions": ["https://specific-site.com/*"]
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use `chrome.storage.local` instead of `localStorage` in service workers
+- Handle service worker lifecycle (it can be terminated at any time)
+- Use message passing (`chrome.runtime.sendMessage`) for cross-context communication
+- Always handle `chrome.runtime.lastError` in callbacks
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| Persistent background page | Use MV3 service worker |
+| `localStorage` in service worker | `chrome.storage.local` |
+| `XMLHttpRequest` | Use `fetch` API |
+| Broad host permissions | Use `activeTab` + specific hosts |
+| Untyped message passing | Define message type interfaces |

@@ -1,0 +1,118 @@
+# Project Rules: Go Microservice
+
+> Cloud-native microservice built with Go, Chi router, and PostgreSQL.
+
+## Project Identity
+
+- **Type**: Backend Microservice
+- **Language**: Go 1.22+
+- **Router**: Chi v5
+- **Database**: PostgreSQL (pgx driver)
+- **Testing**: Go standard testing + testify
+- **Container**: Docker + Kubernetes
+
+---
+
+## Coding Standards
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Packages | lowercase, short | `user`, `auth` |
+| Files | snake_case | `user_handler.go` |
+| Exported funcs | PascalCase | `CreateUser()` |
+| Unexported funcs | camelCase | `validateInput()` |
+| Interfaces | PascalCase, `-er` suffix | `UserReader`, `Notifier` |
+| Constants | PascalCase or camelCase | `MaxRetries`, `defaultTimeout` |
+
+### File Organization
+
+```
+cmd/
+└── server/
+    └── main.go           # Entry point
+internal/
+├── handler/              # HTTP handlers
+├── service/              # Business logic
+├── repository/           # Data access
+├── model/                # Domain models
+├── middleware/            # HTTP middleware
+└── config/               # Configuration
+pkg/                      # Shared/public packages
+migrations/               # SQL migrations
+deployments/              # Docker, K8s manifests
+```
+
+---
+
+## Critical Rules (🔴)
+
+### Rule 1: ✅ Always handle errors explicitly
+
+```go
+// ❌ BAD — ignored error
+result, _ := db.Query("SELECT ...")
+
+// ✅ GOOD — handle every error
+result, err := db.Query("SELECT ...")
+if err != nil {
+    return fmt.Errorf("query users: %w", err)
+}
+```
+
+### Rule 2: ✅ Use dependency injection via interfaces
+
+```go
+// ❌ BAD — concrete dependency
+type UserHandler struct {
+    db *sql.DB
+}
+
+// ✅ GOOD — interface dependency
+type UserRepository interface {
+    FindByID(ctx context.Context, id int64) (*User, error)
+}
+
+type UserHandler struct {
+    repo UserRepository
+}
+```
+
+### Rule 3: ✅ Always pass and respect context
+
+```go
+// ❌ BAD — no context
+func (s *Service) GetUser(id int64) (*User, error) { ... }
+
+// ✅ GOOD — context-aware
+func (s *Service) GetUser(ctx context.Context, id int64) (*User, error) {
+    select {
+    case <-ctx.Done():
+        return nil, ctx.Err()
+    default:
+        return s.repo.FindByID(ctx, id)
+    }
+}
+```
+
+---
+
+## Important Guidelines (🟠)
+
+- Use `internal/` for private packages that shouldn't be imported
+- Prefer table-driven tests for comprehensive coverage
+- Use structured logging (slog or zerolog) instead of `fmt.Println`
+- Implement graceful shutdown with signal handling
+
+---
+
+## Code Smells to Avoid
+
+| ❌ Smell | ✅ Instead Do |
+|----------|--------------|
+| `init()` functions | Explicit initialization in `main()` |
+| Global variables | Pass dependencies via constructors |
+| `panic()` in library code | Return errors |
+| `interface{}` / `any` everywhere | Use generics or specific types |
+| Goroutine leak | Use `errgroup` or context cancellation |
