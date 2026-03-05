@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **7 new template examples**: `nodejs-express`, `chrome-extension`, `nextjs-fullstack`, `go-microservice`, `unity-game`, `cli-tool`, `langchain-rag` (total: 10 templates)
 - **Validation Scripts** — `scripts/validate-output.ps1` and `scripts/validate-output.sh` for automated quality checks (file existence, section structure, content smells, cross-file consistency)
 - **5 new keyword categories**: Monorepo, Microservices, Serverless, Database, Package/Library (total: 17 categories)
+- **3 new recommended skill sources**: `anthropics/skills` (official), `tech-leads-club/agent-skills` (curated), `Jeffallan/claude-skills` (full-stack)
 - `i18n/README.md` — Multi-language support guidelines with translation patterns
 
 ### Changed

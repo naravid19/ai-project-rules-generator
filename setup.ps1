@@ -176,12 +176,24 @@ if ($SkillSource) {
         "claude" {
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "awesome-claude-skills"
         }
+        "anthropic" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropic-skills"
+        }
+        "techleads" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/agent-skills" -Label "agent-skills"
+        }
+        "jeffallan" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/claude-skills" -Label "claude-skills"
+        }
         "all" {
             Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "antigravity-awesome-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropic-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/agent-skills" -Label "agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/claude-skills" -Label "claude-skills"
         }
         default {
-            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, all" -ForegroundColor Red
         }
     }
 }
@@ -191,12 +203,15 @@ elseif ($NonInteractive) {
 }
 else {
     Write-Host "Recommended skill sources (optional):" -ForegroundColor Cyan
-    Write-Host "  1) antigravity-awesome-skills (CATALOG format, 968+ skills)"
-    Write-Host "  2) awesome-claude-skills (README format, 30+ skills)"
-    Write-Host "  3) All of the above"
-    Write-Host "  4) Skip (add your own later)"
+    Write-Host "  1) antigravity-awesome-skills  (CATALOG format, 968+ skills)"
+    Write-Host "  2) awesome-claude-skills       (FOLDER format, 30+ skills)"
+    Write-Host "  3) anthropic-skills            (FOLDER format, 50+ official Anthropic skills)"
+    Write-Host "  4) agent-skills                (FOLDER format, curated & human-reviewed)"
+    Write-Host "  5) claude-skills               (FOLDER format, 66 full-stack skills)"
+    Write-Host "  6) All of the above"
+    Write-Host "  7) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-4]"
+    $choice = Read-Host "Choose [1-7]"
 
     switch ($choice) {
         "1" {
@@ -206,10 +221,22 @@ else {
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "awesome-claude-skills"
         }
         "3" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "antigravity-awesome-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropic-skills"
         }
         "4" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/agent-skills" -Label "agent-skills"
+        }
+        "5" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/claude-skills" -Label "claude-skills"
+        }
+        "6" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "antigravity-awesome-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropic-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/agent-skills" -Label "agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/claude-skills" -Label "claude-skills"
+        }
+        "7" {
             Write-Host "Skipping skill source installation." -ForegroundColor DarkGray
         }
         default {

@@ -160,6 +160,9 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 >
 > - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 968+ skills with `CATALOG.md`
 > - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 30+ curated skills
+> - [anthropic-skills](https://github.com/anthropics/skills) — 50+ official Anthropic skills
+> - [agent-skills](https://github.com/tech-leads-club/agent-skills) — curated & human-reviewed
+> - [claude-skills](https://github.com/Jeffallan/claude-skills) — 66 full-stack developer skills
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
 
 ### Installation
@@ -290,7 +293,10 @@ Clone these into your `.agent/` directory:
 | Source                     | Format   | Count             | Link                                                              |
 | -------------------------- | -------- | ----------------- | ----------------------------------------------------------------- |
 | antigravity-awesome-skills | CATALOG  | 968+              | [GitHub](https://github.com/sickn33/antigravity-awesome-skills)   |
-| awesome-claude-skills      | README   | 30+               | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
+| awesome-claude-skills      | FOLDER   | 30+               | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
+| anthropic-skills           | FOLDER   | 50+               | [GitHub](https://github.com/anthropics/skills)                    |
+| agent-skills               | FOLDER   | curated registry  | [GitHub](https://github.com/tech-leads-club/agent-skills)         |
+| claude-skills              | FOLDER   | 66                | [GitHub](https://github.com/Jeffallan/claude-skills)              |
 | ui-ux-pro-max-skill        | WORKFLOW | 1 (comprehensive) | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
@@ -457,6 +463,9 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [Anthropic Claude](https://anthropic.com)
 - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills)
 - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills)
+- [anthropic-skills](https://github.com/anthropics/skills)
+- [agent-skills](https://github.com/tech-leads-club/agent-skills)
+- [claude-skills](https://github.com/Jeffallan/claude-skills)
 - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
