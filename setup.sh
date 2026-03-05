@@ -94,7 +94,7 @@ echo "  2) awesome-claude-skills (README format)"
 echo "  3) All of the above"
 echo "  4) Skip (add your own later)"
 echo
-read -r -p "Choose [1-4]: " choice
+read -r -p "Choose [1-4]: " choice < /dev/tty
 
 case "$choice" in
   1)
