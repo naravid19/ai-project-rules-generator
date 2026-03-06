@@ -118,7 +118,7 @@ if $UNINSTALL; then
 
   echo
   echo "Uninstall complete."
-  echo "Note: Skill sources (.agent/skills/, .agent/awesome-claude-skills/) were NOT removed."
+  echo "Note: Skill sources (.agent/skills/, .agent/awesome-claude-skills/, etc.) were NOT removed."
   echo "      Remove them manually if desired."
   echo "======================================="
   exit 0
@@ -176,26 +176,26 @@ echo
 if [[ -n "$SKILL_SOURCE" ]]; then
   case "$SKILL_SOURCE" in
     antigravity)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
       ;;
     claude)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "awesome-claude-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
       ;;
     anthropic)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropic-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
       ;;
     techleads)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/agent-skills" "agent-skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
       ;;
     jeffallan)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/claude-skills" "claude-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
     all)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropic-skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/agent-skills" "agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/claude-skills" "claude-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
     *)
       echo "Unknown skill source: $SKILL_SOURCE. Options: antigravity, claude, anthropic, techleads, jeffallan, all"
@@ -206,11 +206,11 @@ elif $NON_INTERACTIVE; then
   echo "Use --skill-source <name> to install skill sources."
 else
   echo "Recommended skill sources (optional):"
-  echo "  1) antigravity-awesome-skills  (CATALOG format, 968+ skills)"
-  echo "  2) awesome-claude-skills       (FOLDER format, 30+ skills)"
-  echo "  3) anthropic-skills            (FOLDER format, 50+ official Anthropic skills)"
-  echo "  4) agent-skills                (FOLDER format, curated & human-reviewed)"
-  echo "  5) claude-skills               (FOLDER format, 66 full-stack skills)"
+  echo "  1) sickn33 / antigravity-awesome-skills  (CATALOG, 968+ skills)"
+  echo "  2) ComposioHQ / awesome-claude-skills    (FOLDER, 30+ skills)"
+  echo "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
+  echo "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
+  echo "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
   echo "  6) All of the above"
   echo "  7) Skip (add your own later)"
   echo
@@ -218,26 +218,26 @@ else
 
   case "$choice" in
     1)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
       ;;
     2)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "awesome-claude-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
       ;;
     3)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropic-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
       ;;
     4)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/agent-skills" "agent-skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
       ;;
     5)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/claude-skills" "claude-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
     6)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropic-skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/agent-skills" "agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/claude-skills" "claude-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
     7)
       echo "Skipping skill source installation."

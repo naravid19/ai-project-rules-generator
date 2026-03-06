@@ -192,21 +192,39 @@ Scan .agent/ directory
 
 ```
 .agent/
-├── skills/                    ← Has CATALOG.md → Format: CATALOG
-│   ├── CATALOG.md
+├── skills/                              ← Has CATALOG.md → Format: CATALOG
+│   ├── CATALOG.md                         (sickn33/antigravity-awesome-skills)
 │   └── skills/
 │       ├── clean-code/SKILL.md
-│       ├── api-design/SKILL.md
 │       └── ...
-├── awesome-claude-skills/     ← Has README.md with list → Format: README
-│   ├── README.md
-│   ├── skill-creator/
+├── awesome-claude-skills/               ← Has README.md with list → Format: README
+│   ├── README.md                          (ComposioHQ/awesome-claude-skills)
+│   ├── skill-creator/SKILL.md
 │   └── ...
+├── anthropic-skills/                    ← Outer README → Format: README
+│   ├── README.md                          (anthropics/skills)
+│   └── skills/                          ← Inner SKILL.md folders → Format: FOLDER
+│       ├── pptx/SKILL.md
+│       ├── skill-creator/SKILL.md
+│       └── ...
+├── techleads-agent-skills/              ← Has SKILL.md folders → Format: FOLDER
+│   ├── react-expert/SKILL.md              (tech-leads-club/agent-skills)
+│   └── ...
+├── jeffallan-claude-skills/             ← Outer README → Format: README
+│   ├── README.md                          (Jeffallan/claude-skills)
+│   └── skills/                          ← Inner SKILL.md folders → Format: FOLDER
+│       ├── nestjs-expert/SKILL.md
+│       └── ...
 ├── workflows/
-│   └── ui-ux-pro-max.md       ← Workflow referencing .shared/ → Format: WORKFLOW
-└── my-custom-skills/          ← Has SKILL.md folders → Format: FOLDER
+│   └── ui-ux-pro-max.md                 ← Workflow referencing .shared/ → Format: WORKFLOW
+└── my-custom-skills/                    ← Has SKILL.md folders → Format: FOLDER
     ├── my-react-rules/SKILL.md
     └── my-python-rules/SKILL.md
+
+> [!TIP]
+> For sources like `anthropic-skills/` and `jeffallan-claude-skills/` that have
+> a nested `skills/` subdirectory: scan both the root level AND one level deep.
+> Apply format detection at each level independently.
 
 .shared/
 └── ui-ux-pro-max/             ← Scripts/data referenced by workflow
