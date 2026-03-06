@@ -43,6 +43,7 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#built-with">Built With</a></li>
         <li><a href="#key-features">Key Features</a></li>
         <li><a href="#supported-project-types">Supported Project Types</a></li>
         <li><a href="#multi-platform-support">Multi-Platform Support</a></li>
@@ -55,12 +56,16 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#configuration">Configuration</a></li>
-    <li><a href="#workflow-stages">Workflow Stages</a></li>
-    <li><a href="#format-based-skill-discovery">Format-Based Skill Discovery</a></li>
-    <li><a href="#example-output">Example Output</a></li>
-    <li><a href="#validation">Validation</a></li>
+    <li>
+      <a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#workflow-stages">Workflow Stages</a></li>
+        <li><a href="#format-based-skill-discovery">Format-Based Skill Discovery</a></li>
+        <li><a href="#example-output">Example Output</a></li>
+        <li><a href="#validation">Validation</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+      </ul>
+    </li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -90,7 +95,10 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 
 ### Built With
 
-- [Markdown][Markdown-url]
+- [![PowerShell][PowerShell-badge]][PowerShell-url]
+- [![Bash][Bash-badge]][Bash-url]
+- [![Python][Python-badge]][Python-url]
+- [![Markdown][Markdown-badge]][Markdown-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -240,11 +248,11 @@ Or simply ask:
 
 <!-- CONFIGURATION -->
 
-## Configuration
+### Configuration
 
 Use `.rulesrc.yaml` when you want deterministic output instead of interactive prompts.
 
-### Minimal Example
+#### Minimal Example
 
 ```yaml
 target_platforms:
@@ -259,7 +267,7 @@ preview_mode: false
 existing_files: ask
 ```
 
-### Advanced Example with Shared Skill Roots
+#### Advanced Example with Shared Skill Roots
 
 ```yaml
 target_platforms:
@@ -278,7 +286,7 @@ custom_keywords:
   - workflow
 ```
 
-### Field Semantics
+#### Field Semantics
 
 | Field                                   | Behavior                                                         |
 | --------------------------------------- | ---------------------------------------------------------------- |
@@ -292,7 +300,7 @@ custom_keywords:
 | `preview_mode`                          | Enables the preview step before writing files                    |
 | `existing_files`                        | Chooses ask / overwrite / merge / skip behavior                  |
 
-### Path Rules
+#### Path Rules
 
 - Relative `skill_sources` paths resolve from the project root.
 - Absolute paths are allowed.
@@ -305,21 +313,16 @@ custom_keywords:
 
 ## Workflow Stages
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│         CREATE PROJECT RULES v1.6 - QUICK REF                │
-├──────────────────────────────────────────────────────────────┤
-│ Stage 0: Preferences      │ Config file / interactive        │
-│ Stage 1: Analyze          │ Autonomous scan, tech stack      │
-│ Stage 2: Skill Discovery  │ Auto-detect by FORMAT & 17 cats  │
-│ Stage 3: .cursorrules     │ Progressive disclosure + rules   │
-│ Preview (optional)        │ Review before writing files      │
-│ Stage 4: AGENTS.md        │ Multi-platform output            │
-│ Stage 5: Verify           │ Quality scoring + statistics     │
-├──────────────────────────────────────────────────────────────┤
-│ ⏱️ Total Time: 30-60 minutes                                 │
-└──────────────────────────────────────────────────────────────┘
-```
+| Stage / Step                 | Description                     | Time Estimate     |
+| ---------------------------- | ------------------------------- | ----------------- |
+| **Stage 0: Preferences**     | Config file / interactive       | 2-5 min           |
+| **Stage 1: Analyze**         | Autonomous scan, tech stack     | 10-15 min         |
+| **Stage 2: Skill Discovery** | Auto-detect by FORMAT & 17 cats | 5-10 min          |
+| **Stage 3: .cursorrules**    | Progressive disclosure + rules  | 10-20 min         |
+| **Preview** (optional)       | Review before writing files     | 2-3 min           |
+| **Stage 4: AGENTS.md**       | Multi-platform output           | 10-15 min         |
+| **Stage 5: Verify**          | Quality scoring + statistics    | 5-10 min          |
+| **Total Time**               |                                 | **30-60 minutes** |
 
 > **v1.6 update:** Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validator thresholds, PowerShell 5.1 validator repair, and repo-wide documentation/history alignment.
 
@@ -337,7 +340,7 @@ custom_keywords:
 
 <!-- FORMAT-BASED SKILL DISCOVERY -->
 
-## Format-Based Skill Discovery
+### Format-Based Skill Discovery
 
 The key innovation: instead of hardcoding specific skill repositories, the workflow resolves skill roots in this order and classifies each discovered source by **format**:
 
@@ -352,7 +355,7 @@ Examples:
 - Local root: `.agent/`
 - Shared root: `C:/Users/Desktop/.agent`
 
-### How It Works
+#### How It Works
 
 ```
 Resolve configured roots
@@ -373,7 +376,7 @@ Resolve configured roots
         → Format: WORKFLOW (read workflow file, run referenced scripts)
 ```
 
-### Supported Formats
+#### Supported Formats
 
 | Format            | Detection Signal                               | Search Method                           |
 | ----------------- | ---------------------------------------------- | --------------------------------------- |
@@ -383,7 +386,7 @@ Resolve configured roots
 | **README**        | Contains `README.md` with categorized list     | Browse category headings                |
 | **WORKFLOW**      | `.agent/workflows/*.md` referencing `.shared/` | Read workflow, follow its instructions  |
 
-### Recommended Skill Sources
+#### Recommended Skill Sources
 
 Clone these into your project-local `.agent/` directory or a shared skill root referenced from `.rulesrc.yaml`:
 
@@ -403,9 +406,9 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 
 <!-- EXAMPLE OUTPUT -->
 
-## Example Output
+### Example Output
 
-### .cursorrules (excerpt)
+#### .cursorrules (excerpt)
 
 ```markdown
 # Project Rules: TaskFlow API
@@ -431,7 +434,7 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 | `import os; os.getenv()` | `from app.core.config import settings` |
 ```
 
-### AGENTS.md (excerpt)
+#### AGENTS.md (excerpt)
 
 ```markdown
 # AI Agent Guidelines — TaskFlow API
@@ -455,7 +458,7 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 - Testing: `testing`, `pytest`, `unit`, `tdd`
 ```
 
-### 📄 Template Gallery
+#### 📄 Template Gallery
 
 Pre-made `.cursorrules` examples for common project types are available in [`templates/`](templates/):
 
@@ -479,25 +482,25 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 
 <!-- VALIDATION -->
 
-## Validation
+### Validation
 
 Validation is **heuristic scoring**, not semantic proof. The scripts check structure, placeholders, formatting quality, repo-local path references, and cross-file consistency signals. They do **not** guarantee that generated rules are perfect for every downstream project.
 
-### PowerShell
+#### PowerShell
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-output.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-output.ps1 -Threshold 42
 ```
 
-### Bash
+#### Bash
 
 ```sh
 ./scripts/validate-output.sh
 ./scripts/validate-output.sh --threshold 42
 ```
 
-### Threshold Resolution
+#### Threshold Resolution
 
 The validators use this order:
 
@@ -505,7 +508,7 @@ The validators use this order:
 2. `.rulesrc.yaml` → `quality_threshold`
 3. Default `38/50`
 
-### What the Score Covers
+#### What the Score Covers
 
 Each file is scored across five 0-10 dimensions:
 
@@ -622,6 +625,12 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 [issues-url]: https://github.com/naravid19/ai-project-rules-generator/issues
 [license-shield]: https://img.shields.io/github/license/naravid19/ai-project-rules-generator.svg?style=for-the-badge
 [license-url]: https://github.com/naravid19/ai-project-rules-generator/blob/master/LICENSE
+[PowerShell-badge]: https://img.shields.io/badge/PowerShell-5391FE?style=for-the-badge&logo=powershell&logoColor=white
+[PowerShell-url]: https://microsoft.com/PowerShell
+[Bash-badge]: https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white
+[Bash-url]: https://www.gnu.org/software/bash/
+[Python-badge]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
+[Python-url]: https://www.python.org/
 [Markdown-badge]: https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white
 [Markdown-url]: https://www.markdownguide.org/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
