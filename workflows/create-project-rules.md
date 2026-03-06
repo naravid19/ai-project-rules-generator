@@ -180,13 +180,13 @@ Scan .agent/ directory
 
 #### Format Detection Rules
 
-| Format            | How to Detect                                                                                      | How to Search                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **CATALOG**       | Directory contains `CATALOG.md` with a table of skills (columns: Name, Description, Tags/Triggers) | Search CATALOG.md by keyword in Tags/Description columns                   |
-| **FOLDER**        | Directory contains subfolders, each with `SKILL.md` or similar instruction file                    | Browse folder names for relevant terms, then read matched `SKILL.md` files |
-| **SEARCH_ENGINE** | Directory contains `search.py` or similar executable search tool                                   | Run `search.py --keywords <terms>`                                         |
-| **README**        | Directory contains `README.md` with categorized skill links/descriptions                           | Browse README sections for relevant categories                             |
-| **WORKFLOW**      | `.agent/workflows/*.md` file that references scripts in `.shared/`                                 | Read workflow file, follow its instructions to run search scripts          |
+| Format            | How to Detect                                                                                   | How to Search                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **CATALOG**       | Directory (or subdirs) contains `CATALOG.md` with a skills table                                | Search CATALOG.md by keyword in Tags/Description columns                      |
+| **FOLDER**        | Directory contains subfolders (at any depth) with `SKILL.md` or `CLAUDE.md`                     | Browse nested folder names for relevant terms, read matched instruction files |
+| **SEARCH_ENGINE** | Directory contains `search.py` or similar executable search tool                                | Run `search.py --keywords <terms>`                                            |
+| **README**        | Directory contains `README.md` with categorized skill links/descriptions                        | Browse README sections for relevant categories                                |
+| **WORKFLOW**      | Folder contains `.md` files (like `CLAUDE.md` or inside `workflows/`) that reference `.shared/` | Read workflow file, follow its instructions to run referenced scripts         |
 
 #### Example Auto-Detection
 
@@ -215,16 +215,16 @@ Scan .agent/ directory
 │   └── skills/                          ← Inner SKILL.md folders → Format: FOLDER
 │       ├── nestjs-expert/SKILL.md
 │       └── ...
-├── workflows/
-│   └── ui-ux-pro-max.md                 ← Workflow referencing .shared/ → Format: WORKFLOW
+├── ui-ux-pro-max-skill/                 ← Uses deeply nested CLAUDE.md and .shared/ → Format: WORKFLOW
+│   ├── CLAUDE.md                          (nextlevelbuilder/ui-ux-pro-max-skill)
+│   ├── .claude/skills/ui-ux-pro-max/SKILL.md
+│   └── .shared/
 └── my-custom-skills/                    ← Has SKILL.md folders → Format: FOLDER
     ├── my-react-rules/SKILL.md
     └── my-python-rules/SKILL.md
 
 > [!TIP]
-> For sources like `anthropic-skills/` and `jeffallan-claude-skills/` that have
-> a nested `skills/` subdirectory: scan both the root level AND one level deep.
-> Apply format detection at each level independently.
+> **Scan Deeply!** Many external repositories structure their skills 2-3 levels deep (e.g., `skills/` or `.claude/skills/`). Do **not** stop your detection at the root level of a repository. Scan recursively to guarantee you find every `SKILL.md`, `CLAUDE.md`, or `CATALOG.md`.
 
 .shared/
 └── ui-ux-pro-max/             ← Scripts/data referenced by workflow
@@ -238,15 +238,15 @@ Map the detected tech stack (from Stage 1) to search keywords:
 
 **By Project Type:**
 
-| Type                 | Keywords                                                                               |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| 🌐 Web Frontend      | `react`, `vue`, `angular`, `svelte`, `frontend`, `ui`, `css`, `tailwind`, `nextjs`     |
-| ⚙️ Backend API       | `api`, `backend`, `rest`, `graphql`, `database`, `sql`, `prisma`, `express`, `fastapi` |
-| 🧩 Browser Extension | `browser`, `extension`, `chrome`, `manifest`, `content-script`                         |
-| 📱 Mobile App        | `react-native`, `flutter`, `mobile`, `ios`, `android`, `swiftui`, `jetpack`            |
-| 💻 CLI Tool          | `cli`, `terminal`, `bash`, `powershell`, `commander`                                   |
-| 🤖 AI/ML             | `ai`, `ml`, `llm`, `agent`, `rag`, `prompt`, `langchain`, `embedding`                  |
-| 🎮 Game Dev          | `game`, `unity`, `godot`, `unreal`, `bevy`, `ecs`                                      |
+| Type                 | Keywords                                                                                           |
+| -------------------- | -------------------------------------------------------------------------------------------------- |
+| 🌐 Web Frontend      | `react`, `vue`, `angular`, `svelte`, `frontend`, `ui`, `ux`, `design`, `css`, `tailwind`, `nextjs` |
+| ⚙️ Backend API       | `api`, `backend`, `rest`, `graphql`, `database`, `sql`, `prisma`, `express`, `fastapi`             |
+| 🧩 Browser Extension | `browser`, `extension`, `chrome`, `manifest`, `content-script`                                     |
+| 📱 Mobile App        | `react-native`, `flutter`, `mobile`, `ios`, `android`, `swiftui`, `jetpack`                        |
+| 💻 CLI Tool          | `cli`, `terminal`, `bash`, `powershell`, `commander`                                               |
+| 🤖 AI/ML             | `ai`, `ml`, `llm`, `agent`, `rag`, `prompt`, `langchain`, `embedding`                              |
+| 🎮 Game Dev          | `game`, `unity`, `godot`, `unreal`, `bevy`, `ecs`                                                  |
 
 **By Quality Domain:**
 
@@ -269,17 +269,24 @@ Map the detected tech stack (from Stage 1) to search keywords:
 | 🗄️ Database        | `postgresql`, `mongodb`, `redis`, `migration`, `seeding`, `orm`, `nosql` |
 | 📦 Package/Library | `npm`, `pypi`, `crate`, `gem`, `package`, `library`, `sdk`, `publish`    |
 
+**By Agentic Capability:**
+
+| Capability           | Keywords                                                               |
+| -------------------- | ---------------------------------------------------------------------- |
+| 🧠 Planning & Memory | `planning`, `memory`, `manus`, `workflow`, `reasoning`, `step-by-step` |
+| 🛠️ Tool Use & MCP    | `tool`, `mcp`, `functions`, `api-calling`, `integration`               |
+
 ### 2.3 Search All Detected Sources
 
 For each detected source, use the appropriate search method:
 
-| Source Format     | Search Action                                                                               |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| **CATALOG**       | Open `CATALOG.md`, search for rows matching extracted keywords in Tags/Description columns  |
-| **FOLDER**        | List all subdirectories, match folder names against keywords, read matched `SKILL.md` files |
-| **SEARCH_ENGINE** | Run the search tool with extracted keywords as arguments                                    |
-| **README**        | Open `README.md`, scan category headings and descriptions for relevant entries              |
-| **WORKFLOW**      | Read `.agent/workflows/*.md`, follow instructions to run scripts from `.shared/`            |
+| Source Format     | Search Action                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| **CATALOG**       | Open `CATALOG.md`, search for rows matching extracted keywords in Tags/Description columns |
+| **FOLDER**        | List all nested subdirectories, match folder names against keywords, read matched files    |
+| **SEARCH_ENGINE** | Run the search tool with extracted keywords as arguments                                   |
+| **README**        | Open `README.md`, scan category headings and descriptions for relevant entries             |
+| **WORKFLOW**      | Read workflow / `CLAUDE.md` file, follow instructions to run scripts from `.shared/`       |
 
 ### 2.4 Read and Extract Best Practices
 

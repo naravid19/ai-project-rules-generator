@@ -188,6 +188,9 @@ if ($SkillSource) {
         "ui-ux-pro-max" {
             Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
+        "othmanadi" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+        }
         "all" {
             Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
@@ -195,9 +198,10 @@ if ($SkillSource) {
             Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
         }
         default {
-            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all" -ForegroundColor Red
         }
     }
 }
@@ -213,10 +217,11 @@ else {
     Write-Host "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
     Write-Host "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
     Write-Host "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
-    Write-Host "  7) All of the above"
-    Write-Host "  8) Skip (add your own later)"
+    Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, Manus-style persistence)"
+    Write-Host "  8) All of the above"
+    Write-Host "  9) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-8]"
+    $choice = Read-Host "Choose [1-9]"
 
     switch ($choice) {
         "1" {
@@ -238,14 +243,18 @@ else {
             Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
         "7" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+        }
+        "8" {
             Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
         }
-        "8" {
+        "9" {
             Write-Host "Skipping skill source installation." -ForegroundColor DarkGray
         }
         default {

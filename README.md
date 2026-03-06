@@ -164,6 +164,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 > - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) — curated & human-reviewed
 > - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) — 66 full-stack developer skills
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
+> - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — Manus-style persistent memory planning
 
 ### Installation
 
@@ -298,6 +299,7 @@ Clone these into your `.agent/` directory:
 | techleads-agent-skills     | FOLDER   | curated registry  | [GitHub](https://github.com/tech-leads-club/agent-skills)         |
 | jeffallan-claude-skills    | FOLDER   | 66                | [GitHub](https://github.com/Jeffallan/claude-skills)              |
 | ui-ux-pro-max-skill        | WORKFLOW | 1 (comprehensive) | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
+| othman-planning-with-files | FOLDER   | Manus-style       | [GitHub](https://github.com/OthmanAdi/planning-with-files)        |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
 

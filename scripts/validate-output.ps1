@@ -114,13 +114,13 @@ if ($hasCursorRules) {
 
     $lines = Get-LineCount ".cursorrules"
     if ($lines -ge 100) {
-        Pass ".cursorrules has sufficient content ($lines lines)"
+        Pass (".cursorrules has sufficient content ({0} lines)" -f $lines)
     }
     elseif ($lines -ge 50) {
-        Warn ".cursorrules is short ($lines lines, recommended: 150-400)"
+        Warn (".cursorrules is short ({0} lines, recommended: 150-400)" -f $lines)
     }
     else {
-        Fail ".cursorrules is too short ($lines lines, minimum: 100)"
+        Fail (".cursorrules is too short ({0} lines, minimum: 100)" -f $lines)
     }
 
     Test-NoHardcodedSkills ".cursorrules" | Out-Null
@@ -136,13 +136,13 @@ if ($hasAgents) {
 
     $lines = Get-LineCount "AGENTS.md"
     if ($lines -ge 80) {
-        Pass "AGENTS.md has sufficient content ($lines lines)"
+        Pass ("AGENTS.md has sufficient content ({0} lines)" -f $lines)
     }
     elseif ($lines -ge 40) {
-        Warn "AGENTS.md is short ($lines lines, recommended: 100-250)"
+        Warn ("AGENTS.md is short ({0} lines, recommended: 100-250)" -f $lines)
     }
     else {
-        Fail "AGENTS.md is too short ($lines lines, minimum: 80)"
+        Fail ("AGENTS.md is too short ({0} lines, minimum: 80)" -f $lines)
     }
 
     Test-NoHardcodedSkills "AGENTS.md" | Out-Null

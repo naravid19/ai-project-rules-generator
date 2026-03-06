@@ -20,8 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **7 new template examples**: `nodejs-express`, `chrome-extension`, `nextjs-fullstack`, `go-microservice`, `unity-game`, `cli-tool`, `langchain-rag` (total: 10 templates)
 - **Validation Scripts** — `scripts/validate-output.ps1` and `scripts/validate-output.sh` for automated quality checks (file existence, section structure, content smells, cross-file consistency)
 - **5 new keyword categories**: Monorepo, Microservices, Serverless, Database, Package/Library (total: 17 categories)
-- **3 new recommended skill sources**: `anthropics/skills` (official), `tech-leads-club/agent-skills` (curated), `Jeffallan/claude-skills` (full-stack)
+- **5 new recommended skill sources**: `anthropics/skills` (official), `tech-leads-club/agent-skills` (curated), `Jeffallan/claude-skills` (full-stack), `nextlevelbuilder/ui-ux-pro-max-skill` (UI/UX workflow), `OthmanAdi/planning-with-files` (Manus-style persistence)
+- **Agentic Capability Keywords** — Added `planning`, `memory`, `mcp`, `reasoning`, `workflow` keywords to trigger advanced AI orchestration skills in `create-project-rules.md` and `AGENTS.md`.
 - `i18n/README.md` — Multi-language support guidelines with translation patterns
+
+### Fixed
+
+- **PowerShell Validation Script Parsing** — Fixed a string interpolation issue (`validate-output.ps1`) causing parse errors in Windows PowerShell 5.1 by using the `-f` formatting operator.
 
 ### Changed
 
