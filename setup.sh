@@ -190,15 +190,19 @@ if [[ -n "$SKILL_SOURCE" ]]; then
     jeffallan)
       clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
+    ui-ux-pro-max)
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
+      ;;
     all)
       clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
       clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
       clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
       clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
       clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
       ;;
     *)
-      echo "Unknown skill source: $SKILL_SOURCE. Options: antigravity, claude, anthropic, techleads, jeffallan, all"
+      echo "Unknown skill source: $SKILL_SOURCE. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, all"
       ;;
   esac
 elif $NON_INTERACTIVE; then
@@ -211,10 +215,11 @@ else
   echo "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
   echo "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
   echo "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
-  echo "  6) All of the above"
-  echo "  7) Skip (add your own later)"
+  echo "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
+  echo "  7) All of the above"
+  echo "  8) Skip (add your own later)"
   echo
-  read -r -p "Choose [1-7]: " choice < /dev/tty
+  read -r -p "Choose [1-8]: " choice < /dev/tty
 
   case "$choice" in
     1)
@@ -233,13 +238,17 @@ else
       clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
       ;;
     6)
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
+      ;;
+    7)
       clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
       clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
       clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
       clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
       clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
       ;;
-    7)
+    8)
       echo "Skipping skill source installation."
       ;;
     *)

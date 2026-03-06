@@ -185,15 +185,19 @@ if ($SkillSource) {
         "jeffallan" {
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
         }
+        "ui-ux-pro-max" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+        }
         "all" {
             Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
         default {
-            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, all" -ForegroundColor Red
         }
     }
 }
@@ -208,10 +212,11 @@ else {
     Write-Host "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
     Write-Host "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
     Write-Host "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
-    Write-Host "  6) All of the above"
-    Write-Host "  7) Skip (add your own later)"
+    Write-Host "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
+    Write-Host "  7) All of the above"
+    Write-Host "  8) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-7]"
+    $choice = Read-Host "Choose [1-8]"
 
     switch ($choice) {
         "1" {
@@ -230,13 +235,17 @@ else {
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
         }
         "6" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+        }
+        "7" {
             Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
             Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
-        "7" {
+        "8" {
             Write-Host "Skipping skill source installation." -ForegroundColor DarkGray
         }
         default {
