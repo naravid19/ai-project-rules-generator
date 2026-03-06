@@ -16,7 +16,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/naravid19/ai-project-rules-generator">
-    <img src="https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/assets/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">🤖 AI Project Rules Generator</h3>
