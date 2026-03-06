@@ -63,18 +63,38 @@ function Update-OrCloneRepo {
     git clone --depth 1 $RepoUrl $TargetPath
 }
 
-function Get-SkillTargetPath {
+function Install-Skill {
     param([string]$Key)
 
     switch ($Key) {
-        "antigravity" { return Join-Path $SkillRoot "skills" }
-        "claude" { return Join-Path $SkillRoot "awesome-claude-skills" }
-        "anthropic" { return Join-Path $SkillRoot "anthropic-skills" }
-        "techleads" { return Join-Path $SkillRoot "techleads-agent-skills" }
-        "jeffallan" { return Join-Path $SkillRoot "jeffallan-claude-skills" }
-        "ui-ux-pro-max" { return Join-Path $SkillRoot "ui-ux-pro-max-skill" }
-        "othmanadi" { return Join-Path $SkillRoot "othman-planning-with-files" }
-        default { throw "Unknown skill target key: $Key" }
+        "antigravity" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Join-Path $SkillRoot "skills") -Label "sickn33/antigravity-awesome-skills"
+        }
+        "claude" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Join-Path $SkillRoot "awesome-claude-skills") -Label "ComposioHQ/awesome-claude-skills"
+        }
+        "anthropic" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Join-Path $SkillRoot "anthropic-skills") -Label "anthropics/skills"
+        }
+        "techleads" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Join-Path $SkillRoot "techleads-agent-skills") -Label "tech-leads-club/agent-skills"
+        }
+        "jeffallan" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Join-Path $SkillRoot "jeffallan-claude-skills") -Label "Jeffallan/claude-skills"
+        }
+        "ui-ux-pro-max" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Join-Path $SkillRoot "ui-ux-pro-max-skill") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+        }
+        "othmanadi" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Join-Path $SkillRoot "othman-planning-with-files") -Label "OthmanAdi/planning-with-files"
+        }
+        "all" {
+            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi")
+            foreach ($k in $keys) { Install-Skill -Key $k }
+        }
+        default {
+            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all" -ForegroundColor Red
+        }
     }
 }
 
@@ -190,41 +210,7 @@ Write-Host ""
 # ─── Skill Source Selection ──────────────────────────────────────────────────
 if ($SkillSource) {
     # Direct skill source via parameter
-    switch ($SkillSource.ToLower()) {
-        "antigravity" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
-        }
-        "claude" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
-        }
-        "anthropic" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
-        }
-        "techleads" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
-        }
-        "jeffallan" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
-        }
-        "ui-ux-pro-max" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-        }
-        "othmanadi" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
-        }
-        "all" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
-        }
-        default {
-            Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all" -ForegroundColor Red
-        }
-    }
+    Install-Skill -Key $SkillSource.ToLower()
 }
 elseif ($NonInteractive) {
     Write-Host "Non-interactive mode: skipping skill source selection." -ForegroundColor DarkGray
@@ -247,42 +233,16 @@ else {
     $choice = Read-Host "Choose [1-9]"
 
     switch ($choice) {
-        "1" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
-        }
-        "2" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
-        }
-        "3" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
-        }
-        "4" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
-        }
-        "5" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
-        }
-        "6" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-        }
-        "7" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
-        }
-        "8" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
-        }
-        "9" {
-            Write-Host "Skipping skill source installation." -ForegroundColor DarkGray
-        }
-        default {
-            Write-Host "Invalid choice, skipping skill source installation." -ForegroundColor DarkGray
-        }
+        "1" { Install-Skill -Key "antigravity" }
+        "2" { Install-Skill -Key "claude" }
+        "3" { Install-Skill -Key "anthropic" }
+        "4" { Install-Skill -Key "techleads" }
+        "5" { Install-Skill -Key "jeffallan" }
+        "6" { Install-Skill -Key "ui-ux-pro-max" }
+        "7" { Install-Skill -Key "othmanadi" }
+        "8" { Install-Skill -Key "all" }
+        "9" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
+        default { Write-Host "Invalid choice, skipping skill source installation." -ForegroundColor DarkGray }
     }
 }
 

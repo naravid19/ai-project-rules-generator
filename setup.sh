@@ -73,17 +73,61 @@ clone_or_update_repo() {
   git clone --depth 1 "$repo_url" "$target_path"
 }
 
-skill_target_path() {
-  case "$1" in
-    antigravity) printf '%s\n' "$SKILL_ROOT/skills" ;;
-    claude) printf '%s\n' "$SKILL_ROOT/awesome-claude-skills" ;;
-    anthropic) printf '%s\n' "$SKILL_ROOT/anthropic-skills" ;;
-    techleads) printf '%s\n' "$SKILL_ROOT/techleads-agent-skills" ;;
-    jeffallan) printf '%s\n' "$SKILL_ROOT/jeffallan-claude-skills" ;;
-    ui-ux-pro-max) printf '%s\n' "$SKILL_ROOT/ui-ux-pro-max-skill" ;;
-    othmanadi) printf '%s\n' "$SKILL_ROOT/othman-planning-with-files" ;;
-    *) echo "Unknown skill target key: $1" >&2; exit 1 ;;
+install_skill() {
+  local key="$1"
+  local repo_url=""
+  local target_suffix=""
+  local label=""
+
+  case "$key" in
+    antigravity)
+      repo_url="https://github.com/sickn33/antigravity-awesome-skills.git"
+      target_suffix="skills"
+      label="sickn33/antigravity-awesome-skills"
+      ;;
+    claude)
+      repo_url="https://github.com/ComposioHQ/awesome-claude-skills.git"
+      target_suffix="awesome-claude-skills"
+      label="ComposioHQ/awesome-claude-skills"
+      ;;
+    anthropic)
+      repo_url="https://github.com/anthropics/skills.git"
+      target_suffix="anthropic-skills"
+      label="anthropics/skills"
+      ;;
+    techleads)
+      repo_url="https://github.com/tech-leads-club/agent-skills.git"
+      target_suffix="techleads-agent-skills"
+      label="tech-leads-club/agent-skills"
+      ;;
+    jeffallan)
+      repo_url="https://github.com/Jeffallan/claude-skills.git"
+      target_suffix="jeffallan-claude-skills"
+      label="Jeffallan/claude-skills"
+      ;;
+    ui-ux-pro-max)
+      repo_url="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git"
+      target_suffix="ui-ux-pro-max-skill"
+      label="nextlevelbuilder/ui-ux-pro-max-skill"
+      ;;
+    othmanadi)
+      repo_url="https://github.com/OthmanAdi/planning-with-files.git"
+      target_suffix="othman-planning-with-files"
+      label="OthmanAdi/planning-with-files"
+      ;;
+    all)
+      for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi; do
+        install_skill "$k"
+      done
+      return
+      ;;
+    *)
+      echo "Unknown skill source: $key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all"
+      return 1
+      ;;
   esac
+
+  clone_or_update_repo "$repo_url" "$SKILL_ROOT/$target_suffix" "$label"
 }
 
 # ─── Prerequisite Check ─────────────────────────────────────────────────────
@@ -194,41 +238,7 @@ echo
 
 # ─── Skill Source Selection ──────────────────────────────────────────────────
 if [[ -n "$SKILL_SOURCE" ]]; then
-  case "$SKILL_SOURCE" in
-    antigravity)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
-      ;;
-    claude)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
-      ;;
-    anthropic)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
-      ;;
-    techleads)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
-      ;;
-    jeffallan)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
-      ;;
-    ui-ux-pro-max)
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
-      ;;
-    othmanadi)
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
-      ;;
-    all)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
-      ;;
-    *)
-      echo "Unknown skill source: $SKILL_SOURCE. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all"
-      ;;
-  esac
+  install_skill "$SKILL_SOURCE" || true
 elif $NON_INTERACTIVE; then
   echo "Non-interactive mode: skipping skill source selection."
   echo "Use --skill-source <name> to install skill sources."
@@ -249,42 +259,16 @@ else
   read -r -p "Choose [1-9]: " choice < /dev/tty
 
   case "$choice" in
-    1)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
-      ;;
-    2)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
-      ;;
-    3)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
-      ;;
-    4)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
-      ;;
-    5)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
-      ;;
-    6)
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
-      ;;
-    7)
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
-      ;;
-    8)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
-      ;;
-    9)
-      echo "Skipping skill source installation."
-      ;;
-    *)
-      echo "Invalid choice, skipping skill source installation."
-      ;;
+    1) install_skill "antigravity" ;;
+    2) install_skill "claude" ;;
+    3) install_skill "anthropic" ;;
+    4) install_skill "techleads" ;;
+    5) install_skill "jeffallan" ;;
+    6) install_skill "ui-ux-pro-max" ;;
+    7) install_skill "othmanadi" ;;
+    8) install_skill "all" ;;
+    9) echo "Skipping skill source installation." ;;
+    *) echo "Invalid choice, skipping skill source installation." ;;
   esac
 fi
 
