@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [1.6.0] - 2026-03-06
+
+### Added
+
+- Active `.rulesrc.yaml` semantics for `skill_sources`, `custom_keywords`, `template_style`, and `quality_threshold`
+- Shared skill root support in setup scripts via `-SkillRoot` (PowerShell) and `--skill-root` (Bash)
+
+### Changed
+
+- `README.md`, `AGENTS.md`, `.cursorrules`, and `workflows/create-project-rules.md` now align with the documented validator model and required section names
+- Setup scripts keep the workflow local at `.agent/workflows/create-project-rules.md` while allowing optional skill repositories to install into an external/shared root
+- Quick Reference cards and current-version documentation now reflect the `1.6.0` release state
+
+### Fixed
+
+- `scripts/validate-output.ps1` now parses on Windows PowerShell 5.1 and mirrors the documented 50-point heuristic scoring model
+- `scripts/validate-output.ps1` and `scripts/validate-output.sh` now read `quality_threshold` from `.rulesrc.yaml`, print raw checks plus scorecards, and ignore anti-pattern examples when checking for hardcoded skill names
 
 ## [1.5.0] - 2026-03-05
 
@@ -18,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **Incremental Update / Diff Mode** — Update existing files without full regeneration; preserves user customizations; shows diff before applying
 - **Generation Statistics Dashboard** — Post-generation summary showing skills scanned/matched/applied, lines generated, quality scores, total time, platforms, language
 - **7 new template examples**: `nodejs-express`, `chrome-extension`, `nextjs-fullstack`, `go-microservice`, `unity-game`, `cli-tool`, `langchain-rag` (total: 10 templates)
-- **Validation Scripts** — `scripts/validate-output.ps1` and `scripts/validate-output.sh` for automated quality checks (file existence, section structure, content smells, cross-file consistency)
+- **Validation Scripts** — Initial `scripts/validate-output.ps1` and `scripts/validate-output.sh` scaffolding for automated output checks
 - **5 new keyword categories**: Monorepo, Microservices, Serverless, Database, Package/Library (total: 17 categories)
 - **5 new recommended skill sources**: `anthropics/skills` (official), `tech-leads-club/agent-skills` (curated), `Jeffallan/claude-skills` (full-stack), `nextlevelbuilder/ui-ux-pro-max-skill` (UI/UX workflow), `OthmanAdi/planning-with-files` (Manus-style persistence)
 - **Agentic Capability Keywords** — Added `planning`, `memory`, `mcp`, `reasoning`, `workflow` keywords to trigger advanced AI orchestration skills in `create-project-rules.md` and `AGENTS.md`.
@@ -26,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **PowerShell Validation Script Parsing** — Fixed a string interpolation issue (`validate-output.ps1`) causing parse errors in Windows PowerShell 5.1 by using the `-f` formatting operator.
+- **Validation Script Follow-Up Deferred** — The v1.5.0 release introduced validator scripts, but the full Windows PowerShell 5.1 parser repair and heuristic-scoring alignment are tracked in [Unreleased].
 
 ### Changed
 
@@ -126,7 +144,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
-[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.2.0...v1.3.0

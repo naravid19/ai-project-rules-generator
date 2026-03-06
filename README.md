@@ -1,37 +1,36 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+﻿<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 
-<a id="readme-top"></a>
+`<a id="readme-top"></a>`
 
 <!-- PROJECT SHIELDS -->
-<!--
-*** Using markdown "reference style" links for readability.
-*** See the bottom of this document for the declaration of the reference variables.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[Contributors][contributors-url]
+[Forks][forks-url]
+[Stargazers][stars-url]
+[Issues][issues-url]
+[MIT License][license-url]
+[LinkedIn][linkedin-url]
 
 <!-- PROJECT LOGO -->
 
 <br />
 <div align="center">
+  <a href="https://github.com/naravid19/ai-project-rules-generator">
+    <img src="https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/assets/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
-<h1>🤖 AI Project Rules Generator</h1>
+<h3 align="center">🤖 AI Project Rules Generator</h3>
 
 <p align="center">
     🚀 Generate .cursorrules and AGENTS.md with automatic, format-based skill discovery from 1000+ curated AI skills
     <br />
-    <a href="#usage"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/naravid19/ai-project-rules-generator"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="#example-output">View Example</a>
-    &middot;
+    <a href="https://github.com/naravid19/ai-project-rules-generator">View Demo</a>
+    ·
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
+    ·
     <a href="https://github.com/naravid19/ai-project-rules-generator/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
@@ -57,9 +56,11 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#configuration">Configuration</a></li>
     <li><a href="#workflow-stages">Workflow Stages</a></li>
     <li><a href="#format-based-skill-discovery">Format-Based Skill Discovery</a></li>
     <li><a href="#example-output">Example Output</a></li>
+    <li><a href="#validation">Validation</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -79,7 +80,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 - ✅ **Automatic Skill Selection** — AI analyzes your project and finds relevant skills for you
 - ✅ **Format-Based Discovery** — Works with any skill source (CATALOG, FOLDER, SEARCH_ENGINE, README)
 - ✅ **Multi-Platform** — Generates files for 9+ AI tools (Cursor, Claude, Gemini, Copilot, etc.)
-- ✅ **Quality Scoring** — Built-in verification with ≥38/50 pass criteria
+- ✅ **Quality Scoring** — Built-in verification with a default 38/50 pass threshold and config-aware overrides
 - ✅ **Time-Saving** — Complete in 30-60 minutes
 - ✅ **Never Outdated** — Dynamic skill discovery, no hardcoded skill names
 
@@ -89,7 +90,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 
 ### Built With
 
-- [![Markdown][Markdown-badge]][Markdown-url]
+- [Markdown][Markdown-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,14 +102,15 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README)      |
 | **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
 | **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
-| **Quality Scoring**          | Verification with scoring system (≥38/50 to pass) and content smell detection            |
+| **Quality Scoring**          | Heuristic verification with a default `38/50` pass threshold and config-aware overrides  |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
 | **Preview Mode**             | Review planned output structure before generation begins                                 |
 | **Incremental Update**       | Diff-based update mode for existing files — preserves user customizations                |
 | **Generation Statistics**    | Dashboard showing skills scanned, lines generated, quality scores                        |
+| **Shared Skill Roots**       | Supports project-local `.agent/` plus configured external/shared skill directories       |
 | **10 Template Gallery**      | Pre-made examples for React, Express, Next.js, Go, Unity, CLI, LangChain, and more       |
-| **Validation Scripts**       | Automated output quality checks via `scripts/validate-output.ps1` / `.sh`                |
+| **Validation Scripts**       | Config-aware PowerShell/Bash validators with heuristic scorecards and threshold output   |
 
 ### Supported Project Types
 
@@ -120,7 +122,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 - 🤖 **AI/ML Projects** — LLM, RAG, Agents, LangChain
 - 🎮 **Game Development** — Unity, Godot, Unreal, Bevy
 - 🔒 **Security** — Auth, OAuth, JWT, OWASP
-- 📝 **Documentation** — API docs, Architecture docs
+- 📄 **Documentation** — API docs, Architecture docs
 - 🧪 **Testing** — Jest, Pytest, Playwright, TDD
 - ☁️ **DevOps** — Docker, Kubernetes, CI/CD, Terraform
 - 🏗️ **Architecture** — Design patterns, Clean code, SOLID
@@ -135,7 +137,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | AI Tool             | Icon | Output File(s)                                         |
 | ------------------- | ---- | ------------------------------------------------------ |
 | **Cursor**          | 🟠   | `.cursorrules` or `.cursor/rules/*.mdc`                |
-| **Claude Code**     | 🟣   | `CLAUDE.md` + `.claude/skills/`                        |
+| **Claude Code**     | 🟤   | `CLAUDE.md` + `.claude/skills/`                        |
 | **Antigravity IDE** | 🔴   | `.agent/skills/*/SKILL.md` + `.agent/workflows/`       |
 | **Gemini CLI**      | 🔵   | `GEMINI.md`                                            |
 | **Codex CLI**       | 🟢   | `AGENTS.md`                                            |
@@ -153,7 +155,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 ### Prerequisites
 
 - An AI assistant that supports workflows or skills (Cursor, Claude Code, Antigravity, etc.)
-- At least one AI skill source installed in your `.agent/` directory
+- At least one AI skill source installed in your project-local `.agent/` directory or a configured shared skill root
 - Your project source code
 
 > **Don't have skills yet?** Clone one of these recommended collections into your `.agent/` directory:
@@ -170,6 +172,8 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 
 #### Option A: Quick Start Script (recommended)
 
+Local project setup:
+
 **Linux/macOS:**
 
 ```sh
@@ -181,6 +185,24 @@ curl -sL https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/
 ```powershell
 irm https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.ps1 | iex
 ```
+
+Shared skill root setup:
+
+**Linux/macOS:**
+
+```sh
+curl -sL https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.sh -o setup.sh
+bash setup.sh --skill-source all --skill-root /shared/.agent
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.ps1 -OutFile setup.ps1
+.\setup.ps1 -SkillSource all -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
+```
+
+> The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned.
 
 #### Option B: Manual
 
@@ -216,37 +238,100 @@ Or simply ask:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- CONFIGURATION -->
+
+## Configuration
+
+Use `.rulesrc.yaml` when you want deterministic output instead of interactive prompts.
+
+### Minimal Example
+
+```yaml
+target_platforms:
+  - Cursor
+  - Codex
+  - Antigravity IDE
+severity_level: balanced
+output_language: en
+template_style: progressive
+quality_threshold: 38
+preview_mode: false
+existing_files: ask
+```
+
+### Advanced Example with Shared Skill Roots
+
+```yaml
+target_platforms:
+  - codex
+severity_level: strict
+template_style: minimal
+quality_threshold: 42
+skill_sources:
+  - path: .agent/skills
+    format: CATALOG
+  - path: .agent/awesome-claude-skills
+  - path: "C:/Users/Desktop/.agent"
+custom_keywords:
+  - planning
+  - memory
+  - workflow
+```
+
+### Field Semantics
+
+| Field                                   | Behavior                                                         |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `target_platforms`                      | Overrides AI-tool auto-detection when set                        |
+| `severity_level`                        | Changes the density of critical vs advisory rules                |
+| `sections.include` / `sections.exclude` | Filters optional sections before generation                      |
+| `skill_sources`                         | Discovery roots scanned before falling back to local `.agent/`   |
+| `custom_keywords`                       | Merged with auto-detected keywords using case-insensitive dedupe |
+| `template_style`                        | `progressive`, `flat`, or `minimal` formatting density           |
+| `quality_threshold`                     | Default validator threshold unless a CLI threshold overrides it  |
+| `preview_mode`                          | Enables the preview step before writing files                    |
+| `existing_files`                        | Chooses ask / overwrite / merge / skip behavior                  |
+
+### Path Rules
+
+- Relative `skill_sources` paths resolve from the project root.
+- Absolute paths are allowed.
+- If a `format` value is supplied for a root, the workflow trusts it and skips format inference for that root.
+- `.agent/skills` remains the default Antigravity CATALOG directory for backward compatibility.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- WORKFLOW STAGES -->
 
 ## Workflow Stages
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│         CREATE PROJECT RULES v1.5 - QUICK REF              │
+│         CREATE PROJECT RULES v1.6 - QUICK REF                │
 ├──────────────────────────────────────────────────────────────┤
-│ Stage 0: Preferences      │ Config file / interactive       │
-│ Stage 1: Analyze          │ Autonomous scan, tech stack     │
-│ Stage 2: Skill Discovery  │ Auto-detect by FORMAT & 17 cats │
-│ Stage 3: .cursorrules     │ Progressive disclosure + rules  │
-│ Preview (optional)        │ Review before writing files     │
-│ Stage 4: AGENTS.md        │ Multi-platform output           │
-│ Stage 5: Verify           │ Quality scoring + statistics    │
+│ Stage 0: Preferences      │ Config file / interactive        │
+│ Stage 1: Analyze          │ Autonomous scan, tech stack      │
+│ Stage 2: Skill Discovery  │ Auto-detect by FORMAT & 17 cats  │
+│ Stage 3: .cursorrules     │ Progressive disclosure + rules   │
+│ Preview (optional)        │ Review before writing files      │
+│ Stage 4: AGENTS.md        │ Multi-platform output            │
+│ Stage 5: Verify           │ Quality scoring + statistics     │
 ├──────────────────────────────────────────────────────────────┤
-│ ⏱️  Total Time: 30-60 minutes                                │
+│ ⏱️ Total Time: 30-60 minutes                                 │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-> **v1.5 update:** Interactive mode, multi-language support, preview mode, incremental updates, generation statistics, 7 new templates, validation scripts, extended keywords (17 categories), setup script improvements.
+> **v1.6 update:** Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validator thresholds, PowerShell 5.1 validator repair, and repo-wide documentation/history alignment.
 
-| Stage                      | Time      | Description                                                         |
-| -------------------------- | --------- | ------------------------------------------------------------------- |
-| **0. User Preferences**    | 2-5 min   | Config file or interactive: platforms, severity, language, preview  |
-| **1. Project Analysis**    | 10-15 min | Autonomous scan: structure, tech stack, patterns, AI tool detection |
-| **2. Skill Discovery**     | 5-10 min  | Auto-detect sources by format, search all by 17 keyword categories  |
-| **3. Create .cursorrules** | 10-20 min | Coding standards with severity levels and progressive disclosure    |
-| **Preview** (optional)     | 2-3 min   | Review planned structure before writing files                       |
-| **4. Create AGENTS.md**    | 10-15 min | AI guidelines with multi-platform output and dynamic skill section  |
-| **5. Verification**        | 5-10 min  | Quality scoring (≥38/50), smell detection, generation statistics    |
+| Stage                      | Time      | Description                                                             |
+| -------------------------- | --------- | ----------------------------------------------------------------------- |
+| **0. User Preferences**    | 2-5 min   | Config file or interactive: platforms, severity, language, preview      |
+| **1. Project Analysis**    | 10-15 min | Autonomous scan: structure, tech stack, patterns, AI tool detection     |
+| **2. Skill Discovery**     | 5-10 min  | Auto-detect sources by format, search all by 17 keyword categories      |
+| **3. Create .cursorrules** | 10-20 min | Coding standards with severity levels and progressive disclosure        |
+| **Preview** (optional)     | 2-3 min   | Review planned structure before writing files                           |
+| **4. Create AGENTS.md**    | 10-15 min | AI guidelines with multi-platform output and dynamic skill section      |
+| **5. Verification**        | 5-10 min  | Quality scoring (default 38/50), smell detection, generation statistics |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -254,12 +339,23 @@ Or simply ask:
 
 ## Format-Based Skill Discovery
 
-The key innovation: instead of hardcoding specific skill repositories, the workflow **auto-detects** available skill sources by scanning `.agent/` and classifying each by **format**.
+The key innovation: instead of hardcoding specific skill repositories, the workflow resolves skill roots in this order and classifies each discovered source by **format**:
+
+1. `skill_sources` from `.rulesrc.yaml`
+2. Project-local `.agent/`
+3. A user-provided shared root when the local scan is empty
+
+> `.agent/skills` remains the default Antigravity CATALOG path for backward compatibility. Add shared roots through configuration or setup flags instead of renaming the legacy directory.
+
+Examples:
+
+- Local root: `.agent/`
+- Shared root: `C:/Users/Desktop/.agent`
 
 ### How It Works
 
 ```
-Scan .agent/ directory
+Resolve configured roots
   │
   ├── Found CATALOG.md?
   │     → Format: CATALOG (keyword search in table)
@@ -289,7 +385,7 @@ Scan .agent/ directory
 
 ### Recommended Skill Sources
 
-Clone these into your `.agent/` directory:
+Clone these into your project-local `.agent/` directory or a shared skill root referenced from `.rulesrc.yaml`:
 
 | Source                     | Format   | Count             | Link                                                              |
 | -------------------------- | -------- | ----------------- | ----------------------------------------------------------------- |
@@ -327,7 +423,7 @@ Clone these into your `.agent/` directory:
 1. ❌ Never commit `.env` — use `app/core/config.py` with `pydantic-settings`
 2. ✅ Always validate input with Pydantic schemas
 
-## Code Smells to Avoid
+## Code Smells
 
 | ❌ Smell                 | ✅ Instead Do                          |
 | ------------------------ | -------------------------------------- |
@@ -343,7 +439,7 @@ Clone these into your `.agent/` directory:
 ## 🎯 Available Skills
 
 > [!IMPORTANT]
-> Scan `.agent/` for skill sources before starting work!
+> Scan configured skill roots before starting work!
 
 ### How to Find Skills
 
@@ -359,7 +455,7 @@ Clone these into your `.agent/` directory:
 - Testing: `testing`, `pytest`, `unit`, `tdd`
 ```
 
-### 📝 Template Gallery
+### 📄 Template Gallery
 
 Pre-made `.cursorrules` examples for common project types are available in [`templates/`](templates/):
 
@@ -378,6 +474,48 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 
 > These are **references only** — the workflow generates custom versions tailored to your specific project.
 > Use `templates/rulesrc-template.yaml` to configure workflow behavior for your project.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- VALIDATION -->
+
+## Validation
+
+Validation is **heuristic scoring**, not semantic proof. The scripts check structure, placeholders, formatting quality, repo-local path references, and cross-file consistency signals. They do **not** guarantee that generated rules are perfect for every downstream project.
+
+### PowerShell
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-output.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-output.ps1 -Threshold 42
+```
+
+### Bash
+
+```sh
+./scripts/validate-output.sh
+./scripts/validate-output.sh --threshold 42
+```
+
+### Threshold Resolution
+
+The validators use this order:
+
+1. CLI threshold (`-Threshold` / `--threshold`)
+2. `.rulesrc.yaml` → `quality_threshold`
+3. Default `38/50`
+
+### What the Score Covers
+
+Each file is scored across five 0-10 dimensions:
+
+- Completeness
+- Accuracy
+- Specificity
+- Scannability
+- Consistency
+
+The scripts print both raw checks and final scorecards so you can see why a file passed or failed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -486,3 +624,5 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 [license-url]: https://github.com/naravid19/ai-project-rules-generator/blob/master/LICENSE
 [Markdown-badge]: https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white
 [Markdown-url]: https://www.markdownguide.org/
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/naravidd/

@@ -10,6 +10,7 @@ param(
     [switch]$NonInteractive,
     [switch]$Verbose,
     [string]$SkillSource,
+    [string]$SkillRoot = ".agent",
     [switch]$Uninstall
 )
 
@@ -62,6 +63,21 @@ function Update-OrCloneRepo {
     git clone --depth 1 $RepoUrl $TargetPath
 }
 
+function Get-SkillTargetPath {
+    param([string]$Key)
+
+    switch ($Key) {
+        "antigravity" { return Join-Path $SkillRoot "skills" }
+        "claude" { return Join-Path $SkillRoot "awesome-claude-skills" }
+        "anthropic" { return Join-Path $SkillRoot "anthropic-skills" }
+        "techleads" { return Join-Path $SkillRoot "techleads-agent-skills" }
+        "jeffallan" { return Join-Path $SkillRoot "jeffallan-claude-skills" }
+        "ui-ux-pro-max" { return Join-Path $SkillRoot "ui-ux-pro-max-skill" }
+        "othmanadi" { return Join-Path $SkillRoot "othman-planning-with-files" }
+        default { throw "Unknown skill target key: $Key" }
+    }
+}
+
 # ─── Prerequisite Check ──────────────────────────────────────────────────────
 function Test-Prerequisites {
     # Check Git
@@ -111,7 +127,7 @@ if ($Uninstall) {
 
     Write-Host ""
     Write-Host "Uninstall complete." -ForegroundColor Green
-    Write-Host "Note: Skill sources (.agent/skills/, .agent/awesome-claude-skills/, etc.) were NOT removed." -ForegroundColor DarkGray
+    Write-Host "Note: Skill sources (.agent/skills/, shared SkillRoot paths, etc.) were NOT removed." -ForegroundColor DarkGray
     Write-Host "      Remove them manually if desired." -ForegroundColor DarkGray
     Write-Host "=======================================" -ForegroundColor Cyan
     exit 0
@@ -157,7 +173,12 @@ Test-Prerequisites
 
 Write-Host "Creating .agent/ directory structure..." -ForegroundColor Yellow
 New-Item -ItemType Directory -Force -Path ".agent/workflows" | Out-Null
-New-Item -ItemType Directory -Force -Path ".agent/skills" | Out-Null
+New-Item -ItemType Directory -Force -Path $SkillRoot | Out-Null
+
+if ($SkillRoot -ne ".agent") {
+    Write-Host "Using shared skill root: $SkillRoot" -ForegroundColor DarkGray
+    Write-Host "Keeping workflow local at $WorkflowFile" -ForegroundColor DarkGray
+}
 
 Write-Host "Downloading workflow..." -ForegroundColor Yellow
 Invoke-WebRequest -Uri "$RepoRaw/workflows/create-project-rules.md" -OutFile $WorkflowFile
@@ -171,34 +192,34 @@ if ($SkillSource) {
     # Direct skill source via parameter
     switch ($SkillSource.ToLower()) {
         "antigravity" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
         }
         "claude" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
         }
         "anthropic" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
         }
         "techleads" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
         }
         "jeffallan" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
         }
         "ui-ux-pro-max" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
         "othmanadi" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
         }
         "all" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
         }
         default {
             Write-Host "Unknown skill source: $SkillSource. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all" -ForegroundColor Red
@@ -208,9 +229,11 @@ if ($SkillSource) {
 elseif ($NonInteractive) {
     Write-Host "Non-interactive mode: skipping skill source selection." -ForegroundColor DarkGray
     Write-Host "Use -SkillSource <name> to install skill sources." -ForegroundColor DarkGray
+    Write-Host "Use -SkillRoot <path> to install sources into a shared skill root." -ForegroundColor DarkGray
 }
 else {
     Write-Host "Recommended skill sources (optional):" -ForegroundColor Cyan
+    Write-Host "Install root for skill sources: $SkillRoot" -ForegroundColor DarkGray
     Write-Host "  1) sickn33 / antigravity-awesome-skills  (CATALOG, 968+ skills)"
     Write-Host "  2) ComposioHQ / awesome-claude-skills    (FOLDER, 30+ skills)"
     Write-Host "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
@@ -225,34 +248,34 @@ else {
 
     switch ($choice) {
         "1" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
         }
         "2" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
         }
         "3" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
         }
         "4" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
         }
         "5" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
         }
         "6" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
         }
         "7" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
         }
         "8" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath ".agent/skills" -Label "sickn33/antigravity-awesome-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath ".agent/awesome-claude-skills" -Label "ComposioHQ/awesome-claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath ".agent/anthropic-skills" -Label "anthropics/skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath ".agent/techleads-agent-skills" -Label "tech-leads-club/agent-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath ".agent/jeffallan-claude-skills" -Label "Jeffallan/claude-skills"
-            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath ".agent/ui-ux-pro-max-skill" -Label "nextlevelbuilder/ui-ux-pro-max-skill"
-            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath ".agent/othman-planning-with-files" -Label "OthmanAdi/planning-with-files"
+            Update-OrCloneRepo -RepoUrl "https://github.com/sickn33/antigravity-awesome-skills.git" -TargetPath (Get-SkillTargetPath "antigravity") -Label "sickn33/antigravity-awesome-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/ComposioHQ/awesome-claude-skills.git" -TargetPath (Get-SkillTargetPath "claude") -Label "ComposioHQ/awesome-claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/anthropics/skills.git" -TargetPath (Get-SkillTargetPath "anthropic") -Label "anthropics/skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/tech-leads-club/agent-skills.git" -TargetPath (Get-SkillTargetPath "techleads") -Label "tech-leads-club/agent-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/Jeffallan/claude-skills.git" -TargetPath (Get-SkillTargetPath "jeffallan") -Label "Jeffallan/claude-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" -TargetPath (Get-SkillTargetPath "ui-ux-pro-max") -Label "nextlevelbuilder/ui-ux-pro-max-skill"
+            Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Get-SkillTargetPath "othmanadi") -Label "OthmanAdi/planning-with-files"
         }
         "9" {
             Write-Host "Skipping skill source installation." -ForegroundColor DarkGray
@@ -276,6 +299,7 @@ Write-Host "Options:"
 Write-Host "  Update:      .\setup.ps1 -Update" -ForegroundColor Blue
 Write-Host "  Uninstall:   .\setup.ps1 -Uninstall" -ForegroundColor Blue
 Write-Host "  CI/CD mode:  .\setup.ps1 -NonInteractive -SkillSource all" -ForegroundColor Blue
+Write-Host "  Shared root: .\setup.ps1 -SkillSource all -SkillRoot C:\Shared\.agent" -ForegroundColor Blue
 Write-Host "  Verbose:     .\setup.ps1 -Verbose" -ForegroundColor Blue
 Write-Host ""
 Write-Host "Docs: https://github.com/naravid19/ai-project-rules-generator" -ForegroundColor Blue

@@ -13,6 +13,7 @@ WORKFLOW_FILE=".agent/workflows/create-project-rules.md"
 VERBOSE=false
 NON_INTERACTIVE=false
 SKILL_SOURCE=""
+SKILL_ROOT=".agent"
 UNINSTALL=false
 
 # ─── Parse Arguments ─────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ while [[ $# -gt 0 ]]; do
     --non-interactive) NON_INTERACTIVE=true; shift ;;
     --verbose|-v) VERBOSE=true; shift ;;
     --skill-source) SKILL_SOURCE="$2"; shift 2 ;;
+    --skill-root) SKILL_ROOT="$2"; shift 2 ;;
     *) shift ;;
   esac
 done
@@ -69,6 +71,19 @@ clone_or_update_repo() {
 
   echo "Cloning $label..."
   git clone --depth 1 "$repo_url" "$target_path"
+}
+
+skill_target_path() {
+  case "$1" in
+    antigravity) printf '%s\n' "$SKILL_ROOT/skills" ;;
+    claude) printf '%s\n' "$SKILL_ROOT/awesome-claude-skills" ;;
+    anthropic) printf '%s\n' "$SKILL_ROOT/anthropic-skills" ;;
+    techleads) printf '%s\n' "$SKILL_ROOT/techleads-agent-skills" ;;
+    jeffallan) printf '%s\n' "$SKILL_ROOT/jeffallan-claude-skills" ;;
+    ui-ux-pro-max) printf '%s\n' "$SKILL_ROOT/ui-ux-pro-max-skill" ;;
+    othmanadi) printf '%s\n' "$SKILL_ROOT/othman-planning-with-files" ;;
+    *) echo "Unknown skill target key: $1" >&2; exit 1 ;;
+  esac
 }
 
 # ─── Prerequisite Check ─────────────────────────────────────────────────────
@@ -118,7 +133,7 @@ if $UNINSTALL; then
 
   echo
   echo "Uninstall complete."
-  echo "Note: Skill sources (.agent/skills/, .agent/awesome-claude-skills/, etc.) were NOT removed."
+  echo "Note: Skill sources (.agent/skills/, shared skill roots, etc.) were NOT removed."
   echo "      Remove them manually if desired."
   echo "======================================="
   exit 0
@@ -163,7 +178,12 @@ echo
 check_prerequisites
 
 echo "Creating .agent/ directory structure..."
-mkdir -p .agent/workflows .agent/skills
+mkdir -p .agent/workflows "$SKILL_ROOT"
+
+if [[ "$SKILL_ROOT" != ".agent" ]]; then
+  echo "Using shared skill root: $SKILL_ROOT"
+  echo "Keeping workflow local at $WORKFLOW_FILE"
+fi
 
 echo "Downloading workflow..."
 curl -sL -o "$WORKFLOW_FILE" "${REPO_RAW}/workflows/create-project-rules.md"
@@ -176,34 +196,34 @@ echo
 if [[ -n "$SKILL_SOURCE" ]]; then
   case "$SKILL_SOURCE" in
     antigravity)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
       ;;
     claude)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
       ;;
     anthropic)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
       ;;
     techleads)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
       ;;
     jeffallan)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
       ;;
     ui-ux-pro-max)
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
       ;;
     othmanadi)
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" ".agent/othman-planning-with-files" "OthmanAdi/planning-with-files"
+      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
       ;;
     all)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" ".agent/othman-planning-with-files" "OthmanAdi/planning-with-files"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
+      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
       ;;
     *)
       echo "Unknown skill source: $SKILL_SOURCE. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all"
@@ -212,8 +232,10 @@ if [[ -n "$SKILL_SOURCE" ]]; then
 elif $NON_INTERACTIVE; then
   echo "Non-interactive mode: skipping skill source selection."
   echo "Use --skill-source <name> to install skill sources."
+  echo "Use --skill-root <path> to install sources into a shared skill root."
 else
   echo "Recommended skill sources (optional):"
+  echo "Install root for skill sources: $SKILL_ROOT"
   echo "  1) sickn33 / antigravity-awesome-skills  (CATALOG, 968+ skills)"
   echo "  2) ComposioHQ / awesome-claude-skills    (FOLDER, 30+ skills)"
   echo "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
@@ -228,34 +250,34 @@ else
 
   case "$choice" in
     1)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
       ;;
     2)
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
       ;;
     3)
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
       ;;
     4)
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
       ;;
     5)
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
       ;;
     6)
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
       ;;
     7)
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" ".agent/othman-planning-with-files" "OthmanAdi/planning-with-files"
+      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
       ;;
     8)
-      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" ".agent/skills" "sickn33/antigravity-awesome-skills"
-      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" ".agent/awesome-claude-skills" "ComposioHQ/awesome-claude-skills"
-      clone_or_update_repo "https://github.com/anthropics/skills.git" ".agent/anthropic-skills" "anthropics/skills"
-      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" ".agent/techleads-agent-skills" "tech-leads-club/agent-skills"
-      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" ".agent/jeffallan-claude-skills" "Jeffallan/claude-skills"
-      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" ".agent/ui-ux-pro-max-skill" "nextlevelbuilder/ui-ux-pro-max-skill"
-      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" ".agent/othman-planning-with-files" "OthmanAdi/planning-with-files"
+      clone_or_update_repo "https://github.com/sickn33/antigravity-awesome-skills.git" "$(skill_target_path antigravity)" "sickn33/antigravity-awesome-skills"
+      clone_or_update_repo "https://github.com/ComposioHQ/awesome-claude-skills.git" "$(skill_target_path claude)" "ComposioHQ/awesome-claude-skills"
+      clone_or_update_repo "https://github.com/anthropics/skills.git" "$(skill_target_path anthropic)" "anthropics/skills"
+      clone_or_update_repo "https://github.com/tech-leads-club/agent-skills.git" "$(skill_target_path techleads)" "tech-leads-club/agent-skills"
+      clone_or_update_repo "https://github.com/Jeffallan/claude-skills.git" "$(skill_target_path jeffallan)" "Jeffallan/claude-skills"
+      clone_or_update_repo "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git" "$(skill_target_path ui-ux-pro-max)" "nextlevelbuilder/ui-ux-pro-max-skill"
+      clone_or_update_repo "https://github.com/OthmanAdi/planning-with-files.git" "$(skill_target_path othmanadi)" "OthmanAdi/planning-with-files"
       ;;
     9)
       echo "Skipping skill source installation."
@@ -279,6 +301,7 @@ echo "Options:"
 echo "  Update:      ./setup.sh --update"
 echo "  Uninstall:   ./setup.sh --uninstall"
 echo "  CI/CD mode:  ./setup.sh --non-interactive --skill-source all"
+echo "  Shared root: ./setup.sh --skill-source all --skill-root /shared/.agent"
 echo "  Verbose:     ./setup.sh --verbose"
 echo
 echo "Docs: https://github.com/naravid19/ai-project-rules-generator"

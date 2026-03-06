@@ -1,34 +1,38 @@
 # =============================================================================
-# .rulesrc.yaml — Configuration Template
+# .rulesrc.yaml - Configuration Template
 # =============================================================================
 # Place this file in your project root to customize workflow behavior.
-# The workflow will auto-detect this file during Stage 0 (User Preferences).
-# All fields are optional — defaults are used when omitted.
+# The workflow reads this file during Stage 0 (User Preferences).
+# All fields are optional - defaults are used when omitted.
 # =============================================================================
 
-# ─── Target Platforms ────────────────────────────────────────────────────────
+# --- Target Platforms ---------------------------------------------------------
 # Which AI tools to generate files for.
 # Options: cursor, claude, antigravity, gemini, codex, kiro, copilot, opencode, adal
+# If set, this overrides AI-tool auto-detection.
 # Default: auto-detect from existing files, fallback to [cursor, codex]
 target_platforms:
   - cursor
   - codex
 
-# ─── Severity Level ──────────────────────────────────────────────────────────
+# --- Severity Level -----------------------------------------------------------
 # How strict should the generated rules be?
-# Options: strict (more 🔴 rules), balanced (default), relaxed (more 🟡 notes)
+# strict   = more critical rules, fewer soft suggestions
+# balanced = default mix of critical and important guidance
+# relaxed  = fewer blocking rules, more notes and examples
 severity_level: balanced
 
-# ─── Output Language ─────────────────────────────────────────────────────────
+# --- Output Language ----------------------------------------------------------
 # Language for generated documentation comments and descriptions.
-# The code examples remain in English regardless of this setting.
-# Options: en, th, ja, zh, ko, es, fr, de, pt (ISO 639-1 codes)
+# Code examples remain in the original programming language.
+# Options: en, th, ja, zh, ko, es, fr, de, pt
 # Default: en
 output_language: en
 
-# ─── Sections ────────────────────────────────────────────────────────────────
-# Include or exclude specific sections in generated files.
-# Default: all sections included
+# --- Sections ----------------------------------------------------------------
+# Include or exclude optional sections in generated files.
+# Required sections stay present regardless of this filter.
+# Default: all optional sections included
 sections:
   include:
     - project-identity
@@ -46,42 +50,49 @@ sections:
     # - performance
     # - api-design
 
-# ─── Skill Sources ───────────────────────────────────────────────────────────
-# Override automatic skill source detection.
-# Default: auto-detect from .agent/ directory
+# --- Skill Sources ------------------------------------------------------------
+# Override automatic skill-source discovery roots.
+# If omitted, the workflow scans the project-local `.agent/` directory.
+# Paths may be relative to the project root or absolute.
+# `format` is optional; if provided, the workflow trusts it and skips inference.
+# Keep `.agent/skills` as the default Antigravity CATALOG target for backward compatibility.
 # skill_sources:
 #   - path: .agent/skills
 #     format: CATALOG
 #   - path: .agent/awesome-claude-skills
-#     format: README
+#   - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"
 
-# ─── Custom Keywords ─────────────────────────────────────────────────────────
+# --- Custom Keywords ----------------------------------------------------------
 # Additional keywords to search for during skill discovery (Stage 2).
-# These are merged with auto-detected keywords from your tech stack.
+# These are merged with auto-detected keywords from your tech stack with case-insensitive dedupe.
 custom_keywords:
   # - microservices
   # - event-driven
   # - real-time
   # - cqrs
 
-# ─── Template Style ──────────────────────────────────────────────────────────
+# --- Template Style -----------------------------------------------------------
 # How to structure the generated files.
-# Options: progressive (overview→details), flat (all at same level), minimal (essentials only)
-# Default: progressive
+# progressive = overview -> details (default)
+# flat        = same content scope with shallower headings and fewer long examples
+# minimal     = essential sections only, tuned for shorter outputs
+# Options: progressive, flat, minimal
 template_style: progressive
 
-# ─── Quality Threshold ───────────────────────────────────────────────────────
+# --- Quality Threshold --------------------------------------------------------
 # Minimum quality score to pass verification (Stage 5).
+# Validation scripts use this threshold unless a CLI threshold overrides it.
 # Scale: 0-50, Default: 38
 quality_threshold: 38
 
-# ─── Preview Mode ────────────────────────────────────────────────────────────
-# Show a preview of what will be generated before writing files.
+# --- Preview Mode -------------------------------------------------------------
+# Show a preview of the planned structure before writing files.
 # Default: false
 preview_mode: false
 
-# ─── Overwrite Protection ────────────────────────────────────────────────────
+# --- Existing Files -----------------------------------------------------------
 # What to do if output files already exist.
-# Options: ask (prompt user), overwrite (replace), merge (diff-based update), skip
+# merge = diff-based update guidance that preserves user customizations
+# Options: ask, overwrite, merge, skip
 # Default: ask
 existing_files: ask
