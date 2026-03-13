@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-03-13
+
+### Added
+
+- Script-level regression coverage in `tests/test_skill_scripts.py` with committed fixtures for discovery, extraction, and wizard flows
+- README compatibility and benchmark snapshot for the mixed `.agent/` layout installed by the setup scripts
+
+### Changed
+
+- `scripts/discover-skills.py` now skips the local `.agent/workflows/` output folder when enumerating skill sources, ranks search-engine results alongside other formats, and keeps large-catalog searches easier to trim with `--limit`
+- `README.md` and `workflows/create-project-rules.md` now document reserved output paths, measured discovery performance, and the recommended discovery/extraction commands for real `.agent/` roots
+
+### Fixed
+
+- `scripts/discover-skills.py` no longer reports the generated workflow storage directory as an unsupported skill source
+- `scripts/extract-capabilities.py` no longer crashes on `Any` import/frontmatter parsing paths and now emits stable merged tool metadata
+- `scripts/wizard.py` no longer fails on Windows console encoding or malformed YAML generation paths
+
 ## [1.6.0] - 2026-03-06
 
 ### Added
@@ -144,7 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
-[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.3.0...v1.4.0

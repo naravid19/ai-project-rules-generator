@@ -85,7 +85,13 @@ quality_threshold: 42
 
 ### 0.3 Interactive Preference Questions
 
-If no config file exists and running interactively, ask the user:
+If no config file exists and running interactively, you can run the **Interactive Wizard** to generate one:
+
+```bash
+python scripts/wizard.py
+```
+
+Alternatively, ask the user these core questions:
 
 | Question | Options | Default |
 | -------- | ------- | ------- |
@@ -209,15 +215,17 @@ Resolve discovery roots in this order before classifying formats:
 
 > Keep `.agent/skills` as the default Antigravity CATALOG target for backward compatibility. Add more roots through `skill_sources` or setup flags instead of renaming that directory.
 
-Examples:
+#### Automated Discovery & Extraction
 
-```text
-Local root:
-  .agent/
+Use the following tools to automate the mapping process:
 
-Shared root:
-  C:/Users/narav/Desktop/CE code/Tools/.agent
-```
+| Task | Command | Purpose |
+|------|---------|---------|
+| **Source Discovery** | `python scripts/discover-skills.py` | Scans roots and classifies sources by format. |
+| **Skill Search** | `python scripts/discover-skills.py --keywords <terms> --limit 25` | Finds candidate `SKILL.md` paths matching tech stack and trims broad catalog output. |
+| **Capability Extraction** | `python scripts/extract-capabilities.py <paths>` | Summarizes matched skills for integration. |
+
+> Skip local `.agent/workflows/` when classifying skill sources. It stores installed workflow files, not reusable skill libraries.
 
 For each resolved root, scan recursively and classify each source by **format**:
 
@@ -555,42 +563,61 @@ Based on AI tools detected in Stage 1.4:
 
 > **Default**: If unknown, generate `.cursorrules` + `AGENTS.md` (most universal).
 
-### 4.2 Required Sections
+### 4.2 Minimal, High-Signal Template (ref: `agents-md` skill)
 
 ```markdown
-# AI Agent Guidelines - {PROJECT_NAME}
+# AI Agent Guidelines — {PROJECT_NAME}
 
-> One-line project description.
+> {one_sentence_description}
 
-## Quick Context
+## 🎯 Quick Context
 
-| Key | Value |
-| --------- | -------------- |
-| **What** | {description} |
-| **Type** | {project type} |
-| **Stack** | {tech stack} |
+- **Tech Stack**: {stack_summary}
+- **Key Files**: See below for directory-level guidance.
 
-### Key Files
+### Directory Mapping
 
-| File | Purpose |
-| -------- | ------------- |
-| `{file}` | {description} |
+| Path | Primary Purpose | Agent Constraint |
+|------|-----------------|------------------|
+| `{dir}` | {purpose} | {constraint} |
 
 ---
 
-## Available Skills
+## 🛠️ Multi-Platform Output
+
+| Tool | Rule File | Skills/Workflows |
+|------|-----------|------------------|
+| Cursor | `.cursorrules` | `.cursor/rules/*.mdc` |
+| Claude Code | `CLAUDE.md` | `.claude/skills/` |
+| Antigravity | `.agent/skills/*/SKILL.md` | `.agent/workflows/` |
+| Gemini CLI | `GEMINI.md` | - |
+| Codex/OpenCode | `AGENTS.md` | - |
+
+---
+
+## 🧠 Agent Skills
 
 > [!IMPORTANT]
-> **Skills are constantly updated!** Before any task:
->
-> 1. Scan configured skill roots for available sources
-> 2. Search for skills matching your current task keywords
-> 3. Read the relevant skill instruction files
-> 4. Follow the best practices described
+> Skills are dynamic. Always scan configured roots before starting work.
 
-### Skill Discovery
+### Capability Map
 
-{Auto-detected skill sources and how to search them - populated from Stage 2.1}
+| Keyword | Capability | Source Path |
+|---------|------------|-------------|
+| `{keyword}` | {extracted summary from SKILL.md} | `{path}/SKILL.md` |
+
+### Manual Discovery
+
+Scan `.agent/` (or `skill_sources`) and classify by format: CATALOG, FOLDER, SEARCH, or README.
+
+---
+
+## 🚫 Non-Negotiable Constraints
+
+1. **Rule 1**: NEVER hardcode skill names in instructions. Use keywords.
+2. **Drafting**: Use progressive disclosure (Overview → Structure → Standards → Snippets).
+3. **Validation**: All changes must pass heuristic scoring before completion.
+```
 
 ### Helpful Keywords for This Project
 
@@ -644,15 +671,21 @@ Based on AI tools detected in Stage 1.4:
 > [!CAUTION]
 > **This is the most important section.** The skill discovery instructions must be dynamic, format-based, and never reference specific repositories by name.
 
-Generate the skill section based on what was discovered in Stage 2.1:
+Generate the skill section based on what was discovered in Stage 2.1. Use a **Capability Map Table** to link keywords to specific internal skill paths:
 
 ```markdown
-## Available Skills
+## Agent Skills
 
 > [!IMPORTANT]
 > Skills are constantly updated. Always check before starting work.
 
-### How to Find Skills
+### Capability Map
+
+| Keyword | Capability | Source Path |
+|---------|------------|-------------|
+| `{keyword}` | {extracted summary from SKILL.md} | `{internal_path}/SKILL.md` |
+
+### How to Find Additional Skills
 
 Scan configured skill roots (`skill_sources` first, otherwise project-local `.agent/`). For each discovered source:
 
@@ -724,7 +757,31 @@ Ask yourself (or a fresh AI instance):
 
 > If any answer is **no**, revisit the relevant stage and fix.
 
-### 5.5 Generation Statistics
+### 5.5 Technical Validation (Automated)
+
+Run the project's heuristic validator to ensure compliance with Rule 1 (No Hardcoding) and structural standards:
+
+```bash
+# Linux/macOS
+./scripts/validate-output.sh --path . --threshold {threshold}
+
+# Windows
+.\scripts\validate-output.ps1 -Path . -Threshold {threshold}
+```
+
+### 5.6 Security Verification (Skill Scanner)
+
+> [!WARNING]
+> Automatically discovered skills must be verified for security before integration.
+
+If `skill-scanner` is available in your sources, run it on the matched `SKILL.md` paths identified in Stage 2:
+
+```bash
+# Example if skill-scanner is found in .agent/skills
+python .agent/skills/skills/skill-scanner/scripts/scan.py {matched_paths}
+```
+
+### 5.7 Generation Statistics
 
 After verification, display a summary dashboard:
 
@@ -807,7 +864,7 @@ After completing this workflow, you should have:
 ## Quick Reference Card
 
 ```text
-CREATE PROJECT RULES v1.6 - QUICK REF
+CREATE PROJECT RULES v1.7 - QUICK REF
 
 Stage 0: Preferences     | Config file / interactive, language, severity, platforms
 Stage 1: Analyze         | Autonomous scan, tech stack, patterns, detect AI tools
@@ -964,3 +1021,4 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.4 | 2026-03-03 | WORKFLOW format support, Quick Start Scripts (`setup.sh`/`setup.ps1`), Template Gallery (React, Python, Flutter) |
 | 1.5 | 2026-03-05 | **Major update**: Stage 0 (Interactive Mode + Config File), Multi-language support, Preview Mode, Incremental Update Mode, Generation Statistics, 7 new templates, Validation Scripts, Extended Keywords (17 categories), Setup Script improvements |
 | 1.6 | 2026-03-06 | Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validation thresholds, PowerShell validator repair, and repo-wide workflow alignment |
+| 1.7 | 2026-03-13 | Mixed `.agent/` compatibility recheck, reserved workflow-folder filtering, relevance-ranked discovery results, regression coverage for helper scripts, and documentation/performance alignment |

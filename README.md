@@ -22,7 +22,7 @@
 <h3 align="center">🤖 AI Project Rules Generator</h3>
 
 <p align="center">
-    🚀 Generate .cursorrules and AGENTS.md with automatic, format-based skill discovery from 1000+ curated AI skills
+    🚀 Generate .cursorrules and AGENTS.md with automatic, format-based skill discovery across mixed .agent sources
     <br />
     <a href="https://github.com/naravid19/ai-project-rules-generator"><strong>Explore the docs »</strong></a>
     <br />
@@ -83,10 +83,11 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 ### Why Use This?
 
 - ✅ **Automatic Skill Selection** — AI analyzes your project and finds relevant skills for you
-- ✅ **Format-Based Discovery** — Works with any skill source (CATALOG, FOLDER, SEARCH_ENGINE, README)
+- ✅ **Format-Based Discovery** — Works with CATALOG, FOLDER, SEARCH_ENGINE, README, and WORKFLOW sources
 - ✅ **Multi-Platform** — Generates files for 9+ AI tools (Cursor, Claude, Gemini, Copilot, etc.)
 - ✅ **Quality Scoring** — Built-in verification with a default 38/50 pass threshold and config-aware overrides
 - ✅ **Time-Saving** — Complete in 30-60 minutes
+- ✅ **Verified on Mixed `.agent/` Layouts** — Current release is checked against the same combined skill setup documented below
 - ✅ **Never Outdated** — Dynamic skill discovery, no hardcoded skill names
 
 > Release details are tracked in [CHANGELOG.md](CHANGELOG.md).
@@ -107,10 +108,12 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | Feature                      | Description                                                                              |
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
 | **6-Stage Workflow**         | Structured process: Preferences → Analyze → Discover → .cursorrules → AGENTS.md → Verify |
-| **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README)      |
+| **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README/WORKFLOW) |
 | **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
 | **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
+| **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
 | **Quality Scoring**          | Heuristic verification with a default `38/50` pass threshold and config-aware overrides  |
+| **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) for surgical rule customization  |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
 | **Preview Mode**             | Review planned output structure before generation begins                                 |
@@ -210,7 +213,7 @@ iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/
 .\setup.ps1 -SkillSource all -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
 ```
 
-> The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned.
+> The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned. The `workflows/` folder is reserved for installed workflow files and is intentionally ignored by `scripts/discover-skills.py` when enumerating external skill sources.
 
 #### Option B: Manual
 
@@ -228,11 +231,14 @@ iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/
 
 ### Quick Start
 
-Run the workflow with your AI assistant:
-
-```
-/create-project-rules
-```
+1. **Customize your preferences** (optional):
+   ```bash
+   python scripts/wizard.py
+   ```
+2. **Run the workflow** with your AI assistant:
+   ```
+   /create-project-rules
+   ```
 
 Or simply ask:
 
@@ -324,7 +330,7 @@ custom_keywords:
 | **Stage 5: Verify**          | Quality scoring + statistics    | 5-10 min          |
 | **Total Time**               |                                 | **30-60 minutes** |
 
-> **v1.6 update:** Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validator thresholds, PowerShell 5.1 validator repair, and repo-wide documentation/history alignment.
+> **v1.7 update:** Discovery now ignores the local `.agent/workflows/` output folder, ranks search-engine matches consistently, ships regression tests for the helper scripts, and documents measured compatibility for the mixed `.agent/` layout installed by the setup scripts.
 
 | Stage                      | Time      | Description                                                             |
 | -------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -342,7 +348,7 @@ custom_keywords:
 
 ### Format-Based Skill Discovery
 
-The key innovation: instead of hardcoding specific skill repositories, the workflow resolves skill roots in this order and classifies each discovered source by **format**:
+The key innovation: instead of hardcoding specific skill repositories, the workflow resolves skill roots in this order and classifies each discovered source by **format**. The current release has been rechecked against the same mixed `.agent/` layout installed by the setup scripts.
 
 1. `skill_sources` from `.rulesrc.yaml`
 2. Project-local `.agent/`
@@ -354,6 +360,7 @@ Examples:
 
 - Local root: `.agent/`
 - Shared root: `C:/Users/Desktop/.agent`
+- Reserved local output: `.agent/workflows/` (workflow storage, not a skill source)
 
 #### How It Works
 
@@ -384,7 +391,7 @@ Resolve configured roots
 | **FOLDER**        | Contains subdirectories with `SKILL.md`        | Browse folder names, read matched files |
 | **SEARCH_ENGINE** | Contains `search.py` or similar tool           | Run search tool with keywords           |
 | **README**        | Contains `README.md` with categorized list     | Browse category headings                |
-| **WORKFLOW**      | `.agent/workflows/*.md` referencing `.shared/` | Read workflow, follow its instructions  |
+| **WORKFLOW**      | Root `CLAUDE.md`/`AGENTS.md` plus hidden integrations or `.shared/` | Read workflow, follow its instructions  |
 
 #### Recommended Skill Sources
 
@@ -401,6 +408,29 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 | othman-planning-with-files | FOLDER   | Manus-style       | [GitHub](https://github.com/OthmanAdi/planning-with-files)        |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
+
+#### Compatibility Snapshot (2026-03-13)
+
+| Check | Result | Notes |
+| ----- | ------ | ----- |
+| Mixed `.agent/` support | Supported | The example `.agent/` layout loaded from the README setup flow is supported in the current release. |
+| Detected skill sources | 7/7 | `skills`, `anthropic-skills`, `awesome-claude-skills`, `jeffallan-claude-skills`, `othman-planning-with-files`, `techleads-agent-skills`, `ui-ux-pro-max-skill` |
+| Observed formats | 1 CATALOG / 5 FOLDER / 1 WORKFLOW | All installed external source roots were classified without manual overrides. |
+| Reserved output handling | Passed | Local `.agent/workflows/` is skipped because it stores installed workflows rather than skill libraries. |
+| Coverage statement | Broad | README and SEARCH_ENGINE support remain implemented and are covered by committed regression fixtures even when the local sample root does not currently include those formats. |
+| Format scan benchmark | ~236 ms | `python scripts/discover-skills.py --format` |
+| Keyword search benchmark | ~886 ms | `python scripts/discover-skills.py --keywords planning workflow python testing --limit 25` |
+| Wide search volume | 283 matches before limiting | Use `--limit` for large catalogs to keep downstream rule generation focused. |
+
+#### Discovery CLI Examples
+
+```bash
+python scripts/discover-skills.py --format
+python scripts/discover-skills.py --keywords planning workflow python testing --limit 25
+python scripts/extract-capabilities.py .agent/othman-planning-with-files/skills/planning-with-files/SKILL.md
+```
+
+Use `--limit` whenever broad keywords can hit the large CATALOG source. The discovery script still searches all sources first, but the trimmed output is easier for agents to rank and summarize correctly.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

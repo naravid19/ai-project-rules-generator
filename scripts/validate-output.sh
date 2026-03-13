@@ -32,6 +32,17 @@ VAGUE_PATTERNS=(
   '\betc\.\b'
 )
 
+# Added for Rule 1 enforcement
+SKILL_NAME_PATTERNS=(
+  'antigravity-awesome-skills'
+  'awesome-claude-skills'
+  'anthropic-skills'
+  'techleads-agent-skills'
+  'jeffallan-claude-skills'
+  'planning-with-files'
+  'ui-ux-pro-max-skill'
+)
+
 REPO_LOCAL_PREFIXES=(
   "README.md"
   "AGENTS.md"
@@ -49,7 +60,7 @@ REPO_LOCAL_PREFIXES=(
 
 declare -A REQUIRED_HEADINGS
 REQUIRED_HEADINGS[".cursorrules"]="Project Identity|Project Structure|Coding Standards|Critical Rules|Code Smells"
-REQUIRED_HEADINGS["AGENTS.md"]="Quick Context|Available Skills|Multi-Platform Output Mapping|Common Patterns|Non-Negotiable Constraints"
+REQUIRED_HEADINGS["AGENTS.md"]="Quick Context|Skills|Output|Patterns|Constraints"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -335,6 +346,13 @@ score_file() {
     warn "$file_name contains broken repo-local path references: $(printf '%s' "$repo_error_list" | tr '\n' ',' | sed 's/,$//')"
   fi
 
+  # Rule 1 Violation Check (Hardcoded Skill Names)
+  skill_hits="$(pattern_count "$sanitized_content" "${SKILL_NAME_PATTERNS[@]}")"
+  if [[ "$skill_hits" -eq 0 ]]; then
+    pass "$file_name has no hardcoded skill names (Rule 1 compliance)"
+  else
+    fail "$file_name violates Rule 1: contains hardcoded skill names ($skill_hits hits)"
+  fi
   vague_hits="$(pattern_count "$sanitized_content" "${VAGUE_PATTERNS[@]}")"
   if [[ "$vague_hits" -eq 0 ]]; then
     pass "$file_name avoids vague rule phrasing"

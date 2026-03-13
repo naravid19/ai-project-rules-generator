@@ -53,7 +53,7 @@ $RepoLocalPrefixes = @(
 
 $RequiredHeadings = @{
     ".cursorrules" = @("Project Identity", "Project Structure", "Coding Standards", "Critical Rules", "Code Smells")
-    "AGENTS.md"    = @("Quick Context", "Available Skills", "Multi-Platform Output Mapping", "Common Patterns", "Non-Negotiable Constraints")
+    "AGENTS.md"    = @("Quick Context", "Skills", "Output", "Patterns", "Constraints")
 }
 
 function Pass([string]$Message) {
