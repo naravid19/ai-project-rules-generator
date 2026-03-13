@@ -1,2 +1,33 @@
-/example
-/log
+# External skill sources and local workflow storage
+/.agent/
+
+# Internal working notes and daily logs
+/log/
+/conductor/
+/problem.md
+/task_plan.md
+/findings.md
+/progress.md
+
+# Local generated outputs and config overrides
+/GEMINI.md
+/.rulesrc.yaml
+
+# Temporary test artifacts
+/.tmp-tests/
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Legacy local scratch area
+/example/
