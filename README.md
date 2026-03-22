@@ -88,6 +88,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 - ✅ **Quality Scoring** — Built-in verification with a default 38/50 pass threshold and config-aware overrides
 - ✅ **Time-Saving** — Complete in 30-60 minutes
 - ✅ **Verified on Mixed `.agent/` Layouts** — Current release is checked against the same combined skill setup documented below
+- ✅ **Works with Specialized Skill Packs** — Domain-specific sources such as `claude-scientific-skills` fit the same discovery pipeline without custom code paths
 - ✅ **Never Outdated** — Dynamic skill discovery, no hardcoded skill names
 
 > Release details are tracked in [CHANGELOG.md](CHANGELOG.md).
@@ -216,7 +217,7 @@ iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/
 
 > The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned. The `workflows/` folder is reserved for installed workflow files and is intentionally ignored by `scripts/discover-skills.py` when enumerating external skill sources.
 
-Single scientific-source setup:
+Single scientific-source setup (`scientific` installer key):
 
 **Linux/macOS:**
 
@@ -229,6 +230,8 @@ bash setup.sh --skill-source scientific --skill-root /shared/.agent
 ```powershell
 .\setup.ps1 -SkillSource scientific -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
 ```
+
+> Use the `scientific` source when you want the shared root to focus on research-heavy work such as literature review, bioinformatics, cheminformatics, medical/clinical analysis, time-series science, or scientific writing workflows.
 
 #### Option B: Manual
 
@@ -425,6 +428,8 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 | othman-planning-with-files | FOLDER   | Planning/persistence set  | [GitHub](https://github.com/OthmanAdi/planning-with-files)        |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
+>
+> **When to choose `claude-scientific-skills`:** Pick it for projects with scientific or research-heavy tasks such as literature review, genomics, chemistry, clinical analysis, forecasting, or scientific communication. Keep the broader general-purpose sources above for mixed engineering work.
 
 #### Compatibility Snapshot (2026-03-22)
 
