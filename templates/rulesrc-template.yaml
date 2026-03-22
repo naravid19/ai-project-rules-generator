@@ -54,13 +54,15 @@ sections:
 # Override automatic skill-source discovery roots.
 # If omitted, the workflow scans the project-local `.agent/` directory.
 # Paths may be relative to the project root or absolute.
+# Roots are scanned in the order listed here, so shared roots should come first.
+# Duplicate source names prefer the first matching root.
 # `format` is optional; if provided, the workflow trusts it and skips inference.
 # Keep `.agent/skills` as the default Antigravity CATALOG target for backward compatibility.
+# Hybrid skill directories may include `SKILL.md` with companion `AGENTS.md`, `CLAUDE.md`,
+# `README.md`, and adjacent `references/` or `rules/` folders.
 # skill_sources:
-#   - path: .agent/skills
-#     format: CATALOG
-#   - path: .agent/awesome-claude-skills
 #   - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"
+#   - path: .agent
 
 # --- Custom Keywords ----------------------------------------------------------
 # Additional keywords to search for during skill discovery (Stage 2).

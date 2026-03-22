@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-03-22
+
+### Added
+
+- Multi-root discovery support in `scripts/discover-skills.py`, including repeated `--agent-dir` handling, ordered root precedence, and deterministic deduplication across shared and local `.agent` roots
+- Companion skill metadata in discovery and extraction output via `source_root`, `instruction_type`, `companion_docs`, and `reference_dirs`
+- Regression fixtures and tests for hybrid skill folders, `AGENTS.md`-only fallback packages, workflow/plugin roots, and duplicate source precedence handling
+- Setup script support for `K-Dense-AI/claude-scientific-skills` so the scientific skill collection can be installed into local or shared roots with the same optional-source flow as the other recommended repositories
+
+### Changed
+
+- Skill discovery now indexes one skill entity per directory, prefers `SKILL.md` as the canonical entry when available, and treats `AGENTS.md`, `CLAUDE.md`, and `README.md` as companion documents
+- Source format classification now recognizes newer hybrid layouts, gives FOLDER precedence over workflow-style root docs when visible skill trees exist, and treats hidden plugin/integration markers as WORKFLOW signals only when no visible skill tree is present
+- `scripts/extract-capabilities.py` now accepts either a skill directory or a supported instruction file path while preserving the existing JSON contract
+- `scripts/wizard.py` now supports writing ordered `skill_sources` entries so a shared root can be configured ahead of the repo-local `.agent` fallback
+- `README.md` and `workflows/create-project-rules.md` now document hybrid skill packages, ordered root precedence, companion docs, local smoke-check commands against shared and repo-local roots, and the new scientific/research-focused recommended source
+- The README now includes single-source installer examples for `scientific` plus an isolated temp-root verification note for the real `claude-scientific-skills` clone/discovery/extraction flow
+
+### Fixed
+
+- Discovery no longer emits separate matches for companion `AGENTS.md`, `CLAUDE.md`, or `README.md` files that belong to the same skill directory
+- Multi-root searches now prefer the first matching source name consistently instead of surfacing duplicate shared/local copies
+- Capability extraction now resolves modern skill packages that expose guidance through adjacent docs and `references/` or `rules/` directories
+- `scripts/validate-output.sh` now treats `claude-scientific-skills` as another known source name when checking generated outputs for Rule 1 hardcoding regressions
+
 ## [1.7.0] - 2026-03-13
 
 ### Added
@@ -162,7 +187,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
-[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.4.0...v1.5.0

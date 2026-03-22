@@ -39,6 +39,7 @@ SKILL_NAME_PATTERNS=(
   'anthropic-skills'
   'techleads-agent-skills'
   'jeffallan-claude-skills'
+  'claude-scientific-skills'
   'planning-with-files'
   'ui-ux-pro-max-skill'
 )

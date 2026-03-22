@@ -88,12 +88,15 @@ function Install-Skill {
         "othmanadi" {
             Update-OrCloneRepo -RepoUrl "https://github.com/OthmanAdi/planning-with-files.git" -TargetPath (Join-Path $SkillRoot "othman-planning-with-files") -Label "OthmanAdi/planning-with-files"
         }
+        "scientific" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/K-Dense-AI/claude-scientific-skills.git" -TargetPath (Join-Path $SkillRoot "claude-scientific-skills") -Label "K-Dense-AI/claude-scientific-skills"
+        }
         "all" {
-            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi")
+            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific")
             foreach ($k in $keys) { Install-Skill -Key $k }
         }
         default {
-            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, all" -ForegroundColor Red
         }
     }
 }
@@ -220,17 +223,18 @@ elseif ($NonInteractive) {
 else {
     Write-Host "Recommended skill sources (optional):" -ForegroundColor Cyan
     Write-Host "Install root for skill sources: $SkillRoot" -ForegroundColor DarkGray
-    Write-Host "  1) sickn33 / antigravity-awesome-skills  (CATALOG, 968+ skills)"
-    Write-Host "  2) ComposioHQ / awesome-claude-skills    (FOLDER, 30+ skills)"
-    Write-Host "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
-    Write-Host "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
-    Write-Host "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
+    Write-Host "  1) sickn33 / antigravity-awesome-skills  (CATALOG, large catalog index)"
+    Write-Host "  2) ComposioHQ / awesome-claude-skills    (FOLDER, community skill packs)"
+    Write-Host "  3) anthropics / skills                   (FOLDER, official Anthropic skills)"
+    Write-Host "  4) tech-leads-club / agent-skills        (FOLDER, curated registry)"
+    Write-Host "  5) Jeffallan / claude-skills             (FOLDER, broad full-stack set)"
     Write-Host "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
-    Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, Manus-style persistence)"
-    Write-Host "  8) All of the above"
-    Write-Host "  9) Skip (add your own later)"
+    Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
+    Write-Host "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
+    Write-Host "  9) All of the above"
+    Write-Host " 10) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-9]"
+    $choice = Read-Host "Choose [1-10]"
 
     switch ($choice) {
         "1" { Install-Skill -Key "antigravity" }
@@ -240,8 +244,9 @@ else {
         "5" { Install-Skill -Key "jeffallan" }
         "6" { Install-Skill -Key "ui-ux-pro-max" }
         "7" { Install-Skill -Key "othmanadi" }
-        "8" { Install-Skill -Key "all" }
-        "9" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
+        "8" { Install-Skill -Key "scientific" }
+        "9" { Install-Skill -Key "all" }
+        "10" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
         default { Write-Host "Invalid choice, skipping skill source installation." -ForegroundColor DarkGray }
     }
 }

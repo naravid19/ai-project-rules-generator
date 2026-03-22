@@ -19,9 +19,14 @@ Before starting, ensure you have:
 > [!TIP]
 > **Don't have skills yet?** Clone one of these recommended collections into your project-local `.agent/` directory or a shared root referenced from `.rulesrc.yaml`:
 >
-> - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) - 968+ skills with `CATALOG.md`
-> - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) - 30+ curated skills
+> - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) - large `CATALOG.md`-driven index
+> - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) - community skill packs
+> - [anthropic-skills](https://github.com/anthropics/skills) - official Anthropic skills
+> - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) - curated registry layout
+> - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) - broad full-stack developer set
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) - UI/UX design intelligence
+> - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) - planning and persistence workflows
+> - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) - scientific and research-focused workflows
 
 ---
 
@@ -209,8 +214,8 @@ Scan the project root for existing AI configuration files to determine which too
 
 Resolve discovery roots in this order before classifying formats:
 
-1. `skill_sources` from `.rulesrc.yaml`
-2. Project-local `.agent/`
+1. `skill_sources` from `.rulesrc.yaml`, scanned in the order listed
+2. Project-local `.agent/` when no explicit roots are configured
 3. If neither yields results, tell the user to clone sources locally or point the workflow at a shared root
 
 > Keep `.agent/skills` as the default Antigravity CATALOG target for backward compatibility. Add more roots through `skill_sources` or setup flags instead of renaming that directory.
@@ -221,9 +226,9 @@ Use the following tools to automate the mapping process:
 
 | Task | Command | Purpose |
 |------|---------|---------|
-| **Source Discovery** | `python scripts/discover-skills.py` | Scans roots and classifies sources by format. |
-| **Skill Search** | `python scripts/discover-skills.py --keywords <terms> --limit 25` | Finds candidate `SKILL.md` paths matching tech stack and trims broad catalog output. |
-| **Capability Extraction** | `python scripts/extract-capabilities.py <paths>` | Summarizes matched skills for integration. |
+| **Source Discovery** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...]` | Scans roots in precedence order and classifies sources by format. |
+| **Skill Search** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords <terms> --limit 25` | Finds candidate skill entries matching the tech stack and trims broad catalog output. |
+| **Capability Extraction** | `python scripts/extract-capabilities.py <skill-dir-or-path>` | Summarizes matched skills, companion docs, and adjacent references for integration. |
 
 > Skip local `.agent/workflows/` when classifying skill sources. It stores installed workflow files, not reusable skill libraries.
 
@@ -231,13 +236,13 @@ For each resolved root, scan recursively and classify each source by **format**:
 
 
 ```text
-Resolve roots -> scan each root recursively
+Resolve roots -> scan each root recursively in precedence order
 
 |-- Found CATALOG.md?
 |   -> Format: CATALOG (keyword search in table)
 |
-|-- Found folders with SKILL.md inside?
-|   -> Format: FOLDER (browse folder names + read descriptions)
+|-- Found visible skill directories with SKILL.md / AGENTS.md / CLAUDE.md?
+|   -> Format: FOLDER (one skill entity per directory; companion docs stay attached)
 |
 |-- Found search.py or search engine?
 |   -> Format: SEARCH_ENGINE (run search with keywords)
@@ -245,8 +250,8 @@ Resolve roots -> scan each root recursively
 |-- Found README.md with skill listing?
 |   -> Format: README (browse categorized list)
 |
-\-- Found .agent/workflows/*.md referencing .shared/ scripts?
-    -> Format: WORKFLOW (read workflow file, run referenced scripts)
+\-- Found root CLAUDE.md / AGENTS.md plus hidden integrations such as .claude-plugin?
+    -> Format: WORKFLOW (read the workflow entrypoint, then follow companion docs or scripts)
 ```
 
 #### Format Detection Rules
@@ -254,12 +259,12 @@ Resolve roots -> scan each root recursively
 | Format | How to Detect | How to Search |
 | ----------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | **CATALOG** | Directory (or subdirs) contains `CATALOG.md` with a skills table | Search CATALOG.md by keyword in Tags/Description columns |
-| **FOLDER** | Directory contains subfolders (at any depth) with `SKILL.md` or `CLAUDE.md` | Browse nested folder names for relevant terms, read matched instruction files |
+| **FOLDER** | Directory contains visible subfolders (at any depth) with `SKILL.md`, `AGENTS.md`, or `CLAUDE.md` | Build one skill entity per directory, prefer `SKILL.md`, and treat adjacent `AGENTS.md` / `CLAUDE.md` / `README.md` as companion docs |
 | **SEARCH_ENGINE** | Directory contains `search.py` or similar executable search tool | Run `search.py --keywords <terms>` |
 | **README** | Directory contains `README.md` with categorized skill links/descriptions | Browse README sections for relevant categories |
-| **WORKFLOW** | Folder contains `.md` files (like `CLAUDE.md` or inside `workflows/`) that reference `.shared/` | Read workflow file, follow its instructions to run referenced scripts |
+| **WORKFLOW** | Folder has root `CLAUDE.md` / `AGENTS.md`, hidden integration directories (`.claude-plugin`, `.cursor-plugin`, etc.), and no visible skill tree | Read the workflow entrypoint, then follow its instructions to run referenced scripts |
 
-> If a root matches multiple signals, prefer the search path that gets you closest to real skill instructions: `SEARCH_ENGINE` -> `CATALOG` -> `FOLDER` -> `README`. Use `WORKFLOW` when the root depends on workflow entrypoints or `.shared/` assets.
+> If a root matches multiple signals, prefer the path that yields real skill entities without duplicating companion docs. `FOLDER` wins over `WORKFLOW` when a visible skill tree exists.
 
 #### Example Auto-Detection
 
@@ -287,6 +292,12 @@ Resolve roots -> scan each root recursively
 |   |-- README.md                     (Jeffallan/claude-skills)
 |   \-- skills/                      <- Inner SKILL.md folders -> Format: FOLDER
 |       |-- nestjs-expert/SKILL.md
+|       \-- ...
+|-- claude-scientific-skills/         <- scientific-skills/ + plugin metadata -> Prefer FOLDER when visible skills exist
+|   |-- README.md                     (K-Dense-AI/claude-scientific-skills)
+|   |-- .claude-plugin/
+|   \-- scientific-skills/           <- Visible skill tree -> Format: FOLDER
+|       |-- literature-review/SKILL.md
 |       \-- ...
 |-- ui-ux-pro-max-skill/              <- Uses deeply nested CLAUDE.md and .shared/ -> Format: WORKFLOW
 |   |-- CLAUDE.md                     (nextlevelbuilder/ui-ux-pro-max-skill)
@@ -348,7 +359,7 @@ For each detected source, use the appropriate search method:
 | Source Format | Search Action |
 | ----------------- | ------------------------------------------------------------------------------------------ |
 | **CATALOG** | Open `CATALOG.md`, search for rows matching extracted keywords in Tags/Description columns |
-| **FOLDER** | List all nested subdirectories, match folder names against keywords, read matched files |
+| **FOLDER** | Build one skill entity per visible directory, rank by folder/path keywords first, then read the primary entry plus companion docs when needed |
 | **SEARCH_ENGINE** | Run the search tool with extracted keywords as arguments |
 | **README** | Open `README.md`, scan category headings and descriptions for relevant entries |
 | **WORKFLOW** | Read workflow / `CLAUDE.md` file, follow instructions to run scripts from `.shared/` |
@@ -357,11 +368,13 @@ For each detected source, use the appropriate search method:
 
 For each matched skill:
 
-1. Open the skill's instruction file (`SKILL.md`, `README.md`, etc.)
-2. Study the "When to Use" section - confirm it applies
-3. Extract applicable best practices, patterns, and rules
-4. Note any code examples worth including
-5. Skip skills that don't match the project context
+1. Resolve the skill directory or instruction file you actually matched
+2. Resolve the primary entrypoint with this order: `SKILL.md` -> `AGENTS.md` -> `CLAUDE.md`
+3. Study the "When to Use" section - confirm it applies
+4. Read companion docs (`AGENTS.md`, `CLAUDE.md`, `README.md`) only when they add relevant context
+5. Note adjacent `references/` or `rules/` folders when they exist
+6. Extract applicable best practices, patterns, and rules
+7. Skip skills that don't match the project context
 
 > [!CAUTION]
 > **Don't include every skill you find!** Only include skills that are directly relevant to the project's tech stack and patterns. Quality over quantity.
@@ -864,7 +877,7 @@ After completing this workflow, you should have:
 ## Quick Reference Card
 
 ```text
-CREATE PROJECT RULES v1.7 - QUICK REF
+CREATE PROJECT RULES v1.8 - QUICK REF
 
 Stage 0: Preferences     | Config file / interactive, language, severity, platforms
 Stage 1: Analyze         | Autonomous scan, tech stack, patterns, detect AI tools
@@ -1022,3 +1035,4 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.5 | 2026-03-05 | **Major update**: Stage 0 (Interactive Mode + Config File), Multi-language support, Preview Mode, Incremental Update Mode, Generation Statistics, 7 new templates, Validation Scripts, Extended Keywords (17 categories), Setup Script improvements |
 | 1.6 | 2026-03-06 | Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validation thresholds, PowerShell validator repair, and repo-wide workflow alignment |
 | 1.7 | 2026-03-13 | Mixed `.agent/` compatibility recheck, reserved workflow-folder filtering, relevance-ranked discovery results, regression coverage for helper scripts, and documentation/performance alignment |
+| 1.8 | 2026-03-22 | Hybrid and multi-root skill source modernization, ordered shared-root precedence, companion-doc extraction, scientific source installer support, and end-to-end scientific-source verification |

@@ -115,14 +115,19 @@ install_skill() {
       target_suffix="othman-planning-with-files"
       label="OthmanAdi/planning-with-files"
       ;;
+    scientific)
+      repo_url="https://github.com/K-Dense-AI/claude-scientific-skills.git"
+      target_suffix="claude-scientific-skills"
+      label="K-Dense-AI/claude-scientific-skills"
+      ;;
     all)
-      for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi; do
+      for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi scientific; do
         install_skill "$k"
       done
       return
       ;;
     *)
-      echo "Unknown skill source: $key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, all"
+      echo "Unknown skill source: $key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, all"
       return 1
       ;;
   esac
@@ -246,17 +251,18 @@ elif $NON_INTERACTIVE; then
 else
   echo "Recommended skill sources (optional):"
   echo "Install root for skill sources: $SKILL_ROOT"
-  echo "  1) sickn33 / antigravity-awesome-skills  (CATALOG, 968+ skills)"
-  echo "  2) ComposioHQ / awesome-claude-skills    (FOLDER, 30+ skills)"
-  echo "  3) anthropics / skills                   (FOLDER, 50+ official Anthropic skills)"
-  echo "  4) tech-leads-club / agent-skills        (FOLDER, curated & human-reviewed)"
-  echo "  5) Jeffallan / claude-skills             (FOLDER, 66 full-stack skills)"
+  echo "  1) sickn33 / antigravity-awesome-skills  (CATALOG, large catalog index)"
+  echo "  2) ComposioHQ / awesome-claude-skills    (FOLDER, community skill packs)"
+  echo "  3) anthropics / skills                   (FOLDER, official Anthropic skills)"
+  echo "  4) tech-leads-club / agent-skills        (FOLDER, curated registry)"
+  echo "  5) Jeffallan / claude-skills             (FOLDER, broad full-stack set)"
   echo "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
-  echo "  7) OthmanAdi / planning-with-files       (FOLDER, Manus-style persistence)"
-  echo "  8) All of the above"
-  echo "  9) Skip (add your own later)"
+  echo "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
+  echo "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
+  echo "  9) All of the above"
+  echo " 10) Skip (add your own later)"
   echo
-  read -r -p "Choose [1-9]: " choice < /dev/tty
+  read -r -p "Choose [1-10]: " choice < /dev/tty
 
   case "$choice" in
     1) install_skill "antigravity" ;;
@@ -266,8 +272,9 @@ else
     5) install_skill "jeffallan" ;;
     6) install_skill "ui-ux-pro-max" ;;
     7) install_skill "othmanadi" ;;
-    8) install_skill "all" ;;
-    9) echo "Skipping skill source installation." ;;
+    8) install_skill "scientific" ;;
+    9) install_skill "all" ;;
+    10) echo "Skipping skill source installation." ;;
     *) echo "Invalid choice, skipping skill source installation." ;;
   esac
 fi

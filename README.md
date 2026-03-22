@@ -171,13 +171,14 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 
 > **Don't have skills yet?** Clone one of these recommended collections into your `.agent/` directory:
 >
-> - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 968+ skills with `CATALOG.md`
-> - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 30+ curated skills
-> - [anthropic-skills](https://github.com/anthropics/skills) — 50+ official Anthropic skills
-> - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) — curated & human-reviewed
-> - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) — 66 full-stack developer skills
+> - [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — large `CATALOG.md`-driven index
+> - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — community skill packs
+> - [anthropic-skills](https://github.com/anthropics/skills) — official Anthropic skills
+> - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) — curated registry layout
+> - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) — broad full-stack developer set
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
 > - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — Manus-style persistent memory planning
+> - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) — scientific and research-focused workflows
 
 ### Installation
 
@@ -214,6 +215,20 @@ iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/
 ```
 
 > The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned. The `workflows/` folder is reserved for installed workflow files and is intentionally ignored by `scripts/discover-skills.py` when enumerating external skill sources.
+
+Single scientific-source setup:
+
+**Linux/macOS:**
+
+```sh
+bash setup.sh --skill-source scientific --skill-root /shared/.agent
+```
+
+**Windows (PowerShell):**
+
+```powershell
+.\setup.ps1 -SkillSource scientific -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
+```
 
 #### Option B: Manual
 
@@ -282,10 +297,8 @@ severity_level: strict
 template_style: minimal
 quality_threshold: 42
 skill_sources:
-  - path: .agent/skills
-    format: CATALOG
-  - path: .agent/awesome-claude-skills
   - path: "C:/Users/Desktop/.agent"
+  - path: .agent
 custom_keywords:
   - planning
   - memory
@@ -299,7 +312,7 @@ custom_keywords:
 | `target_platforms`                      | Overrides AI-tool auto-detection when set                        |
 | `severity_level`                        | Changes the density of critical vs advisory rules                |
 | `sections.include` / `sections.exclude` | Filters optional sections before generation                      |
-| `skill_sources`                         | Discovery roots scanned before falling back to local `.agent/`   |
+| `skill_sources`                         | Discovery roots scanned in order; duplicate source names prefer the first root |
 | `custom_keywords`                       | Merged with auto-detected keywords using case-insensitive dedupe |
 | `template_style`                        | `progressive`, `flat`, or `minimal` formatting density           |
 | `quality_threshold`                     | Default validator threshold unless a CLI threshold overrides it  |
@@ -310,6 +323,9 @@ custom_keywords:
 
 - Relative `skill_sources` paths resolve from the project root.
 - Absolute paths are allowed.
+- Roots are searched in the order listed, so shared roots should appear before `.agent` when they should win.
+- Companion docs next to a skill entry (`AGENTS.md`, `CLAUDE.md`, `README.md`) are indexed with that skill instead of treated as separate matches.
+- Capability extraction prefers `SKILL.md`, then `AGENTS.md`, then `CLAUDE.md`, and reports adjacent `references/` and `rules/` directories when present.
 - If a `format` value is supplied for a root, the workflow trusts it and skips format inference for that root.
 - `.agent/skills` remains the default Antigravity CATALOG directory for backward compatibility.
 
@@ -330,7 +346,7 @@ custom_keywords:
 | **Stage 5: Verify**          | Quality scoring + statistics    | 5-10 min          |
 | **Total Time**               |                                 | **30-60 minutes** |
 
-> **v1.7 update:** Discovery now ignores the local `.agent/workflows/` output folder, ranks search-engine matches consistently, ships regression tests for the helper scripts, and documents measured compatibility for the mixed `.agent/` layout installed by the setup scripts.
+> **Latest compatibility update (2026-03-22):** Discovery now supports repeated `--agent-dir` roots, prefers the first matching source across shared and local `.agent` trees, collapses hybrid skill packages into one entity per directory, and documents the current shared-root smoke-check baseline alongside the repo-local sample.
 
 | Stage                      | Time      | Description                                                             |
 | -------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -350,9 +366,9 @@ custom_keywords:
 
 The key innovation: instead of hardcoding specific skill repositories, the workflow resolves skill roots in this order and classifies each discovered source by **format**. The current release has been rechecked against the same mixed `.agent/` layout installed by the setup scripts.
 
-1. `skill_sources` from `.rulesrc.yaml`
-2. Project-local `.agent/`
-3. A user-provided shared root when the local scan is empty
+1. `skill_sources` from `.rulesrc.yaml`, scanned in the order listed
+2. Project-local `.agent/` when no explicit roots are configured
+3. A user-provided shared root can be listed before `.agent` to become the preferred baseline
 
 > `.agent/skills` remains the default Antigravity CATALOG path for backward compatibility. Add shared roots through configuration or setup flags instead of renaming the legacy directory.
 
@@ -370,8 +386,8 @@ Resolve configured roots
   ├── Found CATALOG.md?
   │     → Format: CATALOG (keyword search in table)
   │
-  ├── Found folders with SKILL.md inside?
-  │     → Format: FOLDER (browse folder names + read descriptions)
+  ├── Found visible skill directories with SKILL.md / AGENTS.md / CLAUDE.md?
+  │     → Format: FOLDER (one skill entity per directory; companion docs stay attached)
   │
   ├── Found search.py or search engine?
   │     → Format: SEARCH_ENGINE (run search with keywords)
@@ -379,8 +395,8 @@ Resolve configured roots
   ├── Found README.md with skill listing?
   │     → Format: README (browse categorized list)
   │
-  └── Found .agent/workflows/*.md referencing .shared/ scripts?
-        → Format: WORKFLOW (read workflow file, run referenced scripts)
+  └── Found root CLAUDE.md / AGENTS.md plus hidden integrations such as .claude-plugin?
+        → Format: WORKFLOW (read the workflow entrypoint and follow its instructions)
 ```
 
 #### Supported Formats
@@ -388,49 +404,60 @@ Resolve configured roots
 | Format            | Detection Signal                               | Search Method                           |
 | ----------------- | ---------------------------------------------- | --------------------------------------- |
 | **CATALOG**       | Contains `CATALOG.md` with skill table         | Search table rows by keywords           |
-| **FOLDER**        | Contains subdirectories with `SKILL.md`        | Browse folder names, read matched files |
+| **FOLDER**        | Contains visible skill directories with `SKILL.md`, `AGENTS.md`, or `CLAUDE.md` | Build one skill entity per directory, then read the primary entry plus companion docs |
 | **SEARCH_ENGINE** | Contains `search.py` or similar tool           | Run search tool with keywords           |
 | **README**        | Contains `README.md` with categorized list     | Browse category headings                |
-| **WORKFLOW**      | Root `CLAUDE.md`/`AGENTS.md` plus hidden integrations or `.shared/` | Read workflow, follow its instructions  |
+| **WORKFLOW**      | Root `CLAUDE.md`/`AGENTS.md` plus hidden integrations or `.shared/`, with no visible skill tree | Read workflow, follow its instructions  |
 
 #### Recommended Skill Sources
 
 Clone these into your project-local `.agent/` directory or a shared skill root referenced from `.rulesrc.yaml`:
 
-| Source                     | Format   | Count             | Link                                                              |
-| -------------------------- | -------- | ----------------- | ----------------------------------------------------------------- |
-| antigravity-awesome-skills | CATALOG  | 968+              | [GitHub](https://github.com/sickn33/antigravity-awesome-skills)   |
-| awesome-claude-skills      | FOLDER   | 30+               | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
-| anthropic-skills           | FOLDER   | 50+               | [GitHub](https://github.com/anthropics/skills)                    |
-| techleads-agent-skills     | FOLDER   | curated registry  | [GitHub](https://github.com/tech-leads-club/agent-skills)         |
-| jeffallan-claude-skills    | FOLDER   | 66                | [GitHub](https://github.com/Jeffallan/claude-skills)              |
-| ui-ux-pro-max-skill        | WORKFLOW | 1 (comprehensive) | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
-| othman-planning-with-files | FOLDER   | Manus-style       | [GitHub](https://github.com/OthmanAdi/planning-with-files)        |
+| Source                     | Format   | Notes                     | Link                                                              |
+| -------------------------- | -------- | ------------------------- | ----------------------------------------------------------------- |
+| antigravity-awesome-skills | CATALOG  | Large catalog-style index | [GitHub](https://github.com/sickn33/antigravity-awesome-skills)   |
+| awesome-claude-skills      | FOLDER   | Community skill packs     | [GitHub](https://github.com/ComposioHQ/awesome-claude-skills)     |
+| anthropic-skills           | FOLDER   | Official skill collection | [GitHub](https://github.com/anthropics/skills)                    |
+| techleads-agent-skills     | FOLDER   | Curated registry layout   | [GitHub](https://github.com/tech-leads-club/agent-skills)         |
+| jeffallan-claude-skills    | FOLDER   | Broad full-stack set      | [GitHub](https://github.com/Jeffallan/claude-skills)              |
+| claude-scientific-skills   | FOLDER   | Scientific/research workflows | [GitHub](https://github.com/K-Dense-AI/claude-scientific-skills)  |
+| ui-ux-pro-max-skill        | WORKFLOW | Workflow-first package    | [GitHub](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) |
+| othman-planning-with-files | FOLDER   | Planning/persistence set  | [GitHub](https://github.com/OthmanAdi/planning-with-files)        |
 
 > **You can use any skill source** — as long as it matches one of the supported formats, the workflow will auto-detect and search it.
 
-#### Compatibility Snapshot (2026-03-13)
+#### Compatibility Snapshot (2026-03-22)
 
 | Check | Result | Notes |
 | ----- | ------ | ----- |
-| Mixed `.agent/` support | Supported | The example `.agent/` layout loaded from the README setup flow is supported in the current release. |
-| Detected skill sources | 7/7 | `skills`, `anthropic-skills`, `awesome-claude-skills`, `jeffallan-claude-skills`, `othman-planning-with-files`, `techleads-agent-skills`, `ui-ux-pro-max-skill` |
-| Observed formats | 1 CATALOG / 5 FOLDER / 1 WORKFLOW | All installed external source roots were classified without manual overrides. |
+| Repo-local `.agent/` sample | Supported | The committed sample root still resolves the mixed-format layout used in tests and documentation. |
+| Shared-root baseline | Supported | The live shared root at `C:/Users/narav/Desktop/CE code/Tools/.agent` was rechecked as the compatibility baseline for the current implementation. |
+| Hybrid skill folders | Supported | Skill directories can now keep `SKILL.md` as the primary entry while surfacing companion `AGENTS.md`, `CLAUDE.md`, and `README.md` files. |
+| `claude-scientific-skills` temp install | Supported | An isolated installer run cloned the scientific source into a temp shared root, discovery classified it as `FOLDER`, and capability extraction succeeded against a real skill directory. |
+| Root precedence | Ordered | Multi-root discovery prefers the first matching source name, so shared roots should be listed before `.agent` when they should win. |
 | Reserved output handling | Passed | Local `.agent/workflows/` is skipped because it stores installed workflows rather than skill libraries. |
-| Coverage statement | Broad | README and SEARCH_ENGINE support remain implemented and are covered by committed regression fixtures even when the local sample root does not currently include those formats. |
-| Format scan benchmark | ~236 ms | `python scripts/discover-skills.py --format` |
-| Keyword search benchmark | ~886 ms | `python scripts/discover-skills.py --keywords planning workflow python testing --limit 25` |
-| Wide search volume | 283 matches before limiting | Use `--limit` for large catalogs to keep downstream rule generation focused. |
+| Format scan benchmark | ~280 ms per root | Measured with `python scripts/discover-skills.py --agent-dir <root> --format` on the local Windows sample. |
+| Limited keyword search benchmark | ~1.3-1.9 s depending on source mix | Measured with `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords planning workflow python testing --limit 25`. |
+| Wide search volume | Still broad on large catalogs | Use `--limit` for large CATALOG sources to keep downstream rule generation focused. |
 
 #### Discovery CLI Examples
 
 ```bash
-python scripts/discover-skills.py --format
-python scripts/discover-skills.py --keywords planning workflow python testing --limit 25
-python scripts/extract-capabilities.py .agent/othman-planning-with-files/skills/planning-with-files/SKILL.md
+python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --format
+python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
+python scripts/extract-capabilities.py .agent/othman-planning-with-files/skills/planning-with-files
 ```
 
 Use `--limit` whenever broad keywords can hit the large CATALOG source. The discovery script still searches all sources first, but the trimmed output is easier for agents to rank and summarize correctly.
+
+#### Local Smoke Check Flow
+
+```bash
+python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --format
+python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
+python scripts/extract-capabilities.py .agent/skills/skills/dbos-python
+python -m unittest discover -s tests -v
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -639,6 +666,8 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [anthropic-skills](https://github.com/anthropics/skills)
 - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills)
 - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills)
+- [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files)
+- [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills)
 - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
