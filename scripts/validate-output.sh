@@ -40,6 +40,7 @@ SKILL_NAME_PATTERNS=(
   'techleads-agent-skills'
   'jeffallan-claude-skills'
   'claude-scientific-skills'
+  'andrej-karpathy-skills'
   'planning-with-files'
   'ui-ux-pro-max-skill'
 )

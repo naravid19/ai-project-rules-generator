@@ -91,12 +91,15 @@ function Install-Skill {
         "scientific" {
             Update-OrCloneRepo -RepoUrl "https://github.com/K-Dense-AI/claude-scientific-skills.git" -TargetPath (Join-Path $SkillRoot "claude-scientific-skills") -Label "K-Dense-AI/claude-scientific-skills"
         }
+        "karpathy" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/multica-ai/andrej-karpathy-skills.git" -TargetPath (Join-Path $SkillRoot "andrej-karpathy-skills") -Label "multica-ai/andrej-karpathy-skills"
+        }
         "all" {
-            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific")
+            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific", "karpathy")
             foreach ($k in $keys) { Install-Skill -Key $k }
         }
         default {
-            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, karpathy, all" -ForegroundColor Red
         }
     }
 }
@@ -231,10 +234,11 @@ else {
     Write-Host "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
     Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
     Write-Host "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
-    Write-Host "  9) All of the above"
-    Write-Host " 10) Skip (add your own later)"
+    Write-Host "  9) multica-ai / andrej-karpathy-skills   (FOLDER, Andrej Karpathy's skills/workflows)"
+    Write-Host " 10) All of the above"
+    Write-Host " 11) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-10]"
+    $choice = Read-Host "Choose [1-11]"
 
     switch ($choice) {
         "1" { Install-Skill -Key "antigravity" }
@@ -245,8 +249,9 @@ else {
         "6" { Install-Skill -Key "ui-ux-pro-max" }
         "7" { Install-Skill -Key "othmanadi" }
         "8" { Install-Skill -Key "scientific" }
-        "9" { Install-Skill -Key "all" }
-        "10" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
+        "9" { Install-Skill -Key "karpathy" }
+        "10" { Install-Skill -Key "all" }
+        "11" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
         default { Write-Host "Invalid choice, skipping skill source installation." -ForegroundColor DarkGray }
     }
 }

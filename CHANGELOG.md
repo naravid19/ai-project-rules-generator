@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Multi-root discovery support in `scripts/discover-skills.py`, including repeated `--agent-dir` handling, ordered root precedence, and deterministic deduplication across shared and local `.agent` roots
 - Companion skill metadata in discovery and extraction output via `source_root`, `instruction_type`, `companion_docs`, and `reference_dirs`
 - Regression fixtures and tests for hybrid skill folders, `AGENTS.md`-only fallback packages, workflow/plugin roots, and duplicate source precedence handling
+- Setup script support for `multica-ai/andrej-karpathy-skills` to provide Andrej Karpathy's skills and workflows alongside other recommended sources
 - Setup script support for `K-Dense-AI/claude-scientific-skills` so the scientific skill collection can be installed into local or shared roots with the same optional-source flow as the other recommended repositories
 
 ### Changed
@@ -30,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Discovery no longer emits separate matches for companion `AGENTS.md`, `CLAUDE.md`, or `README.md` files that belong to the same skill directory
 - Multi-root searches now prefer the first matching source name consistently instead of surfacing duplicate shared/local copies
 - Capability extraction now resolves modern skill packages that expose guidance through adjacent docs and `references/` or `rules/` directories
-- `scripts/validate-output.sh` now treats `claude-scientific-skills` as another known source name when checking generated outputs for Rule 1 hardcoding regressions
+- `scripts/validate-output.sh` now treats `claude-scientific-skills` and `andrej-karpathy-skills` as known source names when checking generated outputs for Rule 1 hardcoding regressions
 
 ## [1.7.0] - 2026-03-13
 

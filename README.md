@@ -178,8 +178,9 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 > - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) — curated registry layout
 > - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) — broad full-stack developer set
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
-> - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — Manus-style persistent memory planning
+> - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — planning and persistence workflows
 > - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) — scientific and research-focused workflows
+> - [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) — Andrej Karpathy's skills and workflows
 
 ### Installation
 
@@ -673,6 +674,7 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills)
 - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files)
 - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills)
+- [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
 - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

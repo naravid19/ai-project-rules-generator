@@ -299,6 +299,9 @@ Resolve roots -> scan each root recursively in precedence order
 |   \-- scientific-skills/           <- Visible skill tree -> Format: FOLDER
 |       |-- literature-review/SKILL.md
 |       \-- ...
+|-- andrej-karpathy-skills/           <- Has SKILL.md folders -> Format: FOLDER
+|   |-- README.md                     (multica-ai/andrej-karpathy-skills)
+|   \-- ...
 |-- ui-ux-pro-max-skill/              <- Uses deeply nested CLAUDE.md and .shared/ -> Format: WORKFLOW
 |   |-- CLAUDE.md                     (nextlevelbuilder/ui-ux-pro-max-skill)
 |   |-- .claude/skills/ui-ux-pro-max/SKILL.md
