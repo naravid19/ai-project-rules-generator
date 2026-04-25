@@ -971,7 +971,7 @@ After completing this workflow, you should have:
 ## Quick Reference Card
 
 ```text
-CREATE PROJECT RULES v1.8 - QUICK REF
+CREATE PROJECT RULES v1.9 - QUICK REF
 
 Stage 0: Preferences     | Config file / interactive, language, severity, platforms
 Stage 1: Analyze         | Autonomous scan, tech stack, patterns, detect AI tools
@@ -1130,3 +1130,4 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.6 | 2026-03-06 | Shared skill roots, active `.rulesrc.yaml` semantics, config-aware validation thresholds, PowerShell validator repair, and repo-wide workflow alignment |
 | 1.7 | 2026-03-13 | Mixed `.agent/` compatibility recheck, reserved workflow-folder filtering, relevance-ranked discovery results, regression coverage for helper scripts, and documentation/performance alignment |
 | 1.8 | 2026-03-22 | Hybrid and multi-root skill source modernization, ordered shared-root precedence, companion-doc extraction, scientific source installer support, and end-to-end scientific-source verification |
+| 1.9.0 | 2026-04-25 | Native MCP server auto-discovery, project-local audit logging and memory persistence, confidence gating heuristics, and strict source root enforcement |
