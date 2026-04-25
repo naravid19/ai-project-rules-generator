@@ -1,0 +1,123 @@
+# Default MCP registry mapping for hybrid tool + local-skill routing.
+# Keys are normalized technical intents. Values are recommended MCP server names.
+
+database:
+  - postgres-mcp
+  - sqlite-mcp
+  - supabase-mcp
+
+github:
+  - github-mcp
+
+terminal:
+  - terminal-mcp
+
+filesystem:
+  - filesystem-mcp
+
+browser:
+  - playwright-mcp
+  - puppeteer-mcp
+
+api:
+  - openapi-mcp
+
+docker:
+  - docker-mcp
+
+memory:
+  - memory-mcp
+
+search:
+  - brave-search-mcp
+  - tavily-mcp
+
+monitoring:
+  - sentry-mcp
+  - datadog-mcp
+
+deployment:
+  - vercel-mcp
+  - cloudflare-mcp
+  - netlify-mcp
+
+cloud:
+  - aws-mcp
+  - gcp-mcp
+  - azure-mcp
+
+ci:
+  - github-actions-mcp
+  - circleci-mcp
+
+testing:
+  - playwright-mcp
+  - cypress-mcp
+
+email:
+  - resend-mcp
+  - sendgrid-mcp
+
+auth:
+  - clerk-mcp
+  - auth0-mcp
+
+storage:
+  - s3-mcp
+  - cloudflare-r2-mcp
+
+analytics:
+  - posthog-mcp
+  - amplitude-mcp
+
+cms:
+  - contentful-mcp
+  - sanity-mcp
+
+redis:
+  - redis-mcp
+  - upstash-mcp
+
+queue:
+  - bullmq-mcp
+  - sqs-mcp
+
+payments:
+  - stripe-mcp
+
+notifications:
+  - slack-mcp
+  - discord-mcp
+
+ai:
+  - openai-mcp
+  - anthropic-mcp
+
+design:
+  - figma-mcp
+
+documentation:
+  - notion-mcp
+  - confluence-mcp
+
+search:
+  - tavily-mcp
+  - exa-mcp
+
+monitoring:
+  - sentry-mcp
+  - datadog-mcp
+
+deployment:
+  - vercel-mcp
+  - cloudflare-mcp
+
+secrets:
+  - vault-mcp
+
+email:
+  - resend-mcp
+
+cloud:
+  - aws-mcp
+  - gcp-mcp

@@ -7,6 +7,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 
@@ -26,10 +27,14 @@ def run_python(*args: str, cwd: Path | None = None) -> subprocess.CompletedProce
 
 
 def load_module(module_path: Path, module_name: str):
+    module_dir = str(module_path.parent)
+    if module_dir not in sys.path:
+        sys.path.insert(0, module_dir)
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)
     assert spec is not None
     assert spec.loader is not None
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -213,9 +218,12 @@ class SkillScriptTests(unittest.TestCase):
                 "1,4",
                 "3",
                 "y",
-                "y",
+                "2",
                 r"C:\Users\narav\Desktop\CE code\Tools\.agent",
                 "42",
+                "85",
+                "5",
+                "1",
             ]
         )
         captured_yaml: dict[str, str] = {}
@@ -226,9 +234,19 @@ class SkillScriptTests(unittest.TestCase):
 
         with mock.patch("builtins.input", side_effect=lambda _prompt="": next(answers)):
             with mock.patch.object(Path, "write_text", autospec=True, side_effect=fake_write_text):
-                with mock.patch("sys.stdout", new=io.StringIO()) as stdout:
-                    wizard.run()
-                    output = stdout.getvalue()
+                with mock.patch.object(
+                    wizard_module,
+                    "score_project_confidence",
+                    return_value=SimpleNamespace(
+                        score=42,
+                        threshold=85,
+                        requires_clarification=True,
+                        clarification_options=("frontend", "backend"),
+                    ),
+                ):
+                    with mock.patch("sys.stdout", new=io.StringIO()) as stdout:
+                        wizard.run()
+                        output = stdout.getvalue()
 
         self.assertTrue(output.isascii())
         config_text = captured_yaml[".rulesrc.yaml"]
@@ -238,9 +256,16 @@ class SkillScriptTests(unittest.TestCase):
         self.assertIn("    - performance", config_text)
         self.assertIn("template_style: minimal", config_text)
         self.assertIn("quality_threshold: 42", config_text)
+        self.assertIn("confidence_threshold: 85", config_text)
+        self.assertIn("skill_match_limit: 5", config_text)
+        self.assertIn("project_intent_override:", config_text)
         self.assertIn("preview_mode: true", config_text)
         self.assertIn('  - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"', config_text)
+        self.assertIn("    confirmed: true", config_text)
         self.assertIn("  - path: .agent", config_text)
+        self.assertIn("    confirmed: false", config_text)
+        self.assertIn("logging:", config_text)
+        self.assertIn("memory:", config_text)
 
 
 if __name__ == "__main__":

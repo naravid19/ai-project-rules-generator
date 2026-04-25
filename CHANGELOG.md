@@ -1,13 +1,27 @@
-﻿# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.9.0][1.9.0] - 2026-04-25
 
-## [1.8.0] - 2026-03-22
+### Added
+
+- **Native MCP Auto-Discovery**: Automatically discovers and loads Model Context Protocol (MCP) servers, giving your AI agents seamless access to external tools and context.
+- **Audit Logging & Memory**: Introduced project-local audit trails and memory summarization. Your agents can now retain context and remember past decisions across different sessions.
+- **Confidence Gating**: New runtime protections that evaluate skill relevance, ensuring only highly confident, appropriate skills are included in your generated rules.
+- **Skill Catalog Indexing**: Lightweight indexing for faster and more reliable skill discovery.
+- **Comprehensive Testing**: Extensive regression coverage for architecture, MCP routing, audit logs, and validators.
+
+### Changed
+
+- **Interactive Configuration (`wizard.py`)**: Now strictly enforces a single confirmed skill source root to prevent conflicts, while retaining your previous `.rulesrc.yaml` settings.
+- **Enhanced Output Validation**: The validator scripts now strictly enforce traceability metadata, verify physical skill source paths, and mandate dedicated `[Native MCP Servers]` and `[Local Agent Skills]` sections in `AGENTS.md`.
+- **Documentation Overhaul**: Updated `README.md`, `AGENTS.md`, and templates to provide clear, easy-to-understand guidance on the new features.
+
+## [1.8.0][1.8.0] - 2026-03-22
 
 ### Added
 
@@ -33,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Capability extraction now resolves modern skill packages that expose guidance through adjacent docs and `references/` or `rules/` directories
 - `scripts/validate-output.sh` now treats `claude-scientific-skills` and `andrej-karpathy-skills` as known source names when checking generated outputs for Rule 1 hardcoding regressions
 
-## [1.7.0] - 2026-03-13
+## [1.7.0][1.7.0] - 2026-03-13
 
 ### Added
 
@@ -51,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `scripts/extract-capabilities.py` no longer crashes on `Any` import/frontmatter parsing paths and now emits stable merged tool metadata
 - `scripts/wizard.py` no longer fails on Windows console encoding or malformed YAML generation paths
 
-## [1.6.0] - 2026-03-06
+## [1.6.0][1.6.0] - 2026-03-06
 
 ### Added
 
@@ -69,7 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `scripts/validate-output.ps1` now parses on Windows PowerShell 5.1 and mirrors the documented 50-point heuristic scoring model
 - `scripts/validate-output.ps1` and `scripts/validate-output.sh` now read `quality_threshold` from `.rulesrc.yaml`, print raw checks plus scorecards, and ignore anti-pattern examples when checking for hardcoded skill names
 
-## [1.5.0] - 2026-03-05
+## [1.5.0][1.5.0] - 2026-03-05
 
 ### Added
 
@@ -88,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **Validation Script Follow-Up Deferred** — The v1.5.0 release introduced validator scripts, but the full Windows PowerShell 5.1 parser repair and heuristic-scoring alignment are tracked in [Unreleased].
+- **Validation Script Follow-Up Deferred** — The v1.5.0 release introduced validator scripts, but the full Windows PowerShell 5.1 parser repair and heuristic-scoring alignment are tracked in [Unreleased][Unreleased].
 
 ### Changed
 
@@ -106,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - **`.cursorrules`** — Updated Key Files table with new files
 - **`templates/README.md`** — Expanded to 10 templates with coverage-by-category table
 
-## [1.4.0] - 2026-03-03
+## [1.4.0][1.4.0] - 2026-03-03
 
 ### Added
 
@@ -119,7 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Example output updated from Chrome Extension to Python FastAPI in `workflows/create-project-rules.md` and `README.md`
 - `README.md` installation flow now includes Quick Start Script (Option A) and Manual setup (Option B)
 
-## [1.3.0] - 2026-03-03
+## [1.3.0][1.3.0] - 2026-03-03
 
 ### Added
 
@@ -157,7 +171,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Hardcoded skill source table ("Supported Skill Sources") - replaced with format-based detection
 - Hardcoded CATALOG.md-only references in pipeline diagram - replaced with format branching
 
-## [1.2.0] - 2026-02-07
+## [1.2.0][1.2.0] - 2026-02-07
 
 ### Added
 
@@ -166,7 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Quick reference card (ASCII art)
 - Architecture keywords in keyword table
 
-## [1.1.0] - 2026-02-07
+## [1.1.0][1.1.0] - 2026-02-07
 
 ### Added
 
@@ -175,7 +189,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Keyword reference table for skill discovery
 - Reader test in verification stage
 
-## [1.0.0] - 2026-02-07
+## [1.0.0][1.0.0] - 2026-02-07
 
 ### Added
 
@@ -188,7 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
-[Unreleased]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...HEAD
+[1.9.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.5.0...v1.6.0

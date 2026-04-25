@@ -8,6 +8,7 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="."
 STRICT_MODE=false
 CLI_THRESHOLD=""
@@ -124,6 +125,68 @@ config_threshold() {
   fi
 
   return 1
+}
+
+strip_yaml_scalar() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+    echo "${value:1:${#value}-2}"
+    return
+  fi
+  if [[ "$value" == \'*\' && "$value" == *\' ]]; then
+    echo "${value:1:${#value}-2}"
+    return
+  fi
+  echo "$value"
+}
+
+configured_skill_sources_json() {
+  python - "$PROJECT_ROOT/.rulesrc.yaml" "$SCRIPT_DIR" <<'PY'
+from pathlib import Path
+import json
+import sys
+
+sys.path.insert(0, sys.argv[2])
+from rules_config import load_skill_sources
+
+config_path = Path(sys.argv[1])
+if not config_path.exists():
+    print("[]")
+else:
+    print(json.dumps([entry.__dict__ for entry in load_skill_sources(config_path)]))
+PY
+}
+
+traceability_metadata() {
+  python - "$1" "$SCRIPT_DIR" <<'PY'
+from pathlib import Path
+import json
+import sys
+
+sys.path.insert(0, sys.argv[2])
+from traceability import extract_traceability_metadata
+
+content = Path(sys.argv[1]).read_text(encoding="utf-8")
+metadata = extract_traceability_metadata(content)
+print(json.dumps(metadata.__dict__))
+PY
+}
+
+resolve_metadata_path() {
+  python - "$1" "$2" <<'PY'
+from pathlib import Path
+import sys
+
+root = Path(sys.argv[1]).resolve()
+raw_path = sys.argv[2]
+candidate = Path(raw_path)
+if candidate.is_absolute():
+    print(candidate)
+else:
+    print((root / candidate).resolve())
+PY
 }
 
 effective_threshold() {
@@ -300,6 +363,7 @@ score_file() {
   local vague_hits=0
   local hardcoded_hits=0
   local repo_errors=0
+  local traceability_path=""
 
   if [[ ! -f "$full_path" ]]; then
     fail "Missing $file_name"
@@ -317,6 +381,50 @@ score_file() {
 
   pass "Found $file_name"
   pass "$file_name line count: $line_count"
+
+  local traceability_json traceability_path_value traceability_confirmed resolved_traceability_path
+  traceability_json="$(traceability_metadata "$full_path")"
+  traceability_path_value="$(python -c "import json,sys; print(json.loads(sys.argv[1])['skill_source_path'])" "$traceability_json")"
+  traceability_confirmed="$(python -c "import json,sys; print(str(json.loads(sys.argv[1])['confirmed_skill_source']).lower())" "$traceability_json")"
+
+  if [[ -z "$traceability_path_value" ]]; then
+    fail "$file_name is missing Skill_Source_Path traceability metadata"
+  else
+    traceability_path="$traceability_path_value"
+    pass "$file_name includes Skill_Source_Path traceability metadata"
+    resolved_traceability_path="$(resolve_metadata_path "$PROJECT_ROOT" "$traceability_path_value")"
+    if [[ -e "$resolved_traceability_path" ]]; then
+      pass "$file_name traceability path exists on disk"
+    else
+      fail "$file_name traceability path does not exist on disk: $traceability_path_value"
+    fi
+  fi
+
+  if [[ "$traceability_confirmed" == "true" ]]; then
+    pass "$file_name confirms the selected skill source"
+  else
+    fail "$file_name is missing Confirmed_Skill_Source: true metadata"
+  fi
+
+  local configured_sources_json
+  configured_sources_json="$(configured_skill_sources_json)"
+  if [[ "$configured_sources_json" != "[]" && -n "$traceability_path_value" ]]; then
+    local config_match_count confirmed_match_count
+    config_match_count="$(python -c "import json,sys,pathlib; root=pathlib.Path(sys.argv[1]).resolve(); metadata=sys.argv[2]; resolved=str((pathlib.Path(metadata) if pathlib.Path(metadata).is_absolute() else (root / metadata).resolve())); records=json.loads(sys.argv[3]); print(sum(1 for item in records if item['path']==metadata or str((pathlib.Path(item['path']) if pathlib.Path(item['path']).is_absolute() else (root / item['path']).resolve()))==resolved))" "$PROJECT_ROOT" "$traceability_path_value" "$configured_sources_json")"
+    confirmed_match_count="$(python -c "import json,sys,pathlib; root=pathlib.Path(sys.argv[1]).resolve(); metadata=sys.argv[2]; resolved=str((pathlib.Path(metadata) if pathlib.Path(metadata).is_absolute() else (root / metadata).resolve())); records=json.loads(sys.argv[3]); print(sum(1 for item in records if item.get('confirmed') and (item['path']==metadata or str((pathlib.Path(item['path']) if pathlib.Path(item['path']).is_absolute() else (root / item['path']).resolve()))==resolved)))" "$PROJECT_ROOT" "$traceability_path_value" "$configured_sources_json")"
+
+    if [[ "$config_match_count" -gt 0 ]]; then
+      pass "$file_name traceability path is listed in .rulesrc.yaml"
+    else
+      fail "$file_name traceability path is not listed in .rulesrc.yaml skill_sources"
+    fi
+
+    if [[ "$confirmed_match_count" -gt 0 ]]; then
+      pass "$file_name traceability path matches a confirmed skill source"
+    else
+      fail "$file_name traceability path does not match a confirmed skill source"
+    fi
+  fi
 
   IFS='|' read -r -a headings <<< "$headings_raw"
   for heading in "${headings[@]}"; do
@@ -387,6 +495,20 @@ score_file() {
     pass "$file_name avoids long wall-of-text paragraphs"
   else
     warn "$file_name has long paragraph blocks: $long_paragraphs"
+  fi
+
+  if [[ "$file_name" == "AGENTS.md" ]]; then
+    if grep -Fq "[Native MCP Servers]" "$full_path"; then
+      pass "AGENTS.md contains [Native MCP Servers] section"
+    else
+      fail "AGENTS.md is missing [Native MCP Servers] section"
+    fi
+
+    if grep -Fq "[Local Agent Skills]" "$full_path"; then
+      pass "AGENTS.md contains [Local Agent Skills] section"
+    else
+      fail "AGENTS.md is missing [Local Agent Skills] section"
+    fi
   fi
 
   local completeness accuracy specificity scannability

@@ -59,10 +59,12 @@ Treat the config file as the source of truth when fields are present:
 | `severity_level` | Controls how many blocking vs advisory rules are written. |
 | `output_language` | Controls translated prose. Keep code examples in the original programming language. |
 | `sections.include` / `sections.exclude` | Filter optional sections before writing files. Required sections remain present. |
-| `skill_sources` | Discovery roots to scan first. If omitted, scan project-local `.agent/`. |
+| `skill_sources` | Discovery roots to scan first. Exactly one root must be confirmed before generation. |
 | `custom_keywords` | Merge with auto-detected keywords using case-insensitive dedupe. |
 | `template_style` | Controls formatting density: `progressive`, `flat`, or `minimal`. |
 | `quality_threshold` | Stage 5 pass threshold. Use this instead of the default `38` when present. |
+| `confidence_threshold` | Minimum score before the workflow must halt and ask the user to clarify intent. |
+| `skill_match_limit` | Hard cap for matched skills carried forward after discovery. |
 | `preview_mode` | If `true`, show the preview step before writing files. |
 | `existing_files` | Controls whether to ask, overwrite, merge, or skip existing outputs. |
 
@@ -70,6 +72,7 @@ Treat the config file as the source of truth when fields are present:
 
 - Relative paths resolve from the project root.
 - Absolute paths are allowed.
+- Exactly one entry must be marked `confirmed: true` before generation begins.
 - If `format` is omitted, auto-detect the format for that root.
 - If `format` is provided, trust it and skip format inference for that root.
 
@@ -79,13 +82,18 @@ Example:
 skill_sources:
   - path: .agent/skills
     format: CATALOG
+    confirmed: true
   - path: .agent/awesome-claude-skills
+    confirmed: false
   - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"
+    confirmed: false
 custom_keywords:
   - planning
   - memory
 template_style: minimal
 quality_threshold: 42
+confidence_threshold: 80
+skill_match_limit: 5
 ```
 
 ### 0.3 Interactive Preference Questions
@@ -134,6 +142,8 @@ Preferences:
   custom_keywords: [planning, memory]
   template_style: progressive
   quality_threshold: 38
+  confidence_threshold: 80
+  skill_match_limit: 5
   preview_mode: false
   existing_files: ask
 ```
@@ -200,6 +210,16 @@ Scan the project root for existing AI configuration files to determine which too
 
 > If none found, default to generating `.cursorrules` + `AGENTS.md` (most universal).
 
+### 1.5 Confidence Gate (Human-in-the-Loop)
+
+Before skill discovery or file generation, score the detected project signals.
+
+- If `confidence_score >= confidence_threshold`, continue automatically.
+- If `confidence_score < confidence_threshold`, stop and ask the user to clarify the project type / intent with multiple-choice options.
+- Do not guess. Do not continue with broad default assumptions.
+
+Use only repo facts for the score: manifests, entrypoints, dependencies, architecture folders, and test signals.
+
 ---
 
 ## Stage 2: Skill Discovery (Format-Based Auto-Detect)
@@ -227,8 +247,10 @@ Use the following tools to automate the mapping process:
 | Task | Command | Purpose |
 |------|---------|---------|
 | **Source Discovery** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...]` | Scans roots in precedence order and classifies sources by format. |
-| **Skill Search** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords <terms> --limit 25` | Finds candidate skill entries matching the tech stack and trims broad catalog output. |
+| **Catalog Indexing** | `python scripts/indexer.py --project-root .` | Builds `.agent/memory/skill_catalog.json` from the confirmed root only. |
+| **Skill Search** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords <terms> --limit <skill_match_limit>` | Finds candidate skill entries matching the tech stack and trims broad catalog output. |
 | **Capability Extraction** | `python scripts/extract-capabilities.py <skill-dir-or-path>` | Summarizes matched skills, companion docs, and adjacent references for integration. |
+| **MCP Auto-Discovery** | Load `templates/mcp_registry.yaml` plus local IDE MCP config files | Maps technical intent to native tool servers before rule generation. |
 
 > Skip local `.agent/workflows/` when classifying skill sources. It stores installed workflow files, not reusable skill libraries.
 
@@ -367,6 +389,37 @@ For each detected source, use the appropriate search method:
 | **README** | Open `README.md`, scan category headings and descriptions for relevant entries |
 | **WORKFLOW** | Read workflow / `CLAUDE.md` file, follow instructions to run scripts from `.shared/` |
 
+> [!IMPORTANT]
+> Every AI execution step must prepend this constraint with the actual confirmed path:
+>
+> `You must ONLY retrieve and reference skills from the confirmed directory: [CONFIRMED_PATH]`
+
+### 2.4 Two-Stage JIT Retrieval
+
+1. Generate a lightweight catalog with `scripts/indexer.py`.
+2. Use only user intent, tech stack, and `skill_catalog.json` to select up to `skill_match_limit` paths.
+3. Load full markdown only for the selected paths.
+4. Never inject raw, unindexed skill trees into the final prompt.
+
+Use a strict Stage 1 prompt that returns JSON only:
+
+```text
+You are matching user intent against a lightweight skill catalog.
+User intent: <intent>
+Tech stack: <stack>
+Hard limit: return a strict JSON array of at most 5 skill paths.
+Return only JSON.
+```
+
+### 2.5 Hybrid MCP + Skill Routing
+
+1. Auto-detect installed MCP servers from local IDE config files such as `.cursor/mcp.json`.
+2. Load `templates/mcp_registry.yaml`.
+3. Route local markdown skills from `skill_catalog.json`.
+4. Route native MCP servers from the registry only when they are both:
+   - relevant to the clarified intent
+   - actually detected on disk
+
 ### 2.4 Read and Extract Best Practices
 
 For each matched skill:
@@ -403,6 +456,13 @@ Use the Stage 0 preference before writing sections:
 > Required sections still remain present in every style. `template_style` changes formatting density and verbosity, not core coverage.
 
 Structure using **progressive disclosure** unless `template_style` changes the presentation:
+
+Add traceability metadata near the top of the generated file:
+
+```markdown
+<!-- Skill_Source_Path: {confirmed_skill_source_path} -->
+<!-- Confirmed_Skill_Source: true -->
+```
 
 ### 3.1 Required Sections
 
@@ -626,6 +686,28 @@ Based on AI tools detected in Stage 1.4:
 
 Scan `.agent/` (or `skill_sources`) and classify by format: CATALOG, FOLDER, SEARCH, or README.
 
+## [Native MCP Servers]
+
+| Server | Purpose |
+|--------|---------|
+| `{server}` | {what it provides} |
+
+## [Local Agent Skills]
+
+Only discover and reference skills from the confirmed root recorded in the traceability metadata comment.
+
+Use this instruction pattern in generated outputs:
+
+```markdown
+### 🛠️ Native MCP Servers
+*Available Tools:* [List auto-detected MCPs here]
+*Instruction:* Use these tools to execute actions (e.g., read files, query DBs, run terminal commands).
+
+### 📚 Local Agent Skills
+*Knowledge Base:* [List confirmed skill paths here]
+*Instruction:* Strictly follow the conceptual guidelines, coding standards, and architectural rules defined in these paths before executing any MCP tool.
+```
+
 ---
 
 ## 🚫 Non-Negotiable Constraints
@@ -713,6 +795,12 @@ Scan configured skill roots (`skill_sources` first, otherwise project-local `.ag
 | A `README.md` with skill list | Browse categories for relevant entries |
 ```
 
+### 4.4 Cascading Rules for Monorepos
+
+- Generate one root `AGENTS.md` with universal rules, security constraints, and no-break policies.
+- If subdirectories such as `frontend/`, `backend/`, `apps/*`, or `services/*` have distinct stack signals, generate local `.cursorrules` files there.
+- Local rules inherit root constraints first, then add service-specific guidance.
+
 ---
 
 ## Stage 5: Verification
@@ -748,6 +836,7 @@ Check for these common problems:
 | Missing time estimates | Stages without time estimates | Add estimates to every stage |
 | Abstract examples | "e.g., do X" without code | Add project-specific code snippets |
 | Platform assumptions | Only references one AI tool | Add multi-platform note or table |
+| Missing traceability | No `Skill_Source_Path` metadata or fake path | Add metadata and ensure the path exists on disk |
 
 ### 5.3 Cross-File Consistency Check
 
@@ -759,6 +848,8 @@ Check for these common problems:
 | Both files consistent with `README.md` if it exists | |
 | Skill references use keywords, not hardcoded names | |
 | Skill source references use formats, not hardcoded repos | |
+| Traceability metadata is present and points to an existing configured path | |
+| `AGENTS.md` contains `[Native MCP Servers]` and `[Local Agent Skills]` sections | |
 | Multi-platform table present if multiple AI tools used | |
 | All file paths and references are correct | |
 

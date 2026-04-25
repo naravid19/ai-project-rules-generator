@@ -1,4 +1,4 @@
-﻿<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 
 <a id="readme-top"></a>
 
@@ -110,10 +110,12 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
 | **6-Stage Workflow**         | Structured process: Preferences → Analyze → Discover → .cursorrules → AGENTS.md → Verify |
 | **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README/WORKFLOW) |
+| **Native MCP Support**       | 🌟 **New in v1.9.0:** Auto-discovery of MCP servers for seamless tool execution context        |
+| **Memory & Audit Logging**   | 🌟 **New in v1.9.0:** Project-local audit trails and memory summarization for agent context retention |
 | **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
 | **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
 | **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
-| **Quality Scoring**          | Heuristic verification with a default `38/50` pass threshold and config-aware overrides  |
+| **Quality & Confidence**     | 🌟 **New in v1.9.0:** Heuristic verification (38/50 default pass) and confidence gating to ensure strict relevance |
 | **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) for surgical rule customization  |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
@@ -339,28 +341,18 @@ custom_keywords:
 
 ## Workflow Stages
 
-| Stage / Step                 | Description                     | Time Estimate     |
-| ---------------------------- | ------------------------------- | ----------------- |
-| **Stage 0: Preferences**     | Config file / interactive       | 2-5 min           |
-| **Stage 1: Analyze**         | Autonomous scan, tech stack     | 10-15 min         |
-| **Stage 2: Skill Discovery** | Auto-detect by FORMAT & 17 cats | 5-10 min          |
-| **Stage 3: .cursorrules**    | Progressive disclosure + rules  | 10-20 min         |
-| **Preview** (optional)       | Review before writing files     | 2-3 min           |
-| **Stage 4: AGENTS.md**       | Multi-platform output           | 10-15 min         |
-| **Stage 5: Verify**          | Quality scoring + statistics    | 5-10 min          |
-| **Total Time**               |                                 | **30-60 minutes** |
+> 🌟 **What's New in v1.9.0 (2026-04-25):** Added Native MCP Server auto-discovery, project-local audit logging, memory summarization, and confidence gating. The interactive wizard now strictly enforces a single confirmed skill source root for guaranteed consistency.
 
-> **Latest compatibility update (2026-03-22):** Discovery now supports repeated `--agent-dir` roots, prefers the first matching source across shared and local `.agent` trees, collapses hybrid skill packages into one entity per directory, and documents the current shared-root smoke-check baseline alongside the repo-local sample.
-
-| Stage                      | Time      | Description                                                             |
-| -------------------------- | --------- | ----------------------------------------------------------------------- |
-| **0. User Preferences**    | 2-5 min   | Config file or interactive: platforms, severity, language, preview      |
-| **1. Project Analysis**    | 10-15 min | Autonomous scan: structure, tech stack, patterns, AI tool detection     |
-| **2. Skill Discovery**     | 5-10 min  | Auto-detect sources by format, search all by 17 keyword categories      |
-| **3. Create .cursorrules** | 10-20 min | Coding standards with severity levels and progressive disclosure        |
-| **Preview** (optional)     | 2-3 min   | Review planned structure before writing files                           |
-| **4. Create AGENTS.md**    | 10-15 min | AI guidelines with multi-platform output and dynamic skill section      |
-| **5. Verification**        | 5-10 min  | Quality scoring (default 38/50), smell detection, generation statistics |
+| Stage / Step                 | Time      | Description                                                             |
+| ---------------------------- | --------- | ----------------------------------------------------------------------- |
+| **0. User Preferences**      | 2-5 min   | Config file or interactive: platforms, severity, language, preview      |
+| **1. Project Analysis**      | 10-15 min | Autonomous scan: structure, tech stack, patterns, AI tool detection     |
+| **2. Skill Discovery**       | 5-10 min  | Auto-detect sources by format, search all by 17 keyword categories      |
+| **3. Create .cursorrules**   | 10-20 min | Coding standards with severity levels and progressive disclosure        |
+| **Preview** (optional)       | 2-3 min   | Review planned structure before writing files                           |
+| **4. Create AGENTS.md**      | 10-15 min | AI guidelines with multi-platform output and dynamic skill section      |
+| **5. Verification**          | 5-10 min  | Quality scoring (default 38/50), smell detection, generation statistics |
+| **Total Time**               | **30-60m**|                                                                         |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -432,19 +424,18 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 >
 > **When to choose `claude-scientific-skills`:** Pick it for projects with scientific or research-heavy tasks such as literature review, genomics, chemistry, clinical analysis, forecasting, or scientific communication. Keep the broader general-purpose sources above for mixed engineering work.
 
-#### Compatibility Snapshot (2026-03-22)
+#### Compatibility Snapshot (2026-04-25)
 
 | Check | Result | Notes |
 | ----- | ------ | ----- |
+| **Native MCP Discovery** | **Supported** | Auto-discovers and registers MCP intents via `templates/mcp_registry.yaml` for enhanced agent capabilities. |
+| **Traceability Metadata** | **Enforced** | Validators strictly require `Skill_Source_Path` and `Confirmed_Skill_Source: true` tags. |
 | Repo-local `.agent/` sample | Supported | The committed sample root still resolves the mixed-format layout used in tests and documentation. |
 | Shared-root baseline | Supported | The live shared root at `C:/Users/narav/Desktop/CE code/Tools/.agent` was rechecked as the compatibility baseline for the current implementation. |
 | Hybrid skill folders | Supported | Skill directories can now keep `SKILL.md` as the primary entry while surfacing companion `AGENTS.md`, `CLAUDE.md`, and `README.md` files. |
-| `claude-scientific-skills` temp install | Supported | An isolated installer run cloned the scientific source into a temp shared root, discovery classified it as `FOLDER`, and capability extraction succeeded against a real skill directory. |
-| Root precedence | Ordered | Multi-root discovery prefers the first matching source name, so shared roots should be listed before `.agent` when they should win. |
-| Reserved output handling | Passed | Local `.agent/workflows/` is skipped because it stores installed workflows rather than skill libraries. |
+| Root precedence | Strict | Multi-root discovery strictly prefers the explicitly confirmed root for predictability. |
 | Format scan benchmark | ~280 ms per root | Measured with `python scripts/discover-skills.py --agent-dir <root> --format` on the local Windows sample. |
-| Limited keyword search benchmark | ~1.3-1.9 s depending on source mix | Measured with `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords planning workflow python testing --limit 25`. |
-| Wide search volume | Still broad on large catalogs | Use `--limit` for large CATALOG sources to keep downstream rule generation focused. |
+| Keyword search benchmark | ~1.3-1.9 s | Measured with `python scripts/discover-skills.py --agent-dir <root> --keywords planning workflow python testing`. |
 
 #### Discovery CLI Examples
 

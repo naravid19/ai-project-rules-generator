@@ -88,6 +88,124 @@ function Get-ConfigThreshold([string]$RootPath) {
     return $null
 }
 
+function Strip-YamlScalar([string]$Value) {
+    $trimmed = $Value.Trim()
+    if (
+        ($trimmed.StartsWith('"') -and $trimmed.EndsWith('"')) -or
+        ($trimmed.StartsWith("'") -and $trimmed.EndsWith("'"))
+    ) {
+        return $trimmed.Substring(1, $trimmed.Length - 2)
+    }
+
+    return $trimmed
+}
+
+function Get-ConfiguredSkillSourceRecords([string]$RootPath) {
+    $configPath = Join-Path $RootPath ".rulesrc.yaml"
+    if (-not (Test-Path $configPath)) {
+        return @()
+    }
+
+    $lines = Get-Content $configPath
+    $records = @()
+    $inSkillSources = $false
+    $current = $null
+
+    foreach ($line in $lines) {
+        if (-not $inSkillSources) {
+            if ($line -match '^\s*skill_sources\s*:\s*$') {
+                $inSkillSources = $true
+            }
+            continue
+        }
+
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.Trim().StartsWith('#')) {
+            continue
+        }
+
+        if ($line -notmatch '^\s') {
+            break
+        }
+
+        $trimmed = $line.Trim()
+        if ($trimmed.StartsWith('- ')) {
+            if ($null -ne $current -and -not [string]::IsNullOrWhiteSpace($current.path)) {
+                $records += [pscustomobject]$current
+            }
+
+            $current = [ordered]@{
+                path = ""
+                confirmed = $false
+                format = ""
+            }
+
+            $payload = $trimmed.Substring(2).Trim()
+            if ($payload -match '^path\s*:\s*(.+)$') {
+                $current.path = Strip-YamlScalar $matches[1]
+            }
+            elseif (-not [string]::IsNullOrWhiteSpace($payload)) {
+                $current.path = Strip-YamlScalar $payload
+            }
+
+            continue
+        }
+
+        if ($null -eq $current -or $trimmed -notmatch '^(path|confirmed|format)\s*:\s*(.+)$') {
+            continue
+        }
+
+        $key = $matches[1]
+        $value = Strip-YamlScalar $matches[2]
+        switch ($key) {
+            "path" {
+                $current.path = $value
+            }
+            "confirmed" {
+                $current.confirmed = $value.ToLower() -eq 'true'
+            }
+            "format" {
+                $current.format = $value
+            }
+        }
+    }
+
+    if ($null -ne $current -and -not [string]::IsNullOrWhiteSpace($current.path)) {
+        $records += [pscustomobject]$current
+    }
+
+    return @($records)
+}
+
+function Get-TraceabilityMetadata([string]$Content) {
+    $pathMatch = [regex]::Match(
+        $Content,
+        '<!--\s*Skill_Source_Path:\s*(.+?)\s*-->',
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+    $confirmedMatch = [regex]::Match(
+        $Content,
+        '<!--\s*Confirmed_Skill_Source:\s*(true|false)\s*-->',
+        [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+    )
+
+    return [pscustomobject]@{
+        Path = $(if ($pathMatch.Success) { $pathMatch.Groups[1].Value.Trim() } else { "" })
+        Confirmed = $(if ($confirmedMatch.Success) { $confirmedMatch.Groups[1].Value.ToLower() -eq 'true' } else { $false })
+    }
+}
+
+function Resolve-MetadataPath([string]$RootPath, [string]$RawPath) {
+    if ([string]::IsNullOrWhiteSpace($RawPath)) {
+        return ""
+    }
+
+    if ([System.IO.Path]::IsPathRooted($RawPath)) {
+        return [System.IO.Path]::GetFullPath($RawPath)
+    }
+
+    return [System.IO.Path]::GetFullPath((Join-Path $RootPath $RawPath))
+}
+
 function Get-EffectiveThreshold([string]$RootPath, [int]$CliThreshold, [switch]$StrictMode) {
     if ($CliThreshold -ge 0) {
         $effective = $CliThreshold
@@ -294,6 +412,7 @@ function New-FileEvaluation([string]$FileName, [string]$RootPath) {
             Total        = 0
         }
         DuplicationCount  = 0
+        TraceabilityPath  = ""
     }
 
     if (-not (Test-Path $fullPath)) {
@@ -316,6 +435,66 @@ function New-FileEvaluation([string]$FileName, [string]$RootPath) {
     Pass $msg
     $msg = "$FileName line count: $($evaluation.LineCount)"
     Pass $msg
+
+    $traceability = Get-TraceabilityMetadata -Content $evaluation.Content
+    if ([string]::IsNullOrWhiteSpace($traceability.Path)) {
+        $msg = "$FileName is missing Skill_Source_Path traceability metadata"
+        Fail $msg
+    }
+    else {
+        $evaluation.TraceabilityPath = $traceability.Path
+        $msg = "$FileName includes Skill_Source_Path traceability metadata"
+        Pass $msg
+
+        $resolvedMetadataPath = Resolve-MetadataPath -RootPath $RootPath -RawPath $traceability.Path
+        if ((-not [string]::IsNullOrWhiteSpace($resolvedMetadataPath)) -and (Test-Path $resolvedMetadataPath)) {
+            $msg = "$FileName traceability path exists on disk"
+            Pass $msg
+        }
+        else {
+            $msg = "$FileName traceability path does not exist on disk: $($traceability.Path)"
+            Fail $msg
+        }
+    }
+
+    if ($traceability.Confirmed) {
+        $msg = "$FileName confirms the selected skill source"
+        Pass $msg
+    }
+    else {
+        $msg = "$FileName is missing Confirmed_Skill_Source: true metadata"
+        Fail $msg
+    }
+
+    $configuredSkillSources = Get-ConfiguredSkillSourceRecords -RootPath $RootPath
+    if ($configuredSkillSources.Count -gt 0 -and -not [string]::IsNullOrWhiteSpace($traceability.Path)) {
+        $resolvedMetadataPath = Resolve-MetadataPath -RootPath $RootPath -RawPath $traceability.Path
+        $configuredMatches = @(
+            $configuredSkillSources | Where-Object {
+                $_.path -eq $traceability.Path -or
+                (Resolve-MetadataPath -RootPath $RootPath -RawPath $_.path) -eq $resolvedMetadataPath
+            }
+        )
+
+        if ($configuredMatches.Count -gt 0) {
+            $msg = "$FileName traceability path is listed in .rulesrc.yaml"
+            Pass $msg
+        }
+        else {
+            $msg = "$FileName traceability path is not listed in .rulesrc.yaml skill_sources"
+            Fail $msg
+        }
+
+        $confirmedMatches = @($configuredMatches | Where-Object { $_.confirmed })
+        if ($confirmedMatches.Count -gt 0) {
+            $msg = "$FileName traceability path matches a confirmed skill source"
+            Pass $msg
+        }
+        else {
+            $msg = "$FileName traceability path does not match a confirmed skill source"
+            Fail $msg
+        }
+    }
 
     foreach ($heading in $RequiredHeadings[$FileName]) {
         if (Test-RequiredHeading -Content $evaluation.Content -Heading $heading) {
@@ -422,6 +601,26 @@ function New-FileEvaluation([string]$FileName, [string]$RootPath) {
     $evaluation.Scores.Accuracy = $accuracy
     $evaluation.Scores.Specificity = $specificity
     $evaluation.Scores.Scannability = $scannability
+
+    if ($FileName -eq "AGENTS.md") {
+        if ($evaluation.Content -match '\[Native MCP Servers\]') {
+            $msg = "AGENTS.md contains [Native MCP Servers] section"
+            Pass $msg
+        }
+        else {
+            $msg = "AGENTS.md is missing [Native MCP Servers] section"
+            Fail $msg
+        }
+
+        if ($evaluation.Content -match '\[Local Agent Skills\]') {
+            $msg = "AGENTS.md contains [Local Agent Skills] section"
+            Pass $msg
+        }
+        else {
+            $msg = "AGENTS.md is missing [Local Agent Skills] section"
+            Fail $msg
+        }
+    }
 
     return [pscustomobject]$evaluation
 }

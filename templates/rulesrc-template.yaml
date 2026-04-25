@@ -54,15 +54,18 @@ sections:
 # Override automatic skill-source discovery roots.
 # If omitted, the workflow scans the project-local `.agent/` directory.
 # Paths may be relative to the project root or absolute.
-# Roots are scanned in the order listed here, so shared roots should come first.
-# Duplicate source names prefer the first matching root.
+# Exactly one entry should be marked `confirmed: true` before generation begins.
+# Roots are scanned in the order listed here, but generation must only retrieve
+# and reference skills from the confirmed root.
 # `format` is optional; if provided, the workflow trusts it and skips inference.
 # Keep `.agent/skills` as the default Antigravity CATALOG target for backward compatibility.
 # Hybrid skill directories may include `SKILL.md` with companion `AGENTS.md`, `CLAUDE.md`,
 # `README.md`, and adjacent `references/` or `rules/` folders.
 # skill_sources:
 #   - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"
+#     confirmed: true
 #   - path: .agent
+#     confirmed: false
 
 # --- Custom Keywords ----------------------------------------------------------
 # Additional keywords to search for during skill discovery (Stage 2).
@@ -87,10 +90,55 @@ template_style: progressive
 # Scale: 0-50, Default: 38
 quality_threshold: 38
 
+# --- Confidence Threshold -----------------------------------------------------
+# Minimum confidence score before the workflow must stop and ask the user to clarify
+# the project type / intent with multiple-choice options.
+# Scale: 0-100, Default: 80
+confidence_threshold: 80
+
+# --- Skill Match Limit --------------------------------------------------------
+# Maximum number of matched skill candidates to carry forward after discovery.
+# This prevents context overload on large catalogs.
+# Default: 5
+skill_match_limit: 5
+
 # --- Preview Mode -------------------------------------------------------------
 # Show a preview of the planned structure before writing files.
 # Default: false
 preview_mode: false
+
+# --- Audit Logging ------------------------------------------------------------
+# JSON audit logs must stay project-local to avoid mixing runs across repos.
+logging:
+  enabled: true
+  directory: .agent/logs
+
+# --- Memory Summary -----------------------------------------------------------
+# Summarized state file generated from recent project-local logs.
+memory:
+  enabled: true
+  summary_path: .agent/memory/project_state.md
+
+# --- Native MCP Servers -------------------------------------------------------
+# Optional list of native MCP server names to surface in generated AGENTS.md
+# under the [Native MCP Servers] section.
+# mcp_servers:
+#   - filesystem
+#   - github
+
+# --- Intent Override ----------------------------------------------------------
+# When the confidence gate falls below the threshold, the CLI wizard can store
+# the user's clarified intent here for downstream routing.
+project_intent_override:
+
+# --- Monorepo Cascading Rules -------------------------------------------------
+# Optional explicit service directories. Root AGENTS.md stays global; local
+# .cursorrules can be generated per service directory when detected.
+# monorepo:
+#   enabled: auto
+#   service_dirs:
+#     - frontend
+#     - backend
 
 # --- Existing Files -----------------------------------------------------------
 # What to do if output files already exist.

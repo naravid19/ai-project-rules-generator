@@ -22,6 +22,7 @@ Pre-made `.cursorrules` examples for common project types. Use these as **refere
 | File                    | Purpose                                                      |
 | ----------------------- | ------------------------------------------------------------ |
 | `rulesrc-template.yaml` | Example `.rulesrc.yaml` config — customize workflow behavior |
+| `mcp_registry.yaml`     | Default mapping from technical intent keywords to MCP server names |
 
 ## How to Use
 
@@ -30,7 +31,8 @@ These templates are **NOT** meant to be copied directly. Instead:
 1. **Run the workflow** — `/create-project-rules` generates tailored files
 2. **Use templates as inspiration** — compare your generated files with these
 3. **Configure with `.rulesrc.yaml`** — copy `rulesrc-template.yaml` to your project root as `.rulesrc.yaml`
-4. **Contribute your own** — submit a PR with your project type template
+4. **Confirm one skill root** — mark exactly one `skill_sources` entry as `confirmed: true`
+5. **Contribute your own** — submit a PR with your project type template
 
 > [!TIP]
 > The workflow will generate better results than any template because it analyzes YOUR specific project.
