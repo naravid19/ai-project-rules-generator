@@ -215,7 +215,7 @@ bash setup.sh --skill-source all --skill-root /shared/.agent
 
 ```powershell
 iwr https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/setup.ps1 -OutFile setup.ps1
-.\setup.ps1 -SkillSource all -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
+.\setup.ps1 -SkillSource all -SkillRoot "C:\shared\team-skills\.agent"
 ```
 
 > The workflow file still installs locally at `.agent/workflows/create-project-rules.md`. `SkillRoot` only changes where optional skill repositories are cloned. The `workflows/` folder is reserved for installed workflow files and is intentionally ignored by `scripts/discover-skills.py` when enumerating external skill sources.
@@ -231,7 +231,7 @@ bash setup.sh --skill-source scientific --skill-root /shared/.agent
 **Windows (PowerShell):**
 
 ```powershell
-.\setup.ps1 -SkillSource scientific -SkillRoot "C:\Users\narav\Desktop\CE code\Tools\.agent"
+.\setup.ps1 -SkillSource scientific -SkillRoot "C:\shared\team-skills\.agent"
 ```
 
 > Use the `scientific` source when you want the shared root to focus on research-heavy work such as literature review, bioinformatics, cheminformatics, medical/clinical analysis, time-series science, or scientific writing workflows.
@@ -250,20 +250,26 @@ bash setup.sh --skill-source scientific --skill-root /shared/.agent
 
 ## Usage
 
-### Quick Start
+### 1. Using the Workflow in Your Project
 
-1. **Customize your preferences** (optional):
-   ```bash
-   python scripts/wizard.py
-   ```
-2. **Run the workflow** with your AI assistant:
-   ```
+If you used the Quick Start script (`setup.sh` or `setup.ps1`) to install the tool into your own project, simply use your AI assistant:
+
+1. **Run the workflow** inside your AI Editor (e.g., Cursor, Claude Code, Antigravity IDE):
+   ```text
    /create-project-rules
    ```
 
-Or simply ask:
-
+Or simply ask your AI:
 > "Create professional project rules for this project"
+
+### 2. Configuration Wizard (Cloned Repo Only)
+
+*(Note: The interactive wizard script is only available if you cloned this repository directly. If you used the Quick Start scripts in your own project, you can manually create a `.rulesrc.yaml` file instead. See [Configuration](#configuration) below).*
+
+1. If you cloned this repository, you can generate a `.rulesrc.yaml` file interactively:
+   ```bash
+   python scripts/wizard.py
+   ```
 
 ### Manual Execution
 
@@ -303,7 +309,7 @@ severity_level: strict
 template_style: minimal
 quality_threshold: 42
 skill_sources:
-  - path: "C:/Users/Desktop/.agent"
+  - path: "C:/shared/team-skills/.agent"
   - path: .agent
 custom_keywords:
   - planning
@@ -371,7 +377,7 @@ The key innovation: instead of hardcoding specific skill repositories, the workf
 Examples:
 
 - Local root: `.agent/`
-- Shared root: `C:/Users/Desktop/.agent`
+- Shared root: `C:/shared/team-skills/.agent`
 - Reserved local output: `.agent/workflows/` (workflow storage, not a skill source)
 
 #### How It Works
@@ -431,7 +437,7 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 | **Native MCP Discovery** | **Supported** | Auto-discovers and registers MCP intents via `templates/mcp_registry.yaml` for enhanced agent capabilities. |
 | **Traceability Metadata** | **Enforced** | Validators strictly require `Skill_Source_Path` and `Confirmed_Skill_Source: true` tags. |
 | Repo-local `.agent/` sample | Supported | The committed sample root still resolves the mixed-format layout used in tests and documentation. |
-| Shared-root baseline | Supported | The live shared root at `C:/Users/narav/Desktop/CE code/Tools/.agent` was rechecked as the compatibility baseline for the current implementation. |
+| Shared-root baseline | Supported | The live shared root at `C:/shared/team-skills/.agent` was rechecked as the compatibility baseline for the current implementation. |
 | Hybrid skill folders | Supported | Skill directories can now keep `SKILL.md` as the primary entry while surfacing companion `AGENTS.md`, `CLAUDE.md`, and `README.md` files. |
 | Root precedence | Strict | Multi-root discovery strictly prefers the explicitly confirmed root for predictability. |
 | Format scan benchmark | ~280 ms per root | Measured with `python scripts/discover-skills.py --agent-dir <root> --format` on the local Windows sample. |
@@ -440,8 +446,8 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 #### Discovery CLI Examples
 
 ```bash
-python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --format
-python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
+python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --format
+python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
 python scripts/extract-capabilities.py .agent/othman-planning-with-files/skills/planning-with-files
 ```
 
@@ -450,8 +456,8 @@ Use `--limit` whenever broad keywords can hit the large CATALOG source. The disc
 #### Local Smoke Check Flow
 
 ```bash
-python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --format
-python scripts/discover-skills.py --agent-dir "C:/Users/narav/Desktop/CE code/Tools/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
+python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --format
+python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --keywords planning workflow python testing --limit 25
 python scripts/extract-capabilities.py .agent/skills/skills/dbos-python
 python -m unittest discover -s tests -v
 ```
