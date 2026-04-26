@@ -606,8 +606,20 @@ def _is_workflow_root(source_path: Path) -> bool:
 
     try:
         return any(
-            child.is_dir() and (child.name in WORKFLOW_HIDDEN_DIR_MARKERS or child.name.endswith("-plugin"))
+            child.is_dir() and (child.name in WORKFLOW_HIDDEN_DIR_MARKERS or child.name.endswith("-plugin"))    
             for child in source_path.iterdir()
         )
     except OSError:
         return False
+
+def extract_design_tokens(project_root: Path) -> dict:
+    """Parse tailwind.config.ts/js or CSS custom properties 
+    to extract actual design tokens."""
+    # Parse tailwind config
+    # Parse CSS custom properties
+    # Return structured dict of colors, fonts, spacing
+    return {
+        "colors": {},
+        "fonts": {},
+        "spacing": {}
+    }

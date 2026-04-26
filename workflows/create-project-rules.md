@@ -182,17 +182,63 @@ Database:            ___
 Deployment:          ___
 ```
 
-### 1.3 Detect Design Patterns
+### 1.2b Extract Design Tokens from Source Files (MANDATORY)
 
-Look for patterns already used in the codebase:
+> [!CAUTION]
+> NEVER infer colors, fonts, spacing, or breakpoints from README descriptions or design documents.
+> ALWAYS extract them from the actual config files listed below.
 
-- Error handling approach (try/catch, Result type, error codes)
-- Async patterns (callbacks, promises, async/await, goroutines)
-- State management (Redux, Zustand, Context, Pinia)
-- API communication (REST, GraphQL, gRPC, WebSocket)
-- Authentication flow (JWT, OAuth, session-based)
-- Dependency injection / IoC patterns
-- Component patterns (atomic design, compound components, HOC)
+For projects with styling:
+
+| Config File | What to Extract |
+|-------------|----------------|
+| `tailwind.config.ts/js` | `theme.extend.colors.*`, `theme.extend.fontFamily.*`, `theme.extend.borderRadius.*` |
+| `postcss.config.js` | PostCSS plugins, custom properties |
+| `src/styles/globals.css` | CSS custom properties (`--variable-name: value`) |
+| `theme.ts` / `tokens.ts` | Design token objects |
+| `*.module.css` patterns | CSS module naming conventions |
+
+**Procedure:**
+1. Open the actual config file (e.g., `tailwind.config.ts`)
+2. Copy the exact color hex values from the config object
+3. Copy the exact font family names
+4. If a README describes colors that DIFFER from the config, use the CONFIG values
+5. Note the discrepancy in the output as a "Known Divergence"
+
+### 1.3 Deep Directory & Dependency Scan
+
+> [!IMPORTANT]
+> Do NOT stop at the first few directories. Scan EVERY directory and extract ALL dependencies.
+
+**Directory completeness checklist:**
+
+| Framework | Scan These Directories | What to Document |
+|-----------|----------------------|------------------|
+| Next.js App Router | ALL dirs under `src/app/` | Route name, layout type, server/client |
+| Next.js Pages Router | ALL dirs under `src/pages/` | Route name, data fetching method |
+| React (Vite/CRA) | ALL dirs under `src/` | Component type, purpose |
+| Python/Django | ALL apps, ALL management commands | App purpose, models |
+
+**State management scan:**
+- List ALL files in `src/store/`, `src/state/`, `src/stores/`, or equivalent
+- Document each store/slice name and what it manages
+
+**Dependency cross-reference (MANDATORY):**
+1. Open `package.json` (or equivalent manifest)
+2. Extract EVERY dependency from both `dependencies` and `devDependencies`
+3. Flag any dependency that implies a pattern:
+   - `@tanstack/react-query` → data fetching pattern
+   - `zustand` / `redux` / `jotai` → state management
+   - `firebase` vs `firebase-admin` → client vs server SDK distinction
+   - `framer-motion` → animation pattern
+   - `next-intl` / `i18next` → i18n support
+
+### 1.3b Verify Constraints Before Writing
+
+Before writing ANY constraint (like "pure functions only" or "no side effects"):
+1. List the actual files in the directory
+2. Read at least the imports of each file
+3. If any file has side effects (e.g., `initializeApp`, `createClient`, HTTP calls), do NOT label the directory as "pure"
 
 ### 1.4 Detect Target AI Tools
 
@@ -800,6 +846,26 @@ Scan configured skill roots (`skill_sources` first, otherwise project-local `.ag
 - Generate one root `AGENTS.md` with universal rules, security constraints, and no-break policies.
 - If subdirectories such as `frontend/`, `backend/`, `apps/*`, or `services/*` have distinct stack signals, generate local `.cursorrules` files there.
 - Local rules inherit root constraints first, then add service-specific guidance.
+
+---
+
+## Stage 4.5: Pre-Write Accuracy Gate (MANDATORY)
+
+Before writing the final output files, verify these claims against the actual codebase:
+
+| Claim Category | Verification Method |
+|---------------|-------------------|
+| Color values | Open `tailwind.config.*` or CSS files, compare hex values |
+| Font families | Open config, verify font names match |
+| Directory purposes | List actual files, verify the stated purpose |
+| "Pure" / "no side effects" labels | Check imports for `init*`, `create*`, HTTP calls |
+| Tech stack dependencies | Cross-check against `package.json` / manifest |
+| State stores | List actual store files, verify names |
+
+If ANY claim fails verification:
+1. Fix the claim to match the actual source
+2. Log the correction in the Generation Summary
+3. Do NOT proceed with the incorrect value
 
 ---
 
