@@ -1290,6 +1290,4 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.8 | 2026-03-22 | Hybrid and multi-root skill source modernization, ordered shared-root precedence, companion-doc extraction, scientific source installer support, and end-to-end scientific-source verification |
 | 1.9.0 | 2026-04-25 | Native MCP server auto-discovery, project-local audit logging and memory persistence, confidence gating heuristics, and strict source root enforcement |
 | 1.9.1 | 2026-04-26 | Workflow AI Self-Sufficiency (no scripts required for Quick Start), Accuracy hardening: §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, §4.5 pre-write accuracy gate, and `extract_design_tokens()` runtime stub |
-| 1.9.2 | 2026-04-26 | **Flexible Agentic Execution & Full Token Extraction**: Upgraded `extract_design_tokens()` to a functional regex parser. Implemented Dual-Mode Strategy (Enhanced Scripted vs Autonomous Fallback) to support zero-install users. Added Anti-Overload Rule for manual skill discovery. |
-ery. |
-|
+| 1.9.2 | 2026-04-26 | **9-Pillar Architecture Completion**: Finalized Pillar 4 (Integrated Audit Logging) and Pillar 5 (System Memory Injection). Upgraded `extract_design_tokens()` to a functional regex parser. Implemented Dual-Mode Strategy (Enhanced Scripted vs Autonomous Fallback) to support zero-install users. Added Anti-Overload Rule for manual skill discovery. |

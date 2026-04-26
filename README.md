@@ -120,12 +120,12 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | **6-Stage Workflow**         | Structured process: Preferences → Analyze → Discover → .cursorrules → AGENTS.md → Verify |
 | **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README/WORKFLOW) |
 | **Native MCP Support**       | 🌟 **New in v1.9.0:** Auto-discovery of MCP servers for seamless tool execution context        |
-| **Memory & Audit Logging**   | 🌟 **New in v1.9.0:** Project-local audit trails and memory summarization for agent context retention |
+| **Memory & Audit Logging**   | 🌟 **New in v1.9.2:** Deeply integrated project-local audit trails (`scripts/audit.py`) and automated system prompt injection via memory summarization (`scripts/memory_manager.py`). |
 | **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
 | **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
 | **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
 | **Quality & Confidence**     | 🌟 **New in v1.9.0:** Heuristic verification (38/50 default pass) and confidence gating to ensure strict relevance |
-| **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) for surgical rule customization  |
+| **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) with integrated audit logging   |
 | **Flexible Agentic Engine**  | 🌟 **New in v1.9.2:** 100% functional via native AI context (Zero-Install) with scripted Mode A fallback |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |

@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Integrated Audit Logging (Pillar 4)**: Added `@audit_logger` decoration to core Python modules (`wizard.py`, `indexer.py`). Every configuration and indexing action now produces a project-local JSON log at `.agent/logs/` for traceability and error tracking.
+- **System Memory Injection (Pillar 5)**: Implemented automated memory management via `memory_manager.py`. AI agents are now instructed to silently read `.agent/memory/project_state.md` to maintain cross-session context and project profile awareness.
 - **Tiered Skill Orchestration**: Implemented "Double Search" logic to separate skill discovery into two tiers: `agentic_match_limit` (for functional skills like Planning and Memory) and `skill_match_limit` (for technical implementation skills). This ensures AI agents always load foundational reasoning capabilities alongside coding capabilities without exhausting context windows.
 - **Flexible Agentic Execution**: Implemented a Dual-Mode Strategy (Enhanced Scripted vs. Autonomous Fallback) to support zero-install users. AI now automatically evaluates the workspace and uses native capabilities if Python scripts are missing.
 - **Full Design Token Extraction**: Upgraded `extract_design_tokens()` from a stub to a functional regex-based parser that handles `tailwind.config.*` files and CSS custom properties.
 - **Anti-Overload Rule**: Strict constraints for manual skill discovery (list first, filter, read max 3-5 relevant files) to prevent context window saturation.
-- **Unit Testing**: Added regression coverage for design token parsing.
+- **Unit Testing**: Added regression coverage for design token parsing and catalog validation fixes.
 
 ## [1.9.1][1.9.1] - 2026-04-26
 
