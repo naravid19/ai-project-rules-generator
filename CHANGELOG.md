@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.1][1.9.1] - 2026-04-26
+
+### Added
+
+- **Accuracy Hardening & Constraint Verification**: New internal safeguards including §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, and §4.5 pre-write accuracy gate.
+- **`extract_design_tokens()` Stub**: Runtime stub for processing visual constraints.
+
+### Changed
+
+- **Workflow AI Self-Sufficiency**: Refactored `workflows/create-project-rules.md` so that quick-start users can rely entirely on native AI capabilities without needing to execute Python scripts.
+- **Documentation Qualifiers**: Explicitly marked script-dependent features (CLI examples, benchmarks, local smoke checks, and output validation) as "Full Repo Clone Only" in the `README.md` to prevent confusion for quick-start users.
+
 ## [1.9.0][1.9.0] - 2026-04-25
 
 ### Added
@@ -202,6 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
+[1.9.1]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.6.0...v1.7.0

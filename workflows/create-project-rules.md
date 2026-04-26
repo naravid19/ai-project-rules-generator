@@ -98,13 +98,9 @@ skill_match_limit: 5
 
 ### 0.3 Interactive Preference Questions
 
-If no config file exists and running interactively, you can run the **Interactive Wizard** to generate one:
+If no config file exists, ask the user these core questions directly:
 
-```bash
-python scripts/wizard.py
-```
-
-Alternatively, ask the user these core questions:
+> **Optional Enhancement:** If `scripts/wizard.py` exists in the project root, you may run it for an automated interactive prompt instead of asking manually.
 
 | Question | Options | Default |
 | -------- | ------- | ------- |
@@ -288,15 +284,15 @@ Resolve discovery roots in this order before classifying formats:
 
 #### Automated Discovery & Extraction
 
-Use the following tools to automate the mapping process:
+Scan your project's skill roots manually. For each root:
 
-| Task | Command | Purpose |
-|------|---------|---------|
-| **Source Discovery** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...]` | Scans roots in precedence order and classifies sources by format. |
-| **Catalog Indexing** | `python scripts/indexer.py --project-root .` | Builds `.agent/memory/skill_catalog.json` from the confirmed root only. |
-| **Skill Search** | `python scripts/discover-skills.py --agent-dir <root> [--agent-dir <root> ...] --keywords <terms> --limit <skill_match_limit>` | Finds candidate skill entries matching the tech stack and trims broad catalog output. |
-| **Capability Extraction** | `python scripts/extract-capabilities.py <skill-dir-or-path>` | Summarizes matched skills, companion docs, and adjacent references for integration. |
-| **MCP Auto-Discovery** | Load `templates/mcp_registry.yaml` plus local IDE MCP config files | Maps technical intent to native tool servers before rule generation. |
+1. **Source Discovery**: List directories and read entry files (`CATALOG.md`, `SKILL.md`) to classify the source by format.
+2. **Catalog Indexing**: Build a mental index of available skills and their summaries from the confirmed root.
+3. **Skill Search**: Filter your mental index using the keywords gathered in Stage 2.2.
+4. **Capability Extraction**: Read the full content of the matched `SKILL.md` files (and companion docs if needed) to extract capabilities.
+5. **MCP Auto-Discovery**: Check `templates/mcp_registry.yaml` and local IDE MCP config files.
+
+> **Optional Enhancement:** If the scripts `discover-skills.py`, `indexer.py`, and `extract-capabilities.py` exist in `scripts/`, you may run them to automate this process.
 
 > Skip local `.agent/workflows/` when classifying skill sources. It stores installed workflow files, not reusable skill libraries.
 
@@ -442,10 +438,13 @@ For each detected source, use the appropriate search method:
 
 ### 2.4 Two-Stage JIT Retrieval
 
-1. Generate a lightweight catalog with `scripts/indexer.py`.
-2. Use only user intent, tech stack, and `skill_catalog.json` to select up to `skill_match_limit` paths.
-3. Load full markdown only for the selected paths.
-4. Never inject raw, unindexed skill trees into the final prompt.
+Instead of reading every `SKILL.md` file completely:
+1. Build a lightweight mental catalog by reading just the frontmatter or descriptions of available skills.
+2. Use user intent and tech stack to select up to `skill_match_limit` paths from your mental catalog.
+3. Load the full markdown content only for the selected paths.
+4. Never inject raw, unread skill trees into the final prompt.
+
+> **Optional Enhancement:** If `scripts/indexer.py` exists, you may run it to generate a `skill_catalog.json` automatically.
 
 Use a strict Stage 1 prompt that returns JSON only:
 
@@ -930,29 +929,30 @@ Ask yourself (or a fresh AI instance):
 
 > If any answer is **no**, revisit the relevant stage and fix.
 
-### 5.5 Technical Validation (Automated)
+### 5.5 Technical Validation
 
-Run the project's heuristic validator to ensure compliance with Rule 1 (No Hardcoding) and structural standards:
+Manually verify the generated files against these heuristics:
+- [ ] No Hardcoding: Ensure no specific skill names are hardcoded in positive instructional contexts. Use keywords instead.
+- [ ] Structure: Ensure required sections are present and properly formatted.
+- [ ] Traceability: Verify `Skill_Source_Path` metadata exists and is accurate.
 
-```bash
-# Linux/macOS
-./scripts/validate-output.sh --path . --threshold {threshold}
-
-# Windows
-.\scripts\validate-output.ps1 -Path . -Threshold {threshold}
-```
+> **Optional Enhancement:** If `scripts/validate-output.sh` (or `.ps1`) exists, you may run it for automated scoring instead of checking manually.
 
 ### 5.6 Security Verification (Skill Scanner)
 
 > [!WARNING]
 > Automatically discovered skills must be verified for security before integration.
 
-If `skill-scanner` is available in your sources, run it on the matched `SKILL.md` paths identified in Stage 2:
+Manually review matched `SKILL.md` files for suspicious patterns:
+- Embedded shell commands (`subprocess`, `os.system`, `exec`)
+- Obfuscated or encoded strings (`base64`, hex payloads)
+- External network calls to unknown domains
 
-```bash
-# Example if skill-scanner is found in .agent/skills
-python .agent/skills/skills/skill-scanner/scripts/scan.py {matched_paths}
-```
+> **Optional Enhancement:** If `skill-scanner` is available in your sources, you may run it instead of manual review:
+> ```bash
+> # Example if skill-scanner is found in .agent/skills
+> python .agent/skills/skills/skill-scanner/scripts/scan.py {matched_paths}
+> ```
 
 ### 5.7 Generation Statistics
 
@@ -1197,4 +1197,4 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.7 | 2026-03-13 | Mixed `.agent/` compatibility recheck, reserved workflow-folder filtering, relevance-ranked discovery results, regression coverage for helper scripts, and documentation/performance alignment |
 | 1.8 | 2026-03-22 | Hybrid and multi-root skill source modernization, ordered shared-root precedence, companion-doc extraction, scientific source installer support, and end-to-end scientific-source verification |
 | 1.9.0 | 2026-04-25 | Native MCP server auto-discovery, project-local audit logging and memory persistence, confidence gating heuristics, and strict source root enforcement |
-| 1.9.1 | 2026-04-26 | Accuracy hardening: §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, §4.5 pre-write accuracy gate, and `extract_design_tokens()` runtime stub |
+| 1.9.1 | 2026-04-26 | Workflow AI Self-Sufficiency (no scripts required for Quick Start), Accuracy hardening: §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, §4.5 pre-write accuracy gate, and `extract_design_tokens()` runtime stub |

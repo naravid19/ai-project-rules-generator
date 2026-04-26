@@ -117,6 +117,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
 | **Quality & Confidence**     | 🌟 **New in v1.9.0:** Heuristic verification (38/50 default pass) and confidence gating to ensure strict relevance |
 | **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) for surgical rule customization  |
+| **AI Self-Sufficiency**      | 🌟 **New in v1.9.1:** 100% functional via native AI context without requiring Python scripts for quick starts |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
 | **Preview Mode**             | Review planned output structure before generation begins                                 |
@@ -186,6 +187,9 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 
 ### Installation
 
+**What Gets Installed?**
+When you use the setup scripts below, only the **workflow file** (`.agent/workflows/create-project-rules.md`) and the **selected skill repositories** are downloaded to your project. The Python helper scripts are *not* installed, as the AI will perform all analysis and discovery using its native capabilities.
+
 #### Option A: Quick Start Script (recommended)
 
 Local project setup:
@@ -244,27 +248,37 @@ bash setup.sh --skill-source scientific --skill-root /shared/.agent
    curl -o .agent/workflows/create-project-rules.md https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/workflows/create-project-rules.md
    ```
 
+#### Option C: Advanced (Full Repo Clone)
+
+For power users who want automated Python scripts for discovering skills, building catalogs, and validating outputs:
+```sh
+git clone https://github.com/naravid19/ai-project-rules-generator.git
+cd ai-project-rules-generator
+```
+*(The AI will automatically use the Python scripts from `scripts/` if it detects them in your project.)*
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- USAGE -->
 
 ## Usage
 
-### 1. Using the Workflow in Your Project
+If you used the Quick Start script (`setup.sh` or `setup.ps1`) to install the tool into your own project, the workflow is entirely AI-self-sufficient. No manual script execution is required.
 
-If you used the Quick Start script (`setup.sh` or `setup.ps1`) to install the tool into your own project, simply use your AI assistant:
+Simply ask your AI assistant (e.g., Cursor, Claude Code, Antigravity IDE, Gemini CLI):
 
-1. **Run the workflow** inside your AI Editor (e.g., Cursor, Claude Code, Antigravity IDE):
-   ```text
-   /create-project-rules
-   ```
+```text
+/create-project-rules
+```
 
-Or simply ask your AI:
+Or just say:
 > "Create professional project rules for this project"
 
-### 2. Configuration Wizard (Cloned Repo Only)
+The AI will read the workflow file and handle everything natively: discovering skills, prompting for preferences, generating rules, and verifying accuracy.
 
-*(Note: The interactive wizard script is only available if you cloned this repository directly. If you used the Quick Start scripts in your own project, you can manually create a `.rulesrc.yaml` file instead. See [Configuration](#configuration) below).*
+### Configuration Wizard (Full Repo Clone Only)
+
+*(Note: The interactive wizard script is only available if you cloned the full repository. If you used the Quick Start scripts in your own project, the AI will ask you questions directly or you can manually create a `.rulesrc.yaml` file. See [Configuration](#configuration) below).*
 
 1. If you cloned this repository, you can generate a `.rulesrc.yaml` file interactively:
    ```bash
@@ -347,7 +361,7 @@ custom_keywords:
 
 ## Workflow Stages
 
-> 🌟 **What's New in v1.9.0 (2026-04-25):** Added Native MCP Server auto-discovery, project-local audit logging, memory summarization, and confidence gating. The interactive wizard now strictly enforces a single confirmed skill source root for guaranteed consistency.
+> 🌟 **What's New in v1.9.1 (2026-04-26):** Refactored workflow to be 100% AI-self-sufficient (no script execution required for Quick Start users) and added accuracy hardening constraints. Native MCP Server auto-discovery, audit logging, and confidence gating were introduced in v1.9.0.
 
 | Stage / Step                 | Time      | Description                                                             |
 | ---------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -440,10 +454,12 @@ Clone these into your project-local `.agent/` directory or a shared skill root r
 | Shared-root baseline | Supported | The live shared root at `C:/shared/team-skills/.agent` was rechecked as the compatibility baseline for the current implementation. |
 | Hybrid skill folders | Supported | Skill directories can now keep `SKILL.md` as the primary entry while surfacing companion `AGENTS.md`, `CLAUDE.md`, and `README.md` files. |
 | Root precedence | Strict | Multi-root discovery strictly prefers the explicitly confirmed root for predictability. |
-| Format scan benchmark | ~280 ms per root | Measured with `python scripts/discover-skills.py --agent-dir <root> --format` on the local Windows sample. |
-| Keyword search benchmark | ~1.3-1.9 s | Measured with `python scripts/discover-skills.py --agent-dir <root> --keywords planning workflow python testing`. |
+| Format scan benchmark | ~280 ms per root | Measured with `python scripts/discover-skills.py` (full repo clone only). |
+| Keyword search benchmark | ~1.3-1.9 s | Measured with `python scripts/discover-skills.py` (full repo clone only). |
 
-#### Discovery CLI Examples
+#### Discovery CLI Examples (Full Repo Clone Only)
+
+> These commands are only available if you cloned the full repository. Quick Start users can skip this — the AI performs equivalent discovery natively.
 
 ```bash
 python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --format
@@ -453,7 +469,7 @@ python scripts/extract-capabilities.py .agent/othman-planning-with-files/skills/
 
 Use `--limit` whenever broad keywords can hit the large CATALOG source. The discovery script still searches all sources first, but the trimmed output is easier for agents to rank and summarize correctly.
 
-#### Local Smoke Check Flow
+#### Local Smoke Check Flow (Full Repo Clone Only)
 
 ```bash
 python scripts/discover-skills.py --agent-dir "C:/shared/team-skills/.agent" --agent-dir .agent --format
@@ -542,7 +558,9 @@ Pre-made `.cursorrules` examples for common project types are available in [`tem
 
 <!-- VALIDATION -->
 
-### Validation
+### Validation (Full Repo Clone Only)
+
+> **Quick Start users:** The AI performs equivalent validation natively using the inline checklist from Stage 5.5 of the workflow. You don't need these scripts.
 
 Validation is **heuristic scoring**, not semantic proof. The scripts check structure, placeholders, formatting quality, repo-local path references, and cross-file consistency signals. They do **not** guarantee that generated rules are perfect for every downstream project.
 
