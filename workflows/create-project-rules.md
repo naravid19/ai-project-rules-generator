@@ -745,11 +745,11 @@ Only discover and reference skills from the confirmed root recorded in the trace
 Use this instruction pattern in generated outputs:
 
 ```markdown
-### 🛠️ Native MCP Servers
+## [Native MCP Servers]
 *Available Tools:* [List auto-detected MCPs here]
 *Instruction:* Use these tools to execute actions (e.g., read files, query DBs, run terminal commands).
 
-### 📚 Local Agent Skills
+## [Local Agent Skills]
 *Knowledge Base:* [List confirmed skill paths here]
 *Instruction:* Strictly follow the conceptual guidelines, coding standards, and architectural rules defined in these paths before executing any MCP tool.
 ```
@@ -803,9 +803,9 @@ Use this instruction pattern in generated outputs:
 | ------- | ------------- |
 | {issue} | {explanation} |
 
-### Anti-Patterns
+### Code Smells & Anti-Patterns
 
-| Anti-Pattern | Instead Do |
+| Code Smell / Anti-Pattern | Instead Do |
 | --------------- | ------------- |
 | {bad} | {good} |
 ```
