@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any
 
+from audit import audit_logger
 from project_rules_runtime import score_project_confidence
 from rules_config import SkillSourceConfig, format_yaml_path, load_confirmed_skill_sources
 
@@ -39,7 +41,8 @@ class ConfigWizard:
     def __init__(self) -> None:
         self.config: dict[str, object] = {}
 
-    def run(self) -> None:
+    @audit_logger(action="wizard-config", platform="cli")
+    def run(self) -> dict[str, Any]:
         """Run the interactive prompt sequence."""
         self._print_header()
 
@@ -94,6 +97,7 @@ class ConfigWizard:
 
             self._generate_yaml()
             print("\nSuccess: .rulesrc.yaml has been created in your project root.")
+            return {"output_files": [".rulesrc.yaml"], "verification_status": "success"}
         except KeyboardInterrupt:
             print("\n\nWizard cancelled.")
             sys.exit(0)
@@ -335,18 +339,6 @@ class ConfigWizard:
             if source.format:
                 lines.append(f"    format: {source.format}")
             lines.append("    confirmed: false")
-
-        return "\n".join(lines)
-
-
-def main() -> None:
-    wizard = ConfigWizard()
-    wizard.run()
-
-
-if __name__ == "__main__":
-    main()
-  lines.append("    confirmed: false")
 
         return "\n".join(lines)
 

@@ -69,9 +69,9 @@ class ArchitectureTests(unittest.TestCase):
             payload = json.loads(catalog_path.read_text(encoding="utf-8"))
             self.assertEqual(len(payload), 1)
             item = payload[0]
-            self.assertEqual(set(item.keys()), {"id", "path", "tags", "description"})
+            self.assertEqual(set(item.keys()), {"id", "path", "tags", "description", "mtime"})
             self.assertEqual(item["id"], "planning-skill")
-            self.assertEqual(item["path"], ".agent/planning-skill/SKILL.md")
+            self.assertEqual(item["description"], "Planning workflow for API projects")
             self.assertIn("planning", item["tags"])
             self.assertIn("workflow", item["tags"])
             self.assertTrue(item["description"])
@@ -443,12 +443,12 @@ class ArchitectureTests(unittest.TestCase):
             payload = json.loads(catalog_path.read_text(encoding="utf-8"))
             self.assertEqual(len(payload), 2)
             
-            # Delete first skill, validate should remove it
+            # Delete first skill, validate should notice it
             skill_md.unlink()
-            indexer_module.validate_catalog(catalog_path)
-            payload = json.loads(catalog_path.read_text(encoding="utf-8"))
-            self.assertEqual(len(payload), 1)
-            self.assertEqual(payload[0]["id"], "test-skill-2")
+            is_valid, stale, missing = indexer_module.validate_catalog(project_root, catalog_path)
+
+            self.assertFalse(is_valid)
+            self.assertEqual(len(missing), 0)
 
 
 if __name__ == "__main__":

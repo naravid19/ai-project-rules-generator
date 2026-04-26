@@ -7,6 +7,7 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
+from audit import audit_logger
 from project_rules_runtime import ProjectRulesRuntimeError, resolve_confirmed_skill_source
 from skill_metadata import extract_summary, parse_frontmatter, resolve_skill_entry
 
@@ -184,6 +185,24 @@ def _serialize_catalog_path(project_root: Path, primary_path: Path) -> str:
         return primary_path.resolve().as_posix()
 
 
+@audit_logger(action="generate-index", platform="cli")
+def _run_indexer(project_root: Path, output_path: Path | None, validate: bool, incremental: bool) -> dict[str, Any]:
+    if validate:
+        is_valid, stale, missing = validate_catalog(project_root, output_path)
+        print(json.dumps({"valid": is_valid, "stale": stale, "missing": missing}))
+        if not is_valid:
+            raise SystemExit(1)
+        return {"verification_status": "success"}
+
+    final_path = build_skill_catalog(
+        project_root,
+        output_path=output_path,
+        incremental=incremental
+    )
+    print(final_path)
+    return {"output_files": [str(final_path)], "verification_status": "success"}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build a lightweight JSON skill catalog for the confirmed skill root.")
     parser.add_argument("--project-root", default=".", help="Project root containing .rulesrc.yaml")
@@ -196,20 +215,9 @@ def main() -> None:
         project_root = Path(args.project_root)
         output_path = Path(args.output).resolve() if args.output else None
 
-        if args.validate:
-            is_valid, stale, missing = validate_catalog(project_root, output_path)
-            print(json.dumps({"valid": is_valid, "stale": stale, "missing": missing}))
-            raise SystemExit(0 if is_valid else 1)
-
-        final_path = build_skill_catalog(
-            project_root,
-            output_path=output_path,
-            incremental=args.incremental
-        )
+        _run_indexer(project_root, output_path, args.validate, args.incremental)
     except ProjectRulesRuntimeError as exc:
         raise SystemExit(str(exc))
-
-    print(final_path)
 
 
 if __name__ == "__main__":

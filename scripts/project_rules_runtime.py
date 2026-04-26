@@ -437,8 +437,9 @@ def _detect_framework_signals(root: Path, manifests: list[Path]) -> list[str]:
             if f'"{token}"' in content or f"'{token}'" in content or token in content:
                 found.append(token)
 
-    if "pyproject.toml" in manifest_names:
-        content = (root / "pyproject.toml").read_text(encoding="utf-8", errors="ignore").lower()
+    pyproject = next((path for path in manifests if path.name == "pyproject.toml"), None)
+    if pyproject is not None:
+        content = pyproject.read_text(encoding="utf-8", errors="ignore").lower()
         for token in ("fastapi", "pytest", "django", "flask"):
             if token in content:
                 found.append(token)
