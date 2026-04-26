@@ -39,7 +39,7 @@ log_debug() {
 get_workflow_version() {
   local path="$1"
   awk -F'|' '
-    /^\|[[:space:]]*[0-9]+\.[0-9]+[[:space:]]*\|/ {
+    /^\|[[:space:]]*[0-9]+\.[0-9]+(\.[0-9]+)?[[:space:]]*\|/ {
       gsub(/[[:space:]]/, "", $2);
       latest=$2;
     }
@@ -49,9 +49,9 @@ get_workflow_version() {
       } else {
         print "unknown";
       }
-    }
-  ' "$path"
+    }' "$path"
 }
+
 
 clone_or_update_repo() {
   local repo_url="$1"

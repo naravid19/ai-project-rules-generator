@@ -76,6 +76,14 @@
 
 <!-- ABOUT THE PROJECT -->
 
+### **The Flexible Agentic Engine** (New in v1.9.2)
+
+This generator supports **Dual-Mode Execution**:
+- **Mode A (Enhanced)**: If you clone the full repo, the AI uses Python scripts (`indexer.py`, `wizard.py`) for maximum efficiency.
+- **Mode B (Autonomous)**: If you only use the workflow file, the AI falls back to its native file-reading capabilities to emulate the scripts—**no Python required**.
+
+---
+
 ## About The Project
 
 A structured 6-stage workflow (Stage 0–5) for creating professional project rules (`.cursorrules`) and AI agent guidelines (`AGENTS.md`). This workflow **automatically discovers and integrates** relevant AI skills from any compatible skill source — users never have to manually browse or select skills.
@@ -85,6 +93,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 - ✅ **Automatic Skill Selection** — AI analyzes your project and finds relevant skills for you
 - ✅ **Format-Based Discovery** — Works with CATALOG, FOLDER, SEARCH_ENGINE, README, and WORKFLOW sources
 - ✅ **Multi-Platform** — Generates files for 9+ AI tools (Cursor, Claude, Gemini, Copilot, etc.)
+- ✅ **Custom Specification Support** — Prioritizes high-fidelity architectural intent via **Smart Intent Discovery** (auto-detecting specs, requirement docs, and architectural guides)
 - ✅ **Quality Scoring** — Built-in verification with a default 38/50 pass threshold and config-aware overrides
 - ✅ **Time-Saving** — Complete in 30-60 minutes
 - ✅ **Verified on Mixed `.agent/` Layouts** — Current release is checked against the same combined skill setup documented below
@@ -117,7 +126,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
 | **Quality & Confidence**     | 🌟 **New in v1.9.0:** Heuristic verification (38/50 default pass) and confidence gating to ensure strict relevance |
 | **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) for surgical rule customization  |
-| **AI Self-Sufficiency**      | 🌟 **New in v1.9.1:** 100% functional via native AI context without requiring Python scripts for quick starts |
+| **Flexible Agentic Engine**  | 🌟 **New in v1.9.2:** 100% functional via native AI context (Zero-Install) with scripted Mode A fallback |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
 | **Preview Mode**             | Review planned output structure before generation begins                                 |
@@ -361,7 +370,7 @@ custom_keywords:
 
 ## Workflow Stages
 
-> 🌟 **What's New in v1.9.1 (2026-04-26):** Refactored workflow to be 100% AI-self-sufficient (no script execution required for Quick Start users) and added accuracy hardening constraints. Native MCP Server auto-discovery, audit logging, and confidence gating were introduced in v1.9.0.
+> 🌟 **What's New in v1.9.2 (2026-04-26):** Implemented **Flexible Agentic Execution** (Dual-Mode Strategy). The generator now automatically adapts to its environment: utilizing Python scripts if available (Mode A), or emulating them using native IDE tools if not (Mode B). Added strict **Anti-Overload Rules** for autonomous skill discovery to protect context window limits.
 
 | Stage / Step                 | Time      | Description                                                             |
 | ---------------------------- | --------- | ----------------------------------------------------------------------- |

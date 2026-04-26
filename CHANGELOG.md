@@ -5,11 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.2][1.9.2] - 2026-04-26
+
+### Added
+
+- **Tiered Skill Orchestration**: Implemented "Double Search" logic to separate skill discovery into two tiers: `agentic_match_limit` (for functional skills like Planning and Memory) and `skill_match_limit` (for technical implementation skills). This ensures AI agents always load foundational reasoning capabilities alongside coding capabilities without exhausting context windows.
+- **Flexible Agentic Execution**: Implemented a Dual-Mode Strategy (Enhanced Scripted vs. Autonomous Fallback) to support zero-install users. AI now automatically evaluates the workspace and uses native capabilities if Python scripts are missing.
+- **Full Design Token Extraction**: Upgraded `extract_design_tokens()` from a stub to a functional regex-based parser that handles `tailwind.config.*` files and CSS custom properties.
+- **Anti-Overload Rule**: Strict constraints for manual skill discovery (list first, filter, read max 3-5 relevant files) to prevent context window saturation.
+- **Unit Testing**: Added regression coverage for design token parsing.
+
 ## [1.9.1][1.9.1] - 2026-04-26
 
 ### Added
 
+- **Enterprise-Grade Runtime Hardening**: Fully functional incremental indexing and catalog validation (Pillars 1 & 3), plus an enhanced memory manager with log rotation and automated state diff summaries (Pillars 4 & 5).
+- **Stage 1.5 Runtime Bootstrapping**: Embedded into `workflows/create-project-rules.md` to automatically trigger incremental catalog updates and state memory refreshes prior to generation.
 - **Accuracy Hardening & Constraint Verification**: New internal safeguards including §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, and §4.5 pre-write accuracy gate.
+- **Expanded Testing**: Added unit tests to `tests/test_architecture.py` covering audit log rotation, state diff computation, and incremental indexing.
 - **`extract_design_tokens()` Stub**: Runtime stub for processing visual constraints.
 
 ### Changed
@@ -214,6 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
+[1.9.2]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.7.0...v1.8.0

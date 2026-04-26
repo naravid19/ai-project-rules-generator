@@ -6,6 +6,31 @@ from pathlib import Path
 from typing import Any
 
 
+def compute_state_diff(old_state: dict[str, Any], new_state: dict[str, Any]) -> dict[str, Any]:
+    diff = {}
+    ignore_keys = {"session_id", "timestamp_utc", "project_root"}
+    for key in new_state:
+        if key in ignore_keys:
+            continue
+        old_val = old_state.get(key)
+        new_val = new_state.get(key)
+        if isinstance(new_val, list) and isinstance(old_val, list):
+            if sorted(map(str, new_val)) != sorted(map(str, old_val)):
+                diff[key] = {"old": old_val, "new": new_val}
+        elif new_val != old_val:
+            diff[key] = {"old": old_val, "new": new_val}
+    return diff
+
+
+def format_state_change_notice(diff: dict[str, Any]) -> str:
+    if not diff:
+        return "No significant state changes detected."
+    lines = []
+    for key, values in diff.items():
+        lines.append(f"- **{key}**: `{values['old']}` -> `{values['new']}`")
+    return "\n".join(lines)
+
+
 def summarize_recent_logs(project_root: Path, max_logs: int = 10) -> str:
     root = Path(project_root).resolve()
     log_dir = root / ".agent" / "logs"
@@ -51,6 +76,24 @@ def summarize_recent_logs(project_root: Path, max_logs: int = 10) -> str:
         lines.append(
             f"- Last error: `{last_error.get('error_code', 'unknown')}: {last_error.get('error_message', 'unknown')}`"
         )
+
+    lines.append("\n## Change Log\n")
+    if len(events) >= 2:
+        # Show diffs for the last 5 events
+        for i in range(max(0, len(events) - 5), len(events)):
+            if i == 0:
+                continue
+            old = events[i - 1]
+            new = events[i]
+            diff = compute_state_diff(old, new)
+            if diff:
+                timestamp = new.get('timestamp_utc', 'unknown')
+                action = new.get('action', 'unknown')
+                lines.append(f"### {timestamp} ({action})")
+                lines.append(format_state_change_notice(diff))
+                lines.append("")
+    else:
+        lines.append("Not enough history to generate a change log.")
 
     return "\n".join(lines) + "\n"
 

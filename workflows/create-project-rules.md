@@ -25,10 +25,26 @@ Before starting, ensure you have:
 > - [techleads-agent-skills](https://github.com/tech-leads-club/agent-skills) - curated registry layout
 > - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills) - broad full-stack developer set
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) - UI/UX design intelligence
-> - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) - planning and persistence workflows
-> - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) - scientific and research-focused workflows
+- [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) - planning and persistence workflows
+- [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) - scientific and research-focused workflows
 
 ---
+
+## Execution Strategy: Dual-Mode Prompting
+
+> [!IMPORTANT]
+> You MUST evaluate your workspace environment before proceeding. Use the appropriate mode based on the presence of the `scripts/` directory.
+
+### Mode A: Enhanced (Script Mode)
+**Trigger**: `scripts/` directory exists in project root.
+**Action**: Utilize Python utilities (`indexer.py`, `wizard.py`, etc.) for fast, token-efficient discovery and validation. Run these scripts directly via terminal.
+
+### Mode B: Autonomous (Zero-Install Mode)
+**Trigger**: `scripts/` directory is missing.
+**Action**: **DO NOT** ask the user to download scripts or install Python. Fallback to "Pure Agent Mode" using native IDE capabilities (file reading, directory listing) to emulate script logic.
+
+---
+
 
 ## Stage 0: User Preferences (Interactive Mode)
 
@@ -64,7 +80,8 @@ Treat the config file as the source of truth when fields are present:
 | `template_style` | Controls formatting density: `progressive`, `flat`, or `minimal`. |
 | `quality_threshold` | Stage 5 pass threshold. Use this instead of the default `38` when present. |
 | `confidence_threshold` | Minimum score before the workflow must halt and ask the user to clarify intent. |
-| `skill_match_limit` | Hard cap for matched skills carried forward after discovery. |
+| `skill_match_limit` | Hard cap for technical/domain-specific matched skills carried forward. |
+| `agentic_match_limit` | Hard cap for functional/agentic matched skills (planning, reasoning) carried forward. |
 | `preview_mode` | If `true`, show the preview step before writing files. |
 | `existing_files` | Controls whether to ask, overwrite, merge, or skip existing outputs. |
 
@@ -94,13 +111,15 @@ template_style: minimal
 quality_threshold: 42
 confidence_threshold: 80
 skill_match_limit: 5
+agentic_match_limit: 3
 ```
 
 ### 0.3 Interactive Preference Questions
 
 If no config file exists, ask the user these core questions directly:
 
-> **Optional Enhancement:** If `scripts/wizard.py` exists in the project root, you may run it for an automated interactive prompt instead of asking manually.
+**Mode A (Enhanced)**: If `scripts/wizard.py` exists, run: `python scripts/wizard.py`
+**Mode B (Autonomous)**: Ask the user manually via chat:
 
 | Question | Options | Default |
 | -------- | ------- | ------- |
@@ -160,9 +179,13 @@ Scan the project automatically:
 | Step | Action | How |
 | ---- | ------------------------- | -------------------------------------------------------------------------------------------------------- |
 | 1 | **Read config files** | Look for `package.json`, `manifest.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `pom.xml`, `Gemfile` |
-| 2 | **Identify entry points** | Find `index.js`, `main.py`, `App.tsx`, `main.go`, `lib.rs`, etc. |
-| 3 | **Map architecture** | Scan folder structure, component organization, layers |
-| 4 | **List dependencies** | Extract from config files (key libraries and frameworks) |
+| 2 | **Identify Intent** | **Recommended**: Read `README.md` or any custom instruction/spec file to understand project goals. |
+| 3 | **Identify entry points** | Find `index.js`, `main.py`, `App.tsx`, `main.go`, `lib.rs`, etc. |
+| 4 | **Map architecture** | Scan folder structure, component organization, layers |
+| 5 | **List dependencies** | Extract from config files (key libraries and frameworks) |
+
+> [!TIP]
+> Prioritize dedicated requirement files (like `spec.md` or `architecture.md`) over generic README descriptions for high-fidelity architectural constraints.
 
 ### 1.2 Document Tech Stack
 
@@ -238,7 +261,15 @@ Before writing ANY constraint (like "pure functions only" or "no side effects"):
 
 ### 1.4 Detect Target AI Tools
 
-Scan the project root for existing AI configuration files to determine which tools the user uses:
+Determine the target AI tools using this fallback order:
+
+1. **Self-Awareness (Primary):** Identify what platform you (the AI executing this workflow) are currently running in using your system prompts or context.
+   - If you are Gemini / Gemini CLI → Include `GEMINI.md`
+   - If you are Claude Code → Include `CLAUDE.md`
+   - If you are Antigravity IDE → Include `.agent/skills/*/SKILL.md`
+   - If you are Cursor → Include `.cursorrules`
+2. **Explicit Config:** Read `target_platforms` from `.rulesrc.yaml` if it exists.
+3. **Existing Files:** Scan the project root for existing configuration files:
 
 | If You Find | User Likely Uses |
 | --------------------------------------- | ------------------------------------------ |
@@ -250,9 +281,18 @@ Scan the project root for existing AI configuration files to determine which too
 | `.kiro/` | Kiro IDE/CLI |
 | `.github/copilot-instructions.md` | GitHub Copilot |
 
-> If none found, default to generating `.cursorrules` + `AGENTS.md` (most universal).
+> **Default**: If self-awareness fails and no files are found, generate `.cursorrules` + `AGENTS.md` (most universal).
 
-### 1.5 Confidence Gate (Human-in-the-Loop)
+### 1.5 Runtime Bootstrapping (Enterprise Features)
+
+**Mode A (Enhanced)**: If operating in Enterprise mode (detected by `scripts/indexer.py` and `scripts/memory_manager.py`), bootstrap the environment:
+1. **Incremental Indexing:** Run `python scripts/indexer.py --incremental`
+2. **Catalog Validation:** Run `python scripts/indexer.py --validate`
+3. **State Memory Refresh:** Run `python scripts/memory_manager.py`
+
+**Mode B (Autonomous)**: Skip bootstrapping and proceed directly to manual project analysis using native directory listing.
+
+### 1.6 Confidence Gate (Human-in-the-Loop)
 
 Before skill discovery or file generation, score the detected project signals.
 
@@ -284,15 +324,25 @@ Resolve discovery roots in this order before classifying formats:
 
 #### Automated Discovery & Extraction
 
-Scan your project's skill roots manually. For each root:
+**Mode A (Enhanced)**: Run the following commands for automated results:
+- `python scripts/discover-skills.py --agent-dir <root>`
+- `python scripts/indexer.py --project-root .`
+- `python scripts/extract-capabilities.py --skill-dir <matched_path>`
+
+**Mode B (Autonomous)**: Scan your project's skill roots manually using these **Fallback Constraints (Critical)**:
+
+> [!CAUTION]
+> **Anti-Overload Rule**: When discovering skills manually, you MUST strictly:
+> 1. List directory contents first (`ls -R` or `list_directory`).
+> 2. Filter based on filenames/intents (e.g., matching `react` or `api`).
+> 3. ONLY read the full content of the top 3-5 relevant files.
+> 4. NEVER try to read entire skill directories at once.
 
 1. **Source Discovery**: List directories and read entry files (`CATALOG.md`, `SKILL.md`) to classify the source by format.
 2. **Catalog Indexing**: Build a mental index of available skills and their summaries from the confirmed root.
-3. **Skill Search**: Filter your mental index using the keywords gathered in Stage 2.2.
-4. **Capability Extraction**: Read the full content of the matched `SKILL.md` files (and companion docs if needed) to extract capabilities.
+3. **Skill Search**: Filter your mental index using keywords.
+4. **Capability Extraction**: Read the full content of the matched `SKILL.md` files.
 5. **MCP Auto-Discovery**: Check `templates/mcp_registry.yaml` and local IDE MCP config files.
-
-> **Optional Enhancement:** If the scripts `discover-skills.py`, `indexer.py`, and `extract-capabilities.py` exist in `scripts/`, you may run them to automate this process.
 
 > Skip local `.agent/workflows/` when classifying skill sources. It stores installed workflow files, not reusable skill libraries.
 
@@ -436,11 +486,13 @@ For each detected source, use the appropriate search method:
 >
 > `You must ONLY retrieve and reference skills from the confirmed directory: [CONFIRMED_PATH]`
 
-### 2.4 Two-Stage JIT Retrieval
+### 2.4 Tiered Double Search (JIT Retrieval)
 
 Instead of reading every `SKILL.md` file completely:
 1. Build a lightweight mental catalog by reading just the frontmatter or descriptions of available skills.
-2. Use user intent and tech stack to select up to `skill_match_limit` paths from your mental catalog.
+2. Perform a **Double Search**:
+   - **First Pass (Foundational)**: Select up to `agentic_match_limit` functional/agentic skills (e.g., Planning, Memory, Debugging, Security).
+   - **Second Pass (Technical)**: Select up to `skill_match_limit` technical/domain-specific skills (e.g., React, API, Database).
 3. Load the full markdown content only for the selected paths.
 4. Never inject raw, unread skill trees into the final prompt.
 
@@ -449,10 +501,10 @@ Instead of reading every `SKILL.md` file completely:
 Use a strict Stage 1 prompt that returns JSON only:
 
 ```text
-You are matching user intent against a lightweight skill catalog.
+You are matching user intent against a lightweight skill catalog using a Tiered Search.
 User intent: <intent>
 Tech stack: <stack>
-Hard limit: return a strict JSON array of at most 5 skill paths.
+Hard limits: Return a strict JSON array containing up to <agentic_match_limit> functional skills AND up to <skill_match_limit> technical skills.
 Return only JSON.
 ```
 
@@ -465,7 +517,7 @@ Return only JSON.
    - relevant to the clarified intent
    - actually detected on disk
 
-### 2.4 Read and Extract Best Practices
+### 2.6 Read and Extract Best Practices
 
 For each matched skill:
 
@@ -668,7 +720,7 @@ Use the same style choice from Stage 0:
 
 ### 4.1 Determine Output Files
 
-Based on AI tools detected in Stage 1.4:
+Based on the AI tools detected in Stage 1.4 (via Self-Awareness, Config, or Existing Files):
 
 | Detected Tool | Primary File | Additional Files |
 | ------------------ | --------------------------------- | -------------------------------- |
@@ -931,12 +983,13 @@ Ask yourself (or a fresh AI instance):
 
 ### 5.5 Technical Validation
 
-Manually verify the generated files against these heuristics:
+**Mode A (Enhanced)**: If `scripts/validate-output.sh` (or `.ps1`) exists, run it for automated scoring:
+- `.\scripts\validate-output.ps1 -Path . -Threshold 38`
+
+**Mode B (Autonomous)**: Manually verify the generated files against these heuristics:
 - [ ] No Hardcoding: Ensure no specific skill names are hardcoded in positive instructional contexts. Use keywords instead.
 - [ ] Structure: Ensure required sections are present and properly formatted.
 - [ ] Traceability: Verify `Skill_Source_Path` metadata exists and is accurate.
-
-> **Optional Enhancement:** If `scripts/validate-output.sh` (or `.ps1`) exists, you may run it for automated scoring instead of checking manually.
 
 ### 5.6 Security Verification (Skill Scanner)
 
@@ -1037,7 +1090,7 @@ After completing this workflow, you should have:
 ## Quick Reference Card
 
 ```text
-CREATE PROJECT RULES v1.9 - QUICK REF
+CREATE PROJECT RULES v1.9.2 - QUICK REF
 
 Stage 0: Preferences     | Config file / interactive, language, severity, platforms
 Stage 1: Analyze         | Autonomous scan, tech stack, patterns, detect AI tools
@@ -1198,3 +1251,6 @@ async def get_task(task_id: int, db: AsyncSession):
 | 1.8 | 2026-03-22 | Hybrid and multi-root skill source modernization, ordered shared-root precedence, companion-doc extraction, scientific source installer support, and end-to-end scientific-source verification |
 | 1.9.0 | 2026-04-25 | Native MCP server auto-discovery, project-local audit logging and memory persistence, confidence gating heuristics, and strict source root enforcement |
 | 1.9.1 | 2026-04-26 | Workflow AI Self-Sufficiency (no scripts required for Quick Start), Accuracy hardening: §1.2b source-of-truth design token parsing, §1.3 deep directory & dependency scan, §1.3b constraint verification, §4.5 pre-write accuracy gate, and `extract_design_tokens()` runtime stub |
+| 1.9.2 | 2026-04-26 | **Flexible Agentic Execution & Full Token Extraction**: Upgraded `extract_design_tokens()` to a functional regex parser. Implemented Dual-Mode Strategy (Enhanced Scripted vs Autonomous Fallback) to support zero-install users. Added Anti-Overload Rule for manual skill discovery. |
+ery. |
+|

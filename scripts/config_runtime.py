@@ -103,6 +103,8 @@ def load_runtime_defaults(config_path: Path) -> dict[str, Any]:
         payload["confidence_threshold"] = 80
     if payload.get("skill_match_limit") is None:
         payload["skill_match_limit"] = 5
+    if payload.get("agentic_match_limit") is None:
+        payload["agentic_match_limit"] = 3
     return payload
 
 

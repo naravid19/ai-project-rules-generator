@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import re
 from dataclasses import dataclass
 import json
 from pathlib import Path
@@ -69,6 +70,8 @@ class ConfidenceResult:
     threshold: int
     reasons: tuple[str, ...]
     clarification_options: tuple[str, ...]
+    detected_manifests: tuple[str, ...] = ()
+    detected_frameworks: tuple[str, ...] = ()
 
     @property
     def requires_clarification(self) -> bool:
@@ -312,9 +315,10 @@ def score_project_confidence(project_root: Path, threshold: int = 80) -> Confide
     score = 0
 
     manifests = _find_named_paths(root, PRIMARY_MANIFESTS)
+    manifest_names = tuple(path.name for path in manifests)
     if manifests:
         score += 25
-        reasons.append(f"Detected manifest files: {', '.join(path.name for path in manifests)}")
+        reasons.append(f"Detected manifest files: {', '.join(manifest_names)}")
     else:
         reasons.append("No supported manifest files detected.")
 
@@ -354,6 +358,32 @@ def score_project_confidence(project_root: Path, threshold: int = 80) -> Confide
         score += 10
         reasons.append(f"Detected architecture signals: {', '.join(architecture_tags)}.")
 
+    env_files = []
+    for env_name in (".env", ".env.local", "docker-compose.yml", "docker-compose.yaml"):
+        if (root / env_name).exists():
+            env_files.append(env_name)
+    if env_files:
+        score += 10
+        reasons.append(f"Detected environment/deployment configs: {', '.join(env_files)}.")
+
+    config_files = []
+    for cfg in ("tailwind.config.js", "tailwind.config.ts", "next.config.js", "next.config.mjs", "tsconfig.json", "svelte.config.js", "vite.config.ts", "vite.config.js"):
+        if (root / cfg).exists():
+            config_files.append(cfg)
+    if config_files:
+        score += 15
+        reasons.append(f"Detected project configuration files: {', '.join(config_files)}.")
+
+    # Intent detection (Pattern-based)
+    intent_keywords = ("readme", "spec", "instruction", "requirement", "architecture", "plan")
+    intent_files = [
+        f.name for f in root.iterdir()
+        if f.is_file() and any(k in f.name.lower() for k in intent_keywords)
+    ]
+    if intent_files:
+        score += 15
+        reasons.append(f"Detected project intent/requirement files: {', '.join(intent_files)}.")
+
     if len(languages) > 1:
         score -= 10
     if len({ENTRYPOINTS[path.name] for path in entrypoints if path.name in ENTRYPOINTS}) > 1:
@@ -367,6 +397,8 @@ def score_project_confidence(project_root: Path, threshold: int = 80) -> Confide
         threshold=threshold,
         reasons=tuple(reasons),
         clarification_options=tuple(clarification_options),
+        detected_manifests=manifest_names,
+        detected_frameworks=tuple(frameworks),
     )
 
 
@@ -615,11 +647,68 @@ def _is_workflow_root(source_path: Path) -> bool:
 def extract_design_tokens(project_root: Path) -> dict:
     """Parse tailwind.config.ts/js or CSS custom properties 
     to extract actual design tokens."""
-    # Parse tailwind config
-    # Parse CSS custom properties
-    # Return structured dict of colors, fonts, spacing
-    return {
+    tokens = {
         "colors": {},
         "fonts": {},
         "spacing": {}
     }
+    
+    # 1. Search for Tailwind config
+    tailwind_files = list(project_root.glob("tailwind.config.*"))
+    for tf in tailwind_files:
+        try:
+            content = tf.read_text(encoding="utf-8", errors="ignore")
+            
+            # Simple regex for colors: "primary": "#hex"
+            color_matches = re.findall(r'[\'"]([a-zA-Z0-9-]+)[\'"]\s*:\s*[\'"](#[a-fA-F0-9]{3,8}|(?:rgb|hsl)a?\([^)]+\))[\'"]', content)
+            for name, value in color_matches:
+                if name not in tokens["colors"]:
+                    tokens["colors"][name] = value
+            
+            # Fonts: "sans": ["Inter", "sans-serif"]
+            font_matches = re.findall(r'[\'"]([a-zA-Z0-9-]+)[\'"]\s*:\s*\[\s*([^\]]+)\s*\]', content)
+            for name, value_list in font_matches:
+                items = [v.strip().strip("'\"") for v in value_list.split(",")]
+                tokens["fonts"][name] = items
+        except Exception:
+            pass
+
+    # 2. Search for CSS custom properties
+    # Scan root and src for CSS files, but limit depth to avoid deep scans
+    css_files = []
+    for ext in ["*.css", "*.scss"]:
+        css_files.extend(list(project_root.glob(ext)))
+        css_files.extend(list((project_root / "src").glob(f"**/{ext}")))
+    
+    for cf in css_files:
+        if "node_modules" in cf.parts:
+            continue
+        try:
+            content = cf.read_text(encoding="utf-8", errors="ignore")
+            # --var: value;
+            props = re.findall(r'(--[a-zA-Z0-9-]+)\s*:\s*([^;]+);', content)
+            for name, value in props:
+                v = value.strip()
+                if v.startswith("#") or v.startswith("rgb") or v.startswith("hsl"):
+                    tokens["colors"][name] = v
+                elif "font" in name.lower():
+                    tokens["fonts"][name] = v
+                elif any(k in name.lower() for k in ["spacing", "gap", "padding", "margin"]):
+                    tokens["spacing"][name] = v
+        except Exception:
+            pass
+
+    return tokens
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Project Rules Runtime Helpers")
+    parser.add_argument("--root", type=str, default=".", help="Project root directory")
+    parser.add_argument("--extract-tokens", action="store_true", help="Extract design tokens")
+    
+    args = parser.parse_args()
+    root_path = Path(args.root)
+    
+    if args.extract_tokens:
+        tokens = extract_design_tokens(root_path)
+        print(json.dumps(tokens, indent=2))

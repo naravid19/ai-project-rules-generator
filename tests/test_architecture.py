@@ -389,6 +389,67 @@ class ArchitectureTests(unittest.TestCase):
             result = runtime_module.merge_monorepo_rules(project_root, root_rules)
             self.assertEqual(result, {})
 
+    def test_audit_log_rotation(self) -> None:
+        audit_module = load_module(SCRIPTS_DIR / "audit.py", "audit_module")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            log_dir = project_root / ".agent" / "logs"
+            log_dir.mkdir(parents=True)
+            for i in range(15):
+                (log_dir / f"log_{i:02d}.json").write_text("{}", encoding="utf-8")
+            
+            audit_module.rotate_audit_logs(log_dir, max_logs=10)
+            remaining_logs = list(log_dir.glob("log_*.json"))
+            self.assertEqual(len(remaining_logs), 10)
+
+    def test_memory_diff_computation(self) -> None:
+        memory_module = load_module(SCRIPTS_DIR / "memory_manager.py", "memory_module")
+        old_state = {"action": "plan", "status": "pending", "output_files": ["A"]}
+        new_state = {"action": "plan", "status": "success", "output_files": ["A", "B"]}
+        
+        diff = memory_module.compute_state_diff(old_state, new_state)
+        self.assertIn("status", diff)
+        self.assertEqual(diff["status"]["old"], "pending")
+        self.assertEqual(diff["status"]["new"], "success")
+        self.assertIn("output_files", diff)
+        self.assertEqual(diff["output_files"]["new"], ["A", "B"])
+
+    def test_indexer_incremental_and_validate(self) -> None:
+        indexer_module = load_module(SCRIPTS_DIR / "indexer.py", "indexer_module_inc")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            shared_root = project_root / ".agent"
+            skill_dir = shared_root / "test-skill"
+            skill_dir.mkdir(parents=True)
+            skill_md = skill_dir / "SKILL.md"
+            skill_md.write_text("---\nname: test-skill\n---\n", encoding="utf-8")
+            
+            (project_root / ".rulesrc.yaml").write_text(
+                "skill_sources:\n  - path: .agent\n    confirmed: true\n", encoding="utf-8"
+            )
+            
+            # Initial index
+            catalog_path = indexer_module.build_skill_catalog(project_root)
+            payload = json.loads(catalog_path.read_text(encoding="utf-8"))
+            self.assertEqual(len(payload), 1)
+            
+            # Incremental index with a new skill
+            skill2_dir = shared_root / "test-skill-2"
+            skill2_dir.mkdir(parents=True)
+            (skill2_dir / "SKILL.md").write_text("---\nname: test-skill-2\n---\n", encoding="utf-8")
+            
+            # This should add the new skill
+            indexer_module.build_skill_catalog(project_root, incremental=True)
+            payload = json.loads(catalog_path.read_text(encoding="utf-8"))
+            self.assertEqual(len(payload), 2)
+            
+            # Delete first skill, validate should remove it
+            skill_md.unlink()
+            indexer_module.validate_catalog(catalog_path)
+            payload = json.loads(catalog_path.read_text(encoding="utf-8"))
+            self.assertEqual(len(payload), 1)
+            self.assertEqual(payload[0]["id"], "test-skill-2")
+
 
 if __name__ == "__main__":
     unittest.main()

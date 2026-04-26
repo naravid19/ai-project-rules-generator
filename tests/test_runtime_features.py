@@ -292,6 +292,60 @@ class RuntimeFeatureTests(unittest.TestCase):
             self.assertNotEqual(completed.returncode, 0, combined)
             self.assertIn("traceability path does not exist on disk", combined)
 
+    def test_extract_design_tokens_parses_tailwind_and_css(self) -> None:
+        runtime_module = load_module(
+            SCRIPTS_DIR / "project_rules_runtime.py",
+            "project_rules_runtime_design_tokens_module",
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            
+            # Create tailwind.config.js
+            (project_root / "tailwind.config.js").write_text(
+                textwrap.dedent(
+                    """
+                    module.exports = {
+                      theme: {
+                        extend: {
+                          colors: {
+                            "primary": "#496559",
+                            "secondary": "rgba(255, 0, 0, 0.5)",
+                          },
+                          fontFamily: {
+                            "sans": ["Inter", "sans-serif"],
+                          }
+                        }
+                      }
+                    }
+                    """
+                ).strip(),
+                encoding="utf-8",
+            )
+            
+            # Create a CSS file
+            src_dir = project_root / "src"
+            src_dir.mkdir()
+            (src_dir / "globals.css").write_text(
+                textwrap.dedent(
+                    """
+                    :root {
+                      --brand-color: #00ff00;
+                      --spacing-unit: 1rem;
+                    }
+                    """
+                ).strip(),
+                encoding="utf-8",
+            )
+            
+            tokens = runtime_module.extract_design_tokens(project_root)
+            
+            self.assertEqual(tokens["colors"]["primary"], "#496559")
+            self.assertEqual(tokens["colors"]["secondary"], "rgba(255, 0, 0, 0.5)")
+            self.assertEqual(tokens["fonts"]["sans"], ["Inter", "sans-serif"])
+            self.assertEqual(tokens["colors"]["--brand-color"], "#00ff00")
+            self.assertEqual(tokens["spacing"]["--spacing-unit"], "1rem")
+
 
 if __name__ == "__main__":
     unittest.main()

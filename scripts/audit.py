@@ -100,10 +100,37 @@ def _write_audit_log(session: AuditSession, event: dict[str, Any]) -> None:
     try:
         session.log_directory.mkdir(parents=True, exist_ok=True)
         session.build_log_path().write_text(json.dumps(event, indent=2), encoding="utf-8")
+        rotate_audit_logs(session.log_directory)
     except OSError as exc:
         raise AuditLoggingError(
             "Failed to write the project-local audit log. Pause and ask the user before continuing."
         ) from exc
+
+
+def rotate_audit_logs(log_dir: Path, max_logs: int = 50) -> None:
+    """Rotates logs in the specified directory, keeping only the max_logs most recent files."""
+    if not log_dir.exists():
+        return
+    logs = sorted(log_dir.glob("log_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    for log_path in logs[max_logs:]:
+        try:
+            log_path.unlink()
+        except OSError:
+            pass
+
+
+def list_audit_sessions(log_dir: Path) -> list[dict[str, Any]]:
+    """Returns a list of parsed audit logs."""
+    if not log_dir.exists():
+        return []
+    sessions = []
+    for log_path in sorted(log_dir.glob("log_*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            content = json.loads(log_path.read_text(encoding="utf-8"))
+            sessions.append(content)
+        except Exception:
+            continue
+    return sessions
 
 
 def _listify(value: Any) -> list[str]:

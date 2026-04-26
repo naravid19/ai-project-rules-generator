@@ -97,10 +97,14 @@ quality_threshold: 38
 confidence_threshold: 80
 
 # --- Skill Match Limit --------------------------------------------------------
-# Maximum number of matched skill candidates to carry forward after discovery.
+# Maximum number of matched technical skill candidates to carry forward.
 # This prevents context overload on large catalogs.
 # Default: 5
 skill_match_limit: 5
+
+# Maximum number of matched agentic/functional skills (e.g. planning, security) to carry forward.
+# Default: 3
+agentic_match_limit: 3
 
 # --- Preview Mode -------------------------------------------------------------
 # Show a preview of the planned structure before writing files.

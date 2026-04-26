@@ -33,6 +33,7 @@ def load_rules_config(config_path: Path) -> dict[str, Any]:
         "quality_threshold": _load_top_level_int(lines, "quality_threshold"),
         "confidence_threshold": _load_top_level_int(lines, "confidence_threshold"),
         "skill_match_limit": _load_top_level_int(lines, "skill_match_limit"),
+        "agentic_match_limit": _load_top_level_int(lines, "agentic_match_limit"),
         "project_intent_override": _load_top_level_string(lines, "project_intent_override"),
     }
 

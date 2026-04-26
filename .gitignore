@@ -32,3 +32,6 @@ env/
 # Legacy local scratch area
 /example/
 /log
+/chat
+test_report.txt
+prompt.txt

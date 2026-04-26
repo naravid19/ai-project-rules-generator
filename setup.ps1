@@ -28,10 +28,10 @@ function Get-WorkflowVersion {
     param([string]$Path)
 
     $version = "unknown"
-    $versionRows = Select-String -Path $Path -Pattern '^\|\s*\d+\.\d+\s*\|' | ForEach-Object { $_.Line }
+    $versionRows = Select-String -Path $Path -Pattern '^\|\s*\d+\.\d+(\.\d+)?\s*\|' | ForEach-Object { $_.Line }
     if ($versionRows) {
         $lastRow = $versionRows[-1]
-        if ($lastRow -match '^\|\s*(\d+\.\d+)\s*\|') {
+        if ($lastRow -match '^\|\s*(\d+\.\d+(\.\d+)?)\s*\|') {
             $version = "v$($Matches[1])"
         }
     }

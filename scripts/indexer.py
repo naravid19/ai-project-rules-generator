@@ -3,11 +3,24 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
 from project_rules_runtime import ProjectRulesRuntimeError, resolve_confirmed_skill_source
 from skill_metadata import extract_summary, parse_frontmatter, resolve_skill_entry
+
+
+@dataclass
+class CatalogEntry:
+    id: str
+    path: str
+    tags: list[str]
+    description: str
+    mtime: float = 0.0
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 PREDEFINED_TAGS = (
     "react",
@@ -30,24 +43,84 @@ PREDEFINED_TAGS = (
 )
 
 
-def build_skill_catalog(project_root: Path, output_path: Path | None = None) -> Path:
+def build_skill_catalog(project_root: Path, output_path: Path | None = None, incremental: bool = False) -> Path:
     root = Path(project_root).resolve()
     confirmed = resolve_confirmed_skill_source(root)
     catalog_path = output_path or (root / ".agent" / "memory" / "skill_catalog.json")
     catalog_path.parent.mkdir(parents=True, exist_ok=True)
 
-    entries = _collect_catalog_entries(root, confirmed.resolved_path)
-    catalog_path.write_text(json.dumps(entries, indent=2), encoding="utf-8")
+    existing_catalog: list[dict[str, Any]] = []
+    if incremental and catalog_path.exists():
+        try:
+            existing_catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    entries = _collect_catalog_entries(root, confirmed.resolved_path, existing_catalog)
+    catalog_path.write_text(json.dumps([e.to_dict() for e in entries], indent=2), encoding="utf-8")
     return catalog_path
 
 
-def _collect_catalog_entries(project_root: Path, confirmed_root: Path) -> list[dict[str, Any]]:
-    entries: list[dict[str, Any]] = []
+def validate_catalog(project_root: Path, output_path: Path | None = None) -> tuple[bool, list[str], list[str]]:
+    root = Path(project_root).resolve()
+    confirmed = resolve_confirmed_skill_source(root)
+    catalog_path = output_path or (root / ".agent" / "memory" / "skill_catalog.json")
+    
+    if not catalog_path.exists():
+        return False, [], []
+        
+    try:
+        existing_catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except Exception:
+        return False, [], []
+
+    existing_map = {entry["path"]: entry for entry in existing_catalog}
+    stale_entries = []
+    current_paths = []
+    
+    for entrypoint in _iter_entrypoints(confirmed.resolved_path):
+        resolved = resolve_skill_entry(entrypoint.parent if entrypoint.is_file() else entrypoint)
+        if resolved is None:
+            continue
+        rel_path = _serialize_catalog_path(root, resolved.primary_path)
+        current_paths.append(rel_path)
+        
+        if rel_path not in existing_map:
+            continue
+            
+        mtime = resolved.primary_path.stat().st_mtime
+        if mtime > existing_map[rel_path].get("mtime", 0.0):
+            stale_entries.append(rel_path)
+            
+    missing_entries = [p for p in current_paths if p not in existing_map]
+    is_valid = len(stale_entries) == 0 and len(missing_entries) == 0 and len(existing_map) == len(current_paths)
+    return is_valid, stale_entries, missing_entries
+
+
+def _collect_catalog_entries(project_root: Path, confirmed_root: Path, existing_catalog: list[dict[str, Any]] | None = None) -> list[CatalogEntry]:
+    entries: list[CatalogEntry] = []
+    existing_map = {e["path"]: e for e in (existing_catalog or [])}
 
     for entrypoint in _iter_entrypoints(confirmed_root):
         resolved = resolve_skill_entry(entrypoint.parent if entrypoint.is_file() else entrypoint)
         if resolved is None:
             continue
+
+        relative_path = _serialize_catalog_path(project_root, resolved.primary_path)
+        mtime = resolved.primary_path.stat().st_mtime
+
+        if existing_catalog is not None and relative_path in existing_map:
+            existing = existing_map[relative_path]
+            if existing.get("mtime", 0.0) >= mtime:
+                # Type safe init
+                entries.append(CatalogEntry(
+                    id=existing.get("id", ""),
+                    path=existing.get("path", ""),
+                    tags=existing.get("tags", []),
+                    description=existing.get("description", ""),
+                    mtime=existing.get("mtime", 0.0)
+                ))
+                continue
 
         content = resolved.primary_path.read_text(encoding="utf-8", errors="ignore")
         frontmatter = parse_frontmatter(content)
@@ -57,20 +130,20 @@ def _collect_catalog_entries(project_root: Path, confirmed_root: Path) -> list[d
             or "No description available."
         )
         description = _one_sentence(description)
-        relative_path = _serialize_catalog_path(project_root, resolved.primary_path)
         tags = _extract_tags(description, content, resolved.primary_path)
         skill_id = str(frontmatter.get("name") or resolved.directory.name).strip() or resolved.primary_path.stem
 
         entries.append(
-            {
-                "id": skill_id,
-                "path": relative_path,
-                "tags": tags,
-                "description": description,
-            }
+            CatalogEntry(
+                id=skill_id,
+                path=relative_path,
+                tags=tags,
+                description=description,
+                mtime=mtime
+            )
         )
 
-    return sorted(entries, key=lambda item: (item["id"].lower(), item["path"].lower()))
+    return sorted(entries, key=lambda item: (item.id.lower(), item.path.lower()))
 
 
 def _iter_entrypoints(confirmed_root: Path):
@@ -115,17 +188,28 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build a lightweight JSON skill catalog for the confirmed skill root.")
     parser.add_argument("--project-root", default=".", help="Project root containing .rulesrc.yaml")
     parser.add_argument("--output", help="Optional output path override for skill_catalog.json")
+    parser.add_argument("--validate", action="store_true", help="Validate existing catalog against filesystem")
+    parser.add_argument("--incremental", action="store_true", help="Only index changed files based on mtime")
     args = parser.parse_args()
 
     try:
-        output_path = build_skill_catalog(
-            Path(args.project_root),
-            output_path=Path(args.output).resolve() if args.output else None,
+        project_root = Path(args.project_root)
+        output_path = Path(args.output).resolve() if args.output else None
+
+        if args.validate:
+            is_valid, stale, missing = validate_catalog(project_root, output_path)
+            print(json.dumps({"valid": is_valid, "stale": stale, "missing": missing}))
+            raise SystemExit(0 if is_valid else 1)
+
+        final_path = build_skill_catalog(
+            project_root,
+            output_path=output_path,
+            incremental=args.incremental
         )
     except ProjectRulesRuntimeError as exc:
         raise SystemExit(str(exc))
 
-    print(output_path)
+    print(final_path)
 
 
 if __name__ == "__main__":

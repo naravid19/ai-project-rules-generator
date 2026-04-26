@@ -34,6 +34,7 @@ class ConfigWizard:
     ]
     DEFAULT_CONFIDENCE_THRESHOLD = 80
     DEFAULT_SKILL_MATCH_LIMIT = 5
+    DEFAULT_AGENTIC_MATCH_LIMIT = 3
 
     def __init__(self) -> None:
         self.config: dict[str, object] = {}
@@ -302,6 +303,7 @@ class ConfigWizard:
             f"quality_threshold: {self.config['quality_threshold']}\n"
             f"confidence_threshold: {self.config['confidence_threshold']}\n"
             f"skill_match_limit: {self.config['skill_match_limit']}\n"
+            f"agentic_match_limit: {self.config.get('agentic_match_limit', 3)}\n"
             f"project_intent_override: {self.config.get('project_intent_override', '')}\n"
             f"preview_mode: {'true' if self.config['preview_mode'] else 'false'}\n"
             "logging:\n"
@@ -333,6 +335,18 @@ class ConfigWizard:
             if source.format:
                 lines.append(f"    format: {source.format}")
             lines.append("    confirmed: false")
+
+        return "\n".join(lines)
+
+
+def main() -> None:
+    wizard = ConfigWizard()
+    wizard.run()
+
+
+if __name__ == "__main__":
+    main()
+  lines.append("    confirmed: false")
 
         return "\n".join(lines)
 
