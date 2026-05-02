@@ -54,8 +54,8 @@ def build_skill_catalog(project_root: Path, output_path: Path | None = None, inc
     if incremental and catalog_path.exists():
         try:
             existing_catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Warning: Failed to parse existing catalog JSON at {catalog_path}: {e}")
 
     entries = _collect_catalog_entries(root, confirmed.resolved_path, existing_catalog)
     catalog_path.write_text(json.dumps([e.to_dict() for e in entries], indent=2), encoding="utf-8")
