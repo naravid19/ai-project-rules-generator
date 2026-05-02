@@ -92,7 +92,7 @@ function Install-Skill {
             Update-OrCloneRepo -RepoUrl "https://github.com/K-Dense-AI/claude-scientific-skills.git" -TargetPath (Join-Path $SkillRoot "claude-scientific-skills") -Label "K-Dense-AI/claude-scientific-skills"
         }
         "karpathy" {
-            Update-OrCloneRepo -RepoUrl "https://github.com/multica-ai/andrej-karpathy-skills.git" -TargetPath (Join-Path $SkillRoot "andrej-karpathy-skills") -Label "multica-ai/andrej-karpathy-skills"
+            Update-OrCloneRepo -RepoUrl "https://github.com/forrestchang/andrej-karpathy-skills.git" -TargetPath (Join-Path $SkillRoot "andrej-karpathy-skills") -Label "forrestchang/andrej-karpathy-skills"
         }
         "all" {
             $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific", "karpathy")
@@ -234,7 +234,7 @@ else {
     Write-Host "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
     Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
     Write-Host "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
-    Write-Host "  9) multica-ai / andrej-karpathy-skills   (FOLDER, Andrej Karpathy's skills/workflows)"
+    Write-Host "  9) forrestchang / andrej-karpathy-skills (FOLDER, Andrej Karpathy's skills/workflows)"
     Write-Host " 10) All of the above"
     Write-Host " 11) Skip (add your own later)"
     Write-Host ""

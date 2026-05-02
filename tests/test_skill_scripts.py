@@ -219,7 +219,7 @@ class SkillScriptTests(unittest.TestCase):
                 "3",
                 "y",
                 "2",
-                r"C:\Users\narav\Desktop\CE code\Tools\.agent",
+                r"C:\shared\team-skills\.agent",
                 "42",
                 "85",
                 "5",
@@ -260,7 +260,7 @@ class SkillScriptTests(unittest.TestCase):
         self.assertIn("skill_match_limit: 5", config_text)
         self.assertIn("project_intent_override:", config_text)
         self.assertIn("preview_mode: true", config_text)
-        self.assertIn('  - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"', config_text)
+        self.assertIn('  - path: "C:/shared/team-skills/.agent"', config_text)
         self.assertIn("    confirmed: true", config_text)
         self.assertIn("  - path: .agent", config_text)
         self.assertIn("    confirmed: false", config_text)

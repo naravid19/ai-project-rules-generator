@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.3][1.9.3] - 2026-05-02
+
+### Added
+
+- **9-Pillar Architecture Refinement**: Completed a detailed development pass to ensure perfect alignment with the Lead AI Architect's 9-Pillar specification.
+- **Enhanced Confidence Gate**: Refined Stage 1.6 with explicit scoring criteria (+20 Manifests, +20 Entrypoints, +30 Frameworks, +30 Architecture) and a strict 80% Halt Logic.
+- **Improved JIT Retrieval**: Tightened Stage 2.4 "Double Search" instructions for Mode B (Autonomous) to prevent context overload while ensuring foundational reasoning skills are always loaded.
+- **Agentic Template Upgrade**: Updated `AGENTS.md` template (Stage 4.2) to strictly separate `[Native MCP Servers]` and `[Local Agent Skills]` with clear instructional precedence.
+- **Manual Audit Schema**: Provided the exact JSON schema in Stage 6.1 for manual audit logging in Zero-Install environments.
+
 ## [1.9.2][1.9.2] - 2026-04-26
 
 ### Added
@@ -55,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Multi-root discovery support in `scripts/discover-skills.py`, including repeated `--agent-dir` handling, ordered root precedence, and deterministic deduplication across shared and local `.agent` roots
 - Companion skill metadata in discovery and extraction output via `source_root`, `instruction_type`, `companion_docs`, and `reference_dirs`
 - Regression fixtures and tests for hybrid skill folders, `AGENTS.md`-only fallback packages, workflow/plugin roots, and duplicate source precedence handling
-- Setup script support for `multica-ai/andrej-karpathy-skills` to provide Andrej Karpathy's skills and workflows alongside other recommended sources
+- Setup script support for `forrestchang/andrej-karpathy-skills` to provide Andrej Karpathy's skills and workflows alongside other recommended sources
 - Setup script support for `K-Dense-AI/claude-scientific-skills` so the scientific skill collection can be installed into local or shared roots with the same optional-source flow as the other recommended repositories
 
 ### Changed
@@ -229,6 +239,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `.cursorrules` and `AGENTS.md` templates
 - Tips for effective rules (Do's and Don'ts)
 
+[1.9.3]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/naravid19/ai-project-rules-generator/compare/v1.8.0...v1.9.0

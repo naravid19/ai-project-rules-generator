@@ -1,0 +1,70 @@
+# .rulesrc.yaml - AI Project Rules Generator Configuration
+# Reference: https://github.com/naravid19/ai-project-rules-generator
+
+# --- AI Platform Targets ------------------------------------------------------
+# Specifies which rule files to generate.
+target_platforms:
+  - cursor      # Generates .cursorrules
+  - claude      # Generates CLAUDE.md
+  - gemini      # Generates GEMINI.md
+  - codex       # Generates AGENTS.md
+
+# --- Localization & Severity --------------------------------------------------
+output_language: en  # Options: en, th, ja, zh, ko, es, fr, de, pt
+severity_level: balanced  # Options: strict (heavy enforcement), balanced, relaxed
+
+# --- Section Management -------------------------------------------------------
+# Control which parts of the professional rules are included.
+sections:
+  include:
+    - project-identity
+    - coding-standards
+    - critical-rules
+    - important-guidelines
+    - code-smells
+    - testing
+    - security
+    - performance
+    - git-workflow
+    - api-design
+  exclude: []
+
+# --- Multi-Root Skill Sources -------------------------------------------------
+# The engine will scan these roots in order. 
+# Confirmed roots skip the interactive path confirmation step.
+skill_sources:
+  - path: ".agent/skills"
+    confirmed: true
+    format: FOLDER
+  - path: "C:/shared/team-skills/.agent"
+    confirmed: true
+    format: CATALOG
+  - path: ".agent/andrej-karpathy-skills"
+    confirmed: true
+    format: FOLDER
+
+# --- Orchestration Settings ---------------------------------------------------
+template_style: progressive   # Options: progressive (layered), flat, minimal
+quality_threshold: 42         # Minimum pass score out of 50 (default 38)
+confidence_threshold: 80      # Halt and ask user if project signal < 80%
+skill_match_limit: 5          # Context Overload Protection: Max skills to read
+agentic_match_limit: 3        # Max foundational/reasoning skills to load
+
+# --- Runtime & Memory ---------------------------------------------------------
+preview_mode: true            # Show planned structure before writing files
+existing_files: ask           # Options: ask, overwrite, merge, skip
+project_intent_override: ""   # Manual override (e.g., "frontend", "api")
+
+# --- Audit & Traceability -----------------------------------------------------
+logging:
+  enabled: true
+  directory: ".agent/logs"     # Stores structured JSON logs with decision reasoning
+memory:
+  enabled: true
+  summary_path: ".agent/memory/project_state.md" # Injected as a system prompt
+
+# --- Custom Context -----------------------------------------------------------
+custom_keywords:
+  - "clean-architecture"
+  - "domain-driven-design"
+  - "solid-principles"

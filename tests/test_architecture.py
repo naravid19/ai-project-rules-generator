@@ -402,6 +402,28 @@ class ArchitectureTests(unittest.TestCase):
             remaining_logs = list(log_dir.glob("log_*.json"))
             self.assertEqual(len(remaining_logs), 10)
 
+    def test_audit_log_captures_reasoning(self) -> None:
+        audit_module = load_module(SCRIPTS_DIR / "audit.py", "audit_reasoning_module")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+
+            @audit_module.audit_logger(action="test-reasoning", platform="test")
+            def dummy_func(project_root: Path):
+                return {
+                    "reasoning": "Because of tests",
+                    "verification_status": "pass"
+                }
+
+            dummy_func(project_root=project_root)
+
+            log_dir = project_root / ".agent" / "logs"
+            logs = list(log_dir.glob("log_*.json"))
+            self.assertEqual(len(logs), 1)
+
+            log_content = json.loads(logs[0].read_text(encoding="utf-8"))
+            self.assertEqual(log_content["reasoning"], "Because of tests")
+            self.assertEqual(log_content["verification_status"], "pass")
+
     def test_memory_diff_computation(self) -> None:
         memory_module = load_module(SCRIPTS_DIR / "memory_manager.py", "memory_module")
         old_state = {"action": "plan", "status": "pending", "output_files": ["A"]}

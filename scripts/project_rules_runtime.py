@@ -8,8 +8,10 @@ import json
 from pathlib import Path
 from typing import Any
 
+from audit import audit_logger
 from config_runtime import detect_native_mcp_servers, load_mcp_registry, route_mcp_servers
 from rules_config import SkillSourceConfig, load_confirmed_skill_sources
+from lib.semantic_matcher import SemanticMatcher
 
 PRIMARY_MANIFESTS = {
     "package.json": ("javascript", "node"),
@@ -196,6 +198,7 @@ def parse_stage1_selection_response(raw_response: str, limit: int = 5) -> list[s
     return payload
 
 
+@audit_logger(action="route-intent", platform="generic")
 def route_intent_resources(
     project_root: Path,
     user_intent: str,
@@ -209,15 +212,27 @@ def route_intent_resources(
     catalog_entries = _load_catalog_entries(effective_catalog)
     haystack = " ".join([user_intent.lower(), *(_normalize_sequence(tech_stack))])
 
-    scored_catalog: list[tuple[int, dict[str, Any]]] = []
+    matcher = SemanticMatcher()
+    scored_catalog: list[tuple[float, dict[str, Any]]] = []
+    reasoning_parts = []
+
     for entry in catalog_entries:
         tags = [str(tag).lower() for tag in entry.get("tags", [])]
         description = str(entry.get("description", "")).lower()
-        score = sum(1 for tag in tags if tag.replace("-", " ") in haystack)
-        if description and any(token in description for token in haystack.split()):
-            score += 1
-        if score > 0:
-            scored_catalog.append((score, entry))
+        
+        # 1. Literal score (Primary)
+        literal_matches = [tag for tag in tags if tag.replace("-", " ") in haystack]
+        literal_score = float(len(literal_matches))
+        
+        # 2. Semantic score (Fallback)
+        semantic_score = matcher.score(user_intent, tags)
+        
+        total_score = literal_score + (semantic_score * 0.5)
+        
+        if total_score > 0:
+            scored_catalog.append((total_score, entry))
+            match_type = "literal" if literal_score > 0 else "semantic"
+            reasoning_parts.append(f"Matched '{entry['id']}' ({match_type}, score={total_score:.1f})")
 
     scored_catalog.sort(key=lambda item: (-item[0], str(item[1].get("path", "")).lower()))
     selected_paths = [str(entry["path"]) for _, entry in scored_catalog[:limit]]
@@ -230,12 +245,16 @@ def route_intent_resources(
             available_mcps.append(server)
 
     recommended_mcps = [server for server in routed_mcps if server in available_mcps]
+    
+    if recommended_mcps:
+        reasoning_parts.append(f"Recommended MCPs: {', '.join(recommended_mcps)}")
 
     return {
         "context_injection": build_context_injection(resolve_confirmed_skill_source(root).resolved_path),
         "selected_skill_paths": selected_paths,
         "detected_mcp_servers": available_mcps,
         "recommended_mcp_servers": recommended_mcps,
+        "reasoning": "; ".join(reasoning_parts[:10]), # Cap reasoning size
         "stage1_prompt": build_stage1_selection_prompt(
             user_intent,
             tech_stack,
@@ -402,15 +421,23 @@ def score_project_confidence(project_root: Path, threshold: int = 80) -> Confide
     )
 
 
-def enforce_confidence_threshold(project_root: Path, threshold: int = 80) -> ConfidenceResult:
+@audit_logger(action="confidence-gate", platform="cli")
+def enforce_confidence_threshold(project_root: Path, threshold: int = 80) -> dict[str, Any]:
     result = score_project_confidence(project_root, threshold=threshold)
+    reasoning = "\n".join(result.reasons)
+    
     if result.requires_clarification:
         options = ", ".join(result.clarification_options) or "frontend, backend, cli, ai, monorepo"
         raise ProjectRulesRuntimeError(
             f"Confidence score {result.score} is below the threshold {result.threshold}. "
             f"Pause and ask the user to clarify the project intent. Suggested options: {options}"
         )
-    return result
+    
+    return {
+        "confidence_score": result.score,
+        "reasoning": reasoning,
+        "verification_status": "pass"
+    }
 
 
 def _normalize_path_text(path_value: Path | str) -> str:
@@ -645,61 +672,15 @@ def _is_workflow_root(source_path: Path) -> bool:
     except OSError:
         return False
 
+from lib.design_tokens import DesignTokenEngine
+
+# ... (rest of imports)
+
 def extract_design_tokens(project_root: Path) -> dict:
     """Parse tailwind.config.ts/js or CSS custom properties 
     to extract actual design tokens."""
-    tokens = {
-        "colors": {},
-        "fonts": {},
-        "spacing": {}
-    }
-    
-    # 1. Search for Tailwind config
-    tailwind_files = list(project_root.glob("tailwind.config.*"))
-    for tf in tailwind_files:
-        try:
-            content = tf.read_text(encoding="utf-8", errors="ignore")
-            
-            # Simple regex for colors: "primary": "#hex"
-            color_matches = re.findall(r'[\'"]([a-zA-Z0-9-]+)[\'"]\s*:\s*[\'"](#[a-fA-F0-9]{3,8}|(?:rgb|hsl)a?\([^)]+\))[\'"]', content)
-            for name, value in color_matches:
-                if name not in tokens["colors"]:
-                    tokens["colors"][name] = value
-            
-            # Fonts: "sans": ["Inter", "sans-serif"]
-            font_matches = re.findall(r'[\'"]([a-zA-Z0-9-]+)[\'"]\s*:\s*\[\s*([^\]]+)\s*\]', content)
-            for name, value_list in font_matches:
-                items = [v.strip().strip("'\"") for v in value_list.split(",")]
-                tokens["fonts"][name] = items
-        except Exception:
-            pass
-
-    # 2. Search for CSS custom properties
-    # Scan root and src for CSS files, but limit depth to avoid deep scans
-    css_files = []
-    for ext in ["*.css", "*.scss"]:
-        css_files.extend(list(project_root.glob(ext)))
-        css_files.extend(list((project_root / "src").glob(f"**/{ext}")))
-    
-    for cf in css_files:
-        if "node_modules" in cf.parts:
-            continue
-        try:
-            content = cf.read_text(encoding="utf-8", errors="ignore")
-            # --var: value;
-            props = re.findall(r'(--[a-zA-Z0-9-]+)\s*:\s*([^;]+);', content)
-            for name, value in props:
-                v = value.strip()
-                if v.startswith("#") or v.startswith("rgb") or v.startswith("hsl"):
-                    tokens["colors"][name] = v
-                elif "font" in name.lower():
-                    tokens["fonts"][name] = v
-                elif any(k in name.lower() for k in ["spacing", "gap", "padding", "margin"]):
-                    tokens["spacing"][name] = v
-        except Exception:
-            pass
-
-    return tokens
+    engine = DesignTokenEngine(project_root)
+    return engine.extract()
 
 if __name__ == "__main__":
     import argparse

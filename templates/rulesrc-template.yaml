@@ -62,7 +62,7 @@ sections:
 # Hybrid skill directories may include `SKILL.md` with companion `AGENTS.md`, `CLAUDE.md`,
 # `README.md`, and adjacent `references/` or `rules/` folders.
 # skill_sources:
-#   - path: "C:/Users/narav/Desktop/CE code/Tools/.agent"
+#   - path: "C:/shared/team-skills/.agent"
 #     confirmed: true
 #   - path: .agent
 #     confirmed: false

@@ -35,3 +35,6 @@ env/
 /chat
 test_report.txt
 prompt.txt
+.cursorrules
+AGENTS.md
+/docs

@@ -121,9 +121,9 @@ install_skill() {
       label="K-Dense-AI/claude-scientific-skills"
       ;;
     karpathy)
-      repo_url="https://github.com/multica-ai/andrej-karpathy-skills.git"
+      repo_url="https://github.com/forrestchang/andrej-karpathy-skills.git"
       target_suffix="andrej-karpathy-skills"
-      label="multica-ai/andrej-karpathy-skills"
+      label="forrestchang/andrej-karpathy-skills"
       ;;
     all)
       for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi scientific karpathy; do
@@ -264,7 +264,7 @@ else
   echo "  6) nextlevelbuilder / ui-ux-pro-max      (WORKFLOW, UI/UX design intel)"
   echo "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
   echo "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
-  echo "  9) multica-ai / andrej-karpathy-skills   (FOLDER, Andrej Karpathy's skills/workflows)"
+  echo "  9) forrestchang / andrej-karpathy-skills (FOLDER, Andrej Karpathy's skills/workflows)"
   echo " 10) All of the above"
   echo " 11) Skip (add your own later)"
   echo

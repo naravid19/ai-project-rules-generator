@@ -76,7 +76,7 @@
 
 <!-- ABOUT THE PROJECT -->
 
-### **The Flexible Agentic Engine** (New in v1.9.2)
+### **The Flexible Agentic Engine** (New in v1.9.3)
 
 This generator supports **Dual-Mode Execution**:
 - **Mode A (Enhanced)**: If you clone the full repo, the AI uses Python scripts (`indexer.py`, `wizard.py`) for maximum efficiency.
@@ -119,14 +119,14 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 | ---------------------------- | ---------------------------------------------------------------------------------------- |
 | **6-Stage Workflow**         | Structured process: Preferences → Analyze → Discover → .cursorrules → AGENTS.md → Verify |
 | **Format-Based Auto-Detect** | Automatically detects skill sources by format (CATALOG/FOLDER/SEARCH_ENGINE/README/WORKFLOW) |
-| **Native MCP Support**       | 🌟 **New in v1.9.0:** Auto-discovery of MCP servers for seamless tool execution context        |
-| **Memory & Audit Logging**   | 🌟 **New in v1.9.2:** Deeply integrated project-local audit trails (`scripts/audit.py`) and automated system prompt injection via memory summarization (`scripts/memory_manager.py`). |
+| **Native MCP Support**       | Auto-discovery of MCP servers for seamless tool execution context        |
+| **Memory & Audit Logging**   | Deeply integrated project-local audit trails (`scripts/audit.py`) and automated system prompt injection via memory summarization (`scripts/memory_manager.py`). |
 | **Multi-Platform Output**    | Generates correct files for Cursor, Claude, Antigravity, Gemini, Copilot, and more       |
 | **17 Keyword Categories**    | Comprehensive mapping from project types to skill search terms                           |
 | **Relevance-Ranked Search**  | Scores matches across catalogs, folders, READMEs, and search tools; supports `--limit` for large roots |
-| **Quality & Confidence**     | 🌟 **New in v1.9.0:** Heuristic verification (38/50 default pass) and confidence gating to ensure strict relevance |
+| **Quality & Confidence**     | Heuristic verification (38/50 default pass) and confidence gating with decision reasoning to ensure strict relevance |
 | **Interactive Wizard**       | CLI-based configuration generator (`scripts/wizard.py`) with integrated audit logging   |
-| **Flexible Agentic Engine**  | 🌟 **New in v1.9.2:** 100% functional via native AI context (Zero-Install) with scripted Mode A fallback |
+| **Flexible Agentic Engine**  | 100% functional via native AI context (Zero-Install) with scripted Mode A fallback |
 | **Interactive Mode**         | Optional preferences system with config file (`.rulesrc.yaml`) support                   |
 | **Multi-Language**           | Output generation in 9 languages (en, th, ja, zh, ko, es, fr, de, pt)                    |
 | **Preview Mode**             | Review planned output structure before generation begins                                 |
@@ -192,7 +192,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 > - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) — UI/UX design intelligence
 > - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — planning and persistence workflows
 > - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) — scientific and research-focused workflows
-> - [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) — Andrej Karpathy's skills and workflows
+> - [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — Andrej Karpathy's skills and workflows
 
 ### Installation
 
@@ -370,7 +370,7 @@ custom_keywords:
 
 ## Workflow Stages
 
-> 🌟 **What's New in v1.9.2 (2026-04-26):** Implemented **Flexible Agentic Execution** (Dual-Mode Strategy). The generator now automatically adapts to its environment: utilizing Python scripts if available (Mode A), or emulating them using native IDE tools if not (Mode B). Added strict **Anti-Overload Rules** for autonomous skill discovery to protect context window limits.
+> 🌟 **What's New in v1.9.3 (2026-05-02):** Implemented **Flexible Agentic Execution** (Dual-Mode Strategy). The generator now automatically adapts to its environment: utilizing Python scripts if available (Mode A), or emulating them using native IDE tools if not (Mode B). Added strict **Anti-Overload Rules** for autonomous skill discovery and a 9-Pillar Architecture completion pass.
 
 | Stage / Step                 | Time      | Description                                                             |
 | ---------------------------- | --------- | ----------------------------------------------------------------------- |
@@ -698,7 +698,7 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [jeffallan-claude-skills](https://github.com/Jeffallan/claude-skills)
 - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files)
 - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills)
-- [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+- [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

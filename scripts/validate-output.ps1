@@ -36,6 +36,17 @@ $VaguePatterns = @(
 
 $HardcodedSkillPattern = '@[a-z0-9][a-z0-9-]*'
 $HardcodedSkillIgnoreMarkers = @('Hardcoding', 'BAD', 'Anti-Pattern', 'Instead Do')
+$VerifiedSourceNames = @(
+    'antigravity-awesome-skills',
+    'awesome-claude-skills',
+    'anthropic-skills',
+    'techleads-agent-skills',
+    'jeffallan-claude-skills',
+    'claude-scientific-skills',
+    'andrej-karpathy-skills',
+    'planning-with-files',
+    'ui-ux-pro-max-skill'
+)
 $RepoLocalPrefixes = @(
     'README.md',
     'AGENTS.md',
@@ -364,6 +375,17 @@ function Get-HardcodedSkillHits([string]$Content) {
         $skip = $false
         foreach ($marker in $HardcodedSkillIgnoreMarkers) {
             if ($line -match [regex]::Escape($marker)) {
+                $skip = $true
+                break
+            }
+        }
+        if ($skip) {
+            continue
+        }
+
+        # Skip verified source names to avoid false Rule 1 violations
+        foreach ($source in $VerifiedSourceNames) {
+            if ($line -match [regex]::Escape($source)) {
                 $skip = $true
                 break
             }

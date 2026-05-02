@@ -56,6 +56,7 @@ def audit_logger(action: str, platform: str = "generic") -> Callable[[Callable[P
                 "matched_skill_paths": [],
                 "output_files": [],
                 "verification_status": kwargs.get("verification_status", ""),
+                "reasoning": kwargs.get("reasoning", ""),
                 "error_code": "",
                 "error_message": "",
             }
@@ -75,6 +76,7 @@ def audit_logger(action: str, platform: str = "generic") -> Callable[[Callable[P
             finally:
                 _write_audit_log(session, event)
                 refresh_project_state(project_root)
+                detect_anomalies(session.log_directory)
                 print(f"[audit] {action} -> {event['status']}")
 
         return wrapper
@@ -86,12 +88,12 @@ def _merge_result_metadata(event: dict[str, Any], result: Any) -> None:
     if not isinstance(result, dict):
         return
 
-    for key in ("matched_skill_paths", "output_files", "verification_status"):
+    for key in ("matched_skill_paths", "output_files", "verification_status", "reasoning"):
         value = result.get(key)
         if value is None:
             continue
-        if key == "verification_status":
-            event[key] = str(value)
+        if key in ("verification_status", "reasoning"):
+            event[key] = value if isinstance(value, dict) else str(value)
         else:
             event[key] = _listify(value)
 
@@ -117,6 +119,32 @@ def rotate_audit_logs(log_dir: Path, max_logs: int = 50) -> None:
             log_path.unlink()
         except OSError:
             pass
+
+
+def detect_anomalies(log_dir: Path) -> None:
+    """Analyzes historical logs and warns about significant confidence drops."""
+    sessions = list_audit_sessions(log_dir)
+    if len(sessions) < 3:
+        return
+
+    # Filter for logs that have a confidence_score
+    scores = []
+    for s in sessions:
+        score = s.get("confidence_score")
+        if score is not None and isinstance(score, (int, float)):
+            scores.append(float(score))
+
+    if len(scores) < 2:
+        return
+
+    latest = scores[0]
+    previous_window = scores[1:6]  # Compare against last 5
+    avg_previous = sum(previous_window) / len(previous_window)
+
+    # Flag if latest score is >25% below average
+    if avg_previous > 0 and latest < (avg_previous * 0.75):
+        print(f"\033[93m[WARNING] Anomaly Detected: Confidence score dropped to {latest} "
+              f"(Recent avg: {avg_previous:.1f}). Tech stack signals may be degrading.\033[0m")
 
 
 def list_audit_sessions(log_dir: Path) -> list[dict[str, Any]]:
