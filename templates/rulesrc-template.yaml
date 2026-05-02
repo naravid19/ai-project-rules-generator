@@ -90,7 +90,7 @@ template_style: progressive
 # Scale: 0-50, Default: 38
 quality_threshold: 38
 
-# --- Superpowers Methodology (v1.9.4+) ----------------------------------------
+# --- Superpowers Methodology (v1.9.3+) ----------------------------------------
 # Enables TDD for documentation and Verification Before Completion.
 # verification_before_completion: Forces commands to be run before claiming success.
 # strict_tdd_requirements: RED-GREEN-REFACTOR enforcement for rules and specs.

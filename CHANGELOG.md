@@ -9,11 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Superpowers & Karpathy Integration**: Implemented advanced Agentic Alignment based on the `superpowers` and `andrej-karpathy-skills` methodologies.
+- **Subagent Orchestration**: Implemented rules for AI agents to dynamically dispatch tasks to subagents and invoke MCP tools (e.g., Python REPL).
+- **Deep Context Savings**: Changed JIT retrieval to use a Pointer System instead of injecting massive Markdown files directly into context, significantly reducing token usage.
+- **Systematic Debugging**: Added `duration_ms` and `stack_trace` tracking to `.agent/logs/` (via `scripts/audit.py`) to enable real root-cause investigation.
 - **9-Pillar Architecture Refinement**: Completed a detailed development pass to ensure perfect alignment with the Lead AI Architect's 9-Pillar specification.
+- **TDD for Documentation**: Added new configuration toggles in `rulesrc-template.yaml` enforcing "Verification Before Completion" and "Strict TDD Requirements" for Agentic guidelines.
+
+### Changed
+
+- **Algorithm Refinements (Karpathy Simplicity)**: Refactored `scripts/indexer.py` tagging logic to use exact word boundary matching (Regex `\b`), preventing false-positive matches.
+- **Parallel Processing**: Accelerated skill catalog generation by using `ThreadPoolExecutor` for parallel file processing in the skill indexer.
+- **Lean Memory Management**: Refactored `scripts/memory_manager.py` to stop tracking transient execution diffs in `project_state.md`.
+- **Explicit Trigger Discovery**: Instructed the metadata parser to prioritize "Use when", "trigger", and "when to use" sections over generic "overview" sections.
 - **Enhanced Confidence Gate**: Refined Stage 1.6 with explicit scoring criteria (+20 Manifests, +20 Entrypoints, +30 Frameworks, +30 Architecture) and a strict 80% Halt Logic.
-- **Improved JIT Retrieval**: Tightened Stage 2.4 "Double Search" instructions for Mode B (Autonomous) to prevent context overload while ensuring foundational reasoning skills are always loaded.
-- **Agentic Template Upgrade**: Updated `AGENTS.md` template (Stage 4.2) to strictly separate `[Native MCP Servers]` and `[Local Agent Skills]` with clear instructional precedence.
-- **Manual Audit Schema**: Provided the exact JSON schema in Stage 6.1 for manual audit logging in Zero-Install environments.
+- **Improved JIT Retrieval**: Tightened Stage 2.4 "Double Search" instructions for Mode B (Autonomous) to prevent context overload.
+- **Agentic Template Upgrade**: Updated `AGENTS.md` template (Stage 4.2) to strictly separate `[Native MCP Servers]` and `[Local Agent Skills]`.
 
 ## [1.9.2][1.9.2] - 2026-04-26
 
