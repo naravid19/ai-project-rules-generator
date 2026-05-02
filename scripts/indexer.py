@@ -98,51 +98,63 @@ def validate_catalog(project_root: Path, output_path: Path | None = None) -> tup
     return is_valid, stale_entries, missing_entries
 
 
+def _process_single_entrypoint(args):
+    entrypoint, project_root, existing_map = args
+    from skill_metadata import resolve_skill_entry, parse_frontmatter, extract_summary
+    from indexer import CatalogEntry, _serialize_catalog_path, _one_sentence, _extract_tags, PREDEFINED_TAGS
+    resolved = resolve_skill_entry(entrypoint.parent if entrypoint.is_file() else entrypoint)
+    if resolved is None:
+        return None
+
+    relative_path = _serialize_catalog_path(project_root, resolved.primary_path)
+    mtime = resolved.primary_path.stat().st_mtime
+
+    if existing_map is not None and relative_path in existing_map:
+        existing = existing_map[relative_path]
+        if existing.get("mtime", 0.0) >= mtime:
+            return CatalogEntry(
+                id=existing.get("id", ""),
+                path=existing.get("path", ""),
+                tags=existing.get("tags", []),
+                description=existing.get("description", ""),
+                mtime=existing.get("mtime", 0.0)
+            )
+
+    content = resolved.primary_path.read_text(encoding="utf-8", errors="ignore")
+    frontmatter = parse_frontmatter(content)
+    description = (
+        str(frontmatter.get("description") or "").strip()
+        or extract_summary(content)
+        or "No description available."
+    )
+    description = _one_sentence(description)
+    tags = _extract_tags(description, content, resolved.primary_path)
+    skill_id = str(frontmatter.get("name") or resolved.directory.name).strip() or resolved.primary_path.stem
+
+    return CatalogEntry(
+        id=skill_id,
+        path=relative_path,
+        tags=tags,
+        description=description,
+        mtime=mtime
+    )
+
+
 def _collect_catalog_entries(project_root: Path, confirmed_root: Path, existing_catalog: list[dict[str, Any]] | None = None) -> list[CatalogEntry]:
+    import concurrent.futures
     entries: list[CatalogEntry] = []
     existing_map = {e["path"]: e for e in (existing_catalog or [])}
 
-    for entrypoint in _iter_entrypoints(confirmed_root):
-        resolved = resolve_skill_entry(entrypoint.parent if entrypoint.is_file() else entrypoint)
-        if resolved is None:
-            continue
-
-        relative_path = _serialize_catalog_path(project_root, resolved.primary_path)
-        mtime = resolved.primary_path.stat().st_mtime
-
-        if existing_catalog is not None and relative_path in existing_map:
-            existing = existing_map[relative_path]
-            if existing.get("mtime", 0.0) >= mtime:
-                # Type safe init
-                entries.append(CatalogEntry(
-                    id=existing.get("id", ""),
-                    path=existing.get("path", ""),
-                    tags=existing.get("tags", []),
-                    description=existing.get("description", ""),
-                    mtime=existing.get("mtime", 0.0)
-                ))
-                continue
-
-        content = resolved.primary_path.read_text(encoding="utf-8", errors="ignore")
-        frontmatter = parse_frontmatter(content)
-        description = (
-            str(frontmatter.get("description") or "").strip()
-            or extract_summary(content)
-            or "No description available."
-        )
-        description = _one_sentence(description)
-        tags = _extract_tags(description, content, resolved.primary_path)
-        skill_id = str(frontmatter.get("name") or resolved.directory.name).strip() or resolved.primary_path.stem
-
-        entries.append(
-            CatalogEntry(
-                id=skill_id,
-                path=relative_path,
-                tags=tags,
-                description=description,
-                mtime=mtime
-            )
-        )
+    entrypoints = list(_iter_entrypoints(confirmed_root))
+    
+    # Prepare arguments for multiprocessing/threading
+    args_list = [(ep, project_root, existing_map) for ep in entrypoints]
+    
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(_process_single_entrypoint, args_list)
+        for res in results:
+            if res is not None:
+                entries.append(res)
 
     return sorted(entries, key=lambda item: (item.id.lower(), item.path.lower()))
 
