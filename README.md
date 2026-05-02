@@ -71,8 +71,8 @@ This generator supports **Dual-Mode Execution**:
 
 ### **Agentic Alignment Principles**
 We practice what we preach. This tool enforces high-fidelity standards derived from world-class AI engineering methodologies:
-*   **[Andrej Karpathy's Skills](https://github.com/forrestchang/andrej-karpathy-skills)**: Prioritizes "Simplicity First", "Surgical Changes", and "Think Before Coding" logic to minimize accidental refactoring.
-*   **[Superpowers](https://github.com/obra/superpowers)**: Implements "Verification Before Completion", "Subagent-Driven Development", and "TDD for Documentation" to ensure every AI action is evidence-backed.
+*   **[Andrej Karpathy's Methodology](https://github.com/forrestchang/andrej-karpathy-skills)**: Prioritizes "Simplicity First", "Surgical Changes", and "Think Before Coding" logic to minimize accidental refactoring.
+*   **[Superpowers Framework](https://github.com/obra/superpowers)**: Implements "Verification Before Completion", "Subagent-Driven Development", and "TDD for Documentation" to ensure every AI action is evidence-backed.
 *   **Deep Context Savings**: Generates **Pointers** instead of dumping code. AI agents are instructed to `read_file` specific skills only when contextually relevant.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -129,7 +129,7 @@ The AI will autonomously scan your tech stack, match relevant skills using exact
 - [x] Deep Context Savings (Pointer System)
 - [x] Parallel Indexing (ThreadPoolExecutor)
 - [x] Systematic Debugging (Stack Trace Audit)
-- [x] exact-word boundary tagging (\bregex\b)
+- [x] Exact-word boundary tagging (\bregex\b)
 - [ ] Multi-agent Simulation Environment
 - [ ] Web-based Configuration UI
 
@@ -172,6 +172,8 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 *   [Superpowers Framework](https://github.com/obra/superpowers)
 *   [Antigravity Awesome Skills](https://github.com/sickn33/antigravity-awesome-skills)
 *   [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills)
+*   [Composio Awesome Claude Skills](https://github.com/ComposioHQ/awesome-claude-skills)
+*   [Tech Leads Agent Skills](https://github.com/tech-leads-club/agent-skills)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
