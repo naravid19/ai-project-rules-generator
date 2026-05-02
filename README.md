@@ -62,18 +62,18 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-AI Project Rules Generator is a structured workflow designed to solve the "Context Bloat" and "Agent Drift" problems in modern AI-assisted development. By utilizing **Deterministic JIT (Just-In-Time) Retrieval**, it automatically discovers and integrates relevant AI skills from your `.agent/` directory without overwhelming the LLM's context window.
+AI Project Rules Generator is a production-grade workflow designed to solve **Context Bloat** and **Agent Drift** in AI-assisted development. By utilizing **Deterministic JIT (Just-In-Time) Retrieval**, it automatically discovers and integrates relevant AI skills from your `.agent/` directory without saturating the LLM's context window.
 
 ### **The Flexible Agentic Engine** (v1.9.3)
 This generator supports **Dual-Mode Execution**:
-*   **Mode A (Enhanced)**: Utilizes Python scripts (`indexer.py`, `wizard.py`) for enterprise-scale indexing and parallel processing.
+*   **Mode A (Enhanced)**: Utilizes parallelized Python scripts (`indexer.py`, `wizard.py`) for high-performance indexing via `ThreadPoolExecutor`.
 *   **Mode B (Autonomous)**: 100% self-sufficient via the markdown workflow file—**no installation required**.
 
 ### **Agentic Alignment Principles**
-We practice what we preach. This tool enforces high-fidelity standards derived from world-class methodologies:
-*   **[Andrej Karpathy's Skills](https://github.com/forrestchang/andrej-karpathy-skills)**: Enforces "Simplicity First", "Surgical Changes", and "Think Before Coding" logic.
-*   **[Superpowers](https://github.com/obra/superpowers)**: Implements "Verification Before Completion", "Subagent-Driven Development", and "TDD for Documentation".
-*   **Deep Context Savings**: Generates **Pointers** instead of dumping code. AI agents are instructed to `read_file` specific skills only when needed.
+We practice what we preach. This tool enforces high-fidelity standards derived from world-class AI engineering methodologies:
+*   **[Andrej Karpathy's Skills](https://github.com/forrestchang/andrej-karpathy-skills)**: Prioritizes "Simplicity First", "Surgical Changes", and "Think Before Coding" logic to minimize accidental refactoring.
+*   **[Superpowers](https://github.com/obra/superpowers)**: Implements "Verification Before Completion", "Subagent-Driven Development", and "TDD for Documentation" to ensure every AI action is evidence-backed.
+*   **Deep Context Savings**: Generates **Pointers** instead of dumping code. AI agents are instructed to `read_file` specific skills only when contextually relevant.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -91,7 +91,7 @@ We practice what we preach. This tool enforces high-fidelity standards derived f
 
 ### Prerequisites
 *   An AI assistant (Cursor, Claude Code, Gemini CLI, etc.)
-*   A local `.agent/` directory or a shared skill root.
+*   A local `.agent/` directory containing skill repositories.
 
 ### Installation
 
@@ -110,14 +110,15 @@ irm https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main/
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Simply trigger the workflow in your AI assistant:
+Simply trigger the command in your AI assistant:
 ```text
 /create-project-rules
 ```
-The AI will autonomously analyze your project, discover compatible skills (CATALOG, FOLDER, README, or WORKFLOW formats), and generate tailored instructions.
+The AI will autonomously scan your tech stack, match relevant skills using exact-word regex patterns, and generate a tailored `.cursorrules` and `AGENTS.md`.
 
-**Advanced: Subagent Orchestration**
-For large projects, the generated `AGENTS.md` will instruct the AI to dispatch specialized subagents using `invoke_agent` or Superpowers workflows to maintain focus and quality.
+**Enterprise Features:**
+*   **Subagent Orchestration**: Automatically instructs the AI to dispatch specialized subagents for complex tasks.
+*   **Systematic Debugging**: Generates audit logs with full stack traces and performance metrics for every generation step.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -128,7 +129,7 @@ For large projects, the generated `AGENTS.md` will instruct the AI to dispatch s
 - [x] Deep Context Savings (Pointer System)
 - [x] Parallel Indexing (ThreadPoolExecutor)
 - [x] Systematic Debugging (Stack Trace Audit)
-- [x] Subagent Orchestration Rules
+- [x] exact-word boundary tagging (\bregex\b)
 - [ ] Multi-agent Simulation Environment
 - [ ] Web-based Configuration UI
 
@@ -167,10 +168,10 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 ## Acknowledgments
 
 *   [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
-*   [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
-*   [superpowers](https://github.com/obra/superpowers)
-*   [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills)
-*   [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills)
+*   [Andrej Karpathy's Methodology](https://github.com/forrestchang/andrej-karpathy-skills)
+*   [Superpowers Framework](https://github.com/obra/superpowers)
+*   [Antigravity Awesome Skills](https://github.com/sickn33/antigravity-awesome-skills)
+*   [Claude Scientific Skills](https://github.com/K-Dense-AI/claude-scientific-skills)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
