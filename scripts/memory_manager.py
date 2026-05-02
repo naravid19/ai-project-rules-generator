@@ -23,12 +23,8 @@ def compute_state_diff(old_state: dict[str, Any], new_state: dict[str, Any]) -> 
 
 
 def format_state_change_notice(diff: dict[str, Any]) -> str:
-    if not diff:
-        return "No significant state changes detected."
-    lines = []
-    for key, values in diff.items():
-        lines.append(f"- **{key}**: `{values['old']}` -> `{values['new']}`")
-    return "\n".join(lines)
+    # Deprecated: Kept for API compatibility but returns empty string to prevent transient state in memory
+    return ""
 
 
 def summarize_recent_logs(project_root: Path, max_logs: int = 10) -> str:
@@ -37,18 +33,16 @@ def summarize_recent_logs(project_root: Path, max_logs: int = 10) -> str:
     events = _load_recent_events(log_dir, max_logs=max_logs)
 
     lines = [
-        "# Project State",
+        "# Project State Memory",
+        "> This file maintains the high-level, stable context for the AI agent. Transient execution logs are intentionally excluded.",
         "",
-        f"- Project root: `{root}`",
+        f"- **Project Root**: `{root}`",
     ]
 
     if not events:
         lines.extend(
             [
-                "- Latest phase: No audited execution has been recorded yet.",
-                "- Confirmed skill source: Unknown",
-                "- Recently used skills: None",
-                "- Latest verification: Unknown",
+                "- **Status**: No audited execution has been recorded yet.",
             ]
         )
         return "\n".join(lines) + "\n"
@@ -56,44 +50,25 @@ def summarize_recent_logs(project_root: Path, max_logs: int = 10) -> str:
     latest = events[-1]
     matched_skills = _flatten_unique(events, "matched_skill_paths")
     outputs = _flatten_unique(events, "output_files")
+    platforms = _flatten_unique(events, "platform_targets")
+    mcps = _flatten_unique(events, "recommended_mcp_servers")
 
+    # Extract only stable, architectural, and intent-driven context
     lines.extend(
         [
-            f"- Latest phase: `{latest.get('action', 'unknown')}`",
-            f"- Latest status: `{latest.get('status', 'unknown')}`",
-            f"- Confirmed skill source: `{latest.get('confirmed_skill_source_path', 'unknown')}`",
-            f"- Latest confidence score: `{latest.get('confidence_score', 'unknown')}`",
-            f"- Recently selected keywords: `{', '.join(latest.get('selected_keywords', [])) or 'none'}`",
-            f"- Recently used skills: `{', '.join(matched_skills) or 'none'}`",
-            f"- Latest output files: `{', '.join(outputs) or 'none'}`",
-            f"- Latest verification: `{latest.get('verification_status', latest.get('status', 'unknown'))}`",
+            f"- **Active Phase**: `{latest.get('action', 'unknown')}`",
+            f"- **Target Platforms**: `{', '.join(platforms) or 'auto'}`",
+            f"- **Confirmed Skill Source**: `{latest.get('confirmed_skill_source_path', 'unknown')}`",
+            f"- **Active User Intent**: `{', '.join(latest.get('selected_keywords', [])) or 'none'}`",
+            f"- **Active Skills**: `{', '.join(matched_skills) or 'none'}`",
+            f"- **Recommended MCPs**: `{', '.join(mcps) or 'none'}`",
+            f"- **Latest Managed Files**: `{', '.join(outputs) or 'none'}`",
         ]
     )
 
-    recent_errors = [event for event in events if event.get("status") == "error"]
-    if recent_errors:
-        last_error = recent_errors[-1]
-        lines.append(
-            f"- Last error: `{last_error.get('error_code', 'unknown')}: {last_error.get('error_message', 'unknown')}`"
-        )
-
-    lines.append("\n## Change Log\n")
-    if len(events) >= 2:
-        # Show diffs for the last 5 events
-        for i in range(max(0, len(events) - 5), len(events)):
-            if i == 0:
-                continue
-            old = events[i - 1]
-            new = events[i]
-            diff = compute_state_diff(old, new)
-            if diff:
-                timestamp = new.get('timestamp_utc', 'unknown')
-                action = new.get('action', 'unknown')
-                lines.append(f"### {timestamp} ({action})")
-                lines.append(format_state_change_notice(diff))
-                lines.append("")
-    else:
-        lines.append("Not enough history to generate a change log.")
+    # Note: We intentionally DO NOT include transient metrics like duration_ms, stack_traces,
+    # or step-by-step change logs here to adhere to the Superpowers Memory Management rule:
+    # "Never save transient session state, summaries of code changes, bug fixes, or task-specific findings"
 
     return "\n".join(lines) + "\n"
 
