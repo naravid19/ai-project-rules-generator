@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import time
+import traceback
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
@@ -57,21 +59,27 @@ def audit_logger(action: str, platform: str = "generic") -> Callable[[Callable[P
                 "output_files": [],
                 "verification_status": kwargs.get("verification_status", ""),
                 "reasoning": kwargs.get("reasoning", ""),
+                "duration_ms": 0.0,
                 "error_code": "",
                 "error_message": "",
+                "stack_trace": "",
             }
 
             print(f"[audit] {action} -> starting ({session.platform}, session={session.session_id})")
 
+            start_time = time.time()
             try:
                 result = func(*args, **kwargs)
+                event["duration_ms"] = round((time.time() - start_time) * 1000, 2)
                 _merge_result_metadata(event, result)
                 event["status"] = "success"
                 return result
             except Exception as exc:
+                event["duration_ms"] = round((time.time() - start_time) * 1000, 2)
                 event["status"] = "error"
                 event["error_code"] = exc.__class__.__name__
                 event["error_message"] = str(exc)
+                event["stack_trace"] = traceback.format_exc()
                 raise
             finally:
                 _write_audit_log(session, event)
