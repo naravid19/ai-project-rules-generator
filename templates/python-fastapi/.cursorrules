@@ -106,3 +106,19 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 | `os.getenv()` everywhere | Centralized `config.py` with pydantic-settings |
 | Business logic in routers | Extract to `services/` layer |
 | No input validation | Pydantic schemas for all request bodies |
+
+---
+
+## Testing & Verification Guidelines
+
+**Verification Before Completion**:
+1. IDENTIFY: What command proves this code works?
+2. RUN: Execute the FULL command (e.g. `pytest tests/test_user.py -v`)
+3. READ: Full output, check exit code
+4. VERIFY: Does output confirm the claim?
+5. ONLY THEN: Claim the task is complete.
+
+### Testing Standards
+- Use `pytest` for all unit and integration tests.
+- Use `httpx.AsyncClient` for testing API endpoints.
+- Mocks should only be used for external APIs (e.g., Resend, Stripe). Use a real test database (SQLite/PostgreSQL) for ORM testing.

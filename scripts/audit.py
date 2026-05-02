@@ -96,11 +96,11 @@ def _merge_result_metadata(event: dict[str, Any], result: Any) -> None:
     if not isinstance(result, dict):
         return
 
-    for key in ("matched_skill_paths", "output_files", "verification_status", "reasoning"):
+    for key in ("matched_skill_paths", "output_files", "verification_status", "reasoning", "confirmed_skill_source_path"):
         value = result.get(key)
         if value is None:
             continue
-        if key in ("verification_status", "reasoning"):
+        if key in ("verification_status", "reasoning", "confirmed_skill_source_path"):
             event[key] = value if isinstance(value, dict) else str(value)
         else:
             event[key] = _listify(value)

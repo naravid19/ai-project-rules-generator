@@ -202,12 +202,18 @@ def _serialize_catalog_path(project_root: Path, primary_path: Path) -> str:
 
 @audit_logger(action="generate-index", platform="cli")
 def _run_indexer(project_root: Path, output_path: Path | None, validate: bool, incremental: bool) -> dict[str, Any]:
+    root = Path(project_root).resolve()
+    confirmed = resolve_confirmed_skill_source(root)
+    
     if validate:
         is_valid, stale, missing = validate_catalog(project_root, output_path)
         print(json.dumps({"valid": is_valid, "stale": stale, "missing": missing}))
         if not is_valid:
             raise SystemExit(1)
-        return {"verification_status": "success"}
+        return {
+            "verification_status": "success",
+            "confirmed_skill_source_path": str(confirmed.resolved_path)
+        }
 
     final_path = build_skill_catalog(
         project_root,
@@ -215,7 +221,11 @@ def _run_indexer(project_root: Path, output_path: Path | None, validate: bool, i
         incremental=incremental
     )
     print(final_path)
-    return {"output_files": [str(final_path)], "verification_status": "success"}
+    return {
+        "output_files": [str(final_path)], 
+        "verification_status": "success",
+        "confirmed_skill_source_path": str(confirmed.resolved_path)
+    }
 
 
 def main() -> None:

@@ -31,6 +31,7 @@ memory:
 search:
   - brave-search-mcp
   - tavily-mcp
+  - exa-mcp
 
 monitoring:
   - sentry-mcp
@@ -100,24 +101,5 @@ documentation:
   - notion-mcp
   - confluence-mcp
 
-search:
-  - tavily-mcp
-  - exa-mcp
-
-monitoring:
-  - sentry-mcp
-  - datadog-mcp
-
-deployment:
-  - vercel-mcp
-  - cloudflare-mcp
-
 secrets:
   - vault-mcp
-
-email:
-  - resend-mcp
-
-cloud:
-  - aws-mcp
-  - gcp-mcp
