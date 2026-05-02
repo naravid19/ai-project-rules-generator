@@ -626,6 +626,16 @@ Before writing `AGENTS.md`, define the **Goal-Driven Execution** plan:
 |--------|---------|--------------|
 | `{server}` | {what it provides} | `{keyword}` |
 
+### [Subagent Orchestration & Parallelism]
+*Instruction: For complex, multi-file, or parallel tasks, DO NOT execute everything in the main session. Use the specified subagent workflows to manage cognitive load and context.*
+
+| Task Complexity | Strategy | Required MCP/Subagent Tool |
+|-----------------|----------|----------------------------|
+| **Multi-step Execution** | Dispatch fresh subagent per task | `invoke_agent` or `superpowers:subagent-driven-development` |
+| **Independent Tasks** | Run in parallel without blocking | `superpowers:dispatching-parallel-agents` |
+| **Local Data Analysis** | Spawn a persistent interactive REPL | `mcp_desktop-commander_start_process` (e.g., `python3 -i`) |
+| **UI/React Debugging** | Use visual inspection tools | `chrome-devtools-mcp` |
+
 ### [Local Agent Skills]
 *Instruction: Strictly follow the conceptual guidelines, coding standards, and architectural rules defined in these paths BEFORE executing any MCP tool.*
 

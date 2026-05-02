@@ -137,12 +137,18 @@ memory:
   enabled: true
   summary_path: .agent/memory/project_state.md
 
-# --- Native MCP Servers -------------------------------------------------------
+# --- Native MCP Servers & Subagents -------------------------------------------
 # Optional list of native MCP server names to surface in generated AGENTS.md
 # under the [Native MCP Servers] section.
 # mcp_servers:
 #   - filesystem
 #   - github
+
+# Enable specific orchestration strategies (Superpowers Methodology)
+# Instructs the AI on *how* to use the tools it has.
+enable_subagent_orchestration: true          # Recommends dispatching subagents for multi-step tasks
+enforce_mcp_tool_mapping: true               # Maps specific domains to specific MCPs (e.g. React -> chrome-devtools)
+# ------------------------------------------------------------------------------
 
 # --- Intent Override ----------------------------------------------------------
 # When the confidence gate falls below the threshold, the CLI wizard can store
