@@ -156,6 +156,7 @@ def _iter_entrypoints(confirmed_root: Path):
 
 
 def _extract_tags(description: str, content: str, primary_path: Path) -> list[str]:
+    import re
     haystack = " ".join(
         [
             description.lower(),
@@ -163,7 +164,9 @@ def _extract_tags(description: str, content: str, primary_path: Path) -> list[st
             primary_path.as_posix().lower().replace("-", " "),
         ]
     )
-    tags = [tag for tag in PREDEFINED_TAGS if tag in haystack]
+    # Use word boundaries to prevent false positives (e.g., 'c"api"tal' matching 'api')
+    haystack_words = set(re.findall(r'\b[\w-]+\b', haystack))
+    tags = [tag for tag in PREDEFINED_TAGS if tag in haystack_words]
     return tags[:17]
 
 
