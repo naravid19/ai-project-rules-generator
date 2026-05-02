@@ -2,6 +2,20 @@
 
 > RESTful API built with FastAPI, SQLAlchemy, and PostgreSQL.
 
+## 📐 High-Fidelity Baseline
+
+### Assumptions
+- **Async First**: All I/O and DB operations use `async/await`.
+- **Validation**: Pydantic v2 for all schema enforcement.
+- **Environment**: Python 3.11+ using `ruff` for linting.
+
+### Success Criteria
+- [ ] No raw SQL strings in the code.
+- [ ] 100% test coverage for API routes using `pytest`.
+- [ ] Dependency injection used for all service layer access.
+
+---
+
 ## Project Identity
 
 - **Type**: Backend API

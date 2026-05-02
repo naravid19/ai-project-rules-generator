@@ -2,6 +2,20 @@
 
 > Single-Page Application built with React, TypeScript, and Vite.
 
+## 📐 High-Fidelity Baseline
+
+### Assumptions
+- **Framework**: React 18+ Concurrent Mode.
+- **Typing**: Strict TypeScript, no `any`.
+- **Environment**: Modern browser (no IE11 support).
+
+### Success Criteria
+- [ ] Every component has a defined prop interface.
+- [ ] No derived state is stored in `useEffect`.
+- [ ] 100% of API calls are typed via `Zod` or `TS interfaces`.
+
+---
+
 ## Project Identity
 
 - **Type**: Web Frontend (SPA)

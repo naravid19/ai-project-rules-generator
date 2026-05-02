@@ -90,6 +90,13 @@ template_style: progressive
 # Scale: 0-50, Default: 38
 quality_threshold: 38
 
+# --- Karpathy Methodology (v1.9.3+) -------------------------------------------
+# Enables high-fidelity 'Think Before Coding' features.
+# surgical_mode: Adds 'Assumptions' and 'Tradeoffs' sections to outputs.
+# goal_driven_execution: Forces [Step] -> verify: [check] pattern for workflows.
+surgical_mode: true
+goal_driven_execution: true
+
 # --- Confidence Threshold -----------------------------------------------------
 # Minimum confidence score before the workflow must stop and ask the user to clarify
 # the project type / intent with multiple-choice options.
