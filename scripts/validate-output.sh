@@ -42,6 +42,7 @@ SKILL_NAME_PATTERNS=(
   'jeffallan-claude-skills'
   'claude-scientific-skills'
   'andrej-karpathy-skills'
+  'superpowers-skills'
   'planning-with-files'
   'ui-ux-pro-max-skill'
 )

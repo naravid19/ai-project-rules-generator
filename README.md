@@ -193,6 +193,7 @@ A structured 6-stage workflow (Stage 0–5) for creating professional project ru
 > - [othman-planning-with-files](https://github.com/OthmanAdi/planning-with-files) — planning and persistence workflows
 > - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills) — scientific and research-focused workflows
 > - [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — Andrej Karpathy's skills and workflows
+> - [superpowers](https://github.com/obra/superpowers) — advanced agent skills
 
 ### Installation
 
@@ -700,6 +701,7 @@ Project Link: [https://github.com/naravid19/ai-project-rules-generator](https://
 - [claude-scientific-skills](https://github.com/K-Dense-AI/claude-scientific-skills)
 - [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 - [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+- [superpowers](https://github.com/obra/superpowers)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

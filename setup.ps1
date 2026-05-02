@@ -94,12 +94,15 @@ function Install-Skill {
         "karpathy" {
             Update-OrCloneRepo -RepoUrl "https://github.com/forrestchang/andrej-karpathy-skills.git" -TargetPath (Join-Path $SkillRoot "andrej-karpathy-skills") -Label "forrestchang/andrej-karpathy-skills"
         }
+        "superpowers" {
+            Update-OrCloneRepo -RepoUrl "https://github.com/obra/superpowers.git" -TargetPath (Join-Path $SkillRoot "superpowers-skills") -Label "obra/superpowers"
+        }
         "all" {
-            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific", "karpathy")
+            $keys = @("antigravity", "claude", "anthropic", "techleads", "jeffallan", "ui-ux-pro-max", "othmanadi", "scientific", "karpathy", "superpowers")
             foreach ($k in $keys) { Install-Skill -Key $k }
         }
         default {
-            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, karpathy, all" -ForegroundColor Red
+            Write-Host "Unknown skill source: $Key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, karpathy, superpowers, all" -ForegroundColor Red
         }
     }
 }
@@ -235,10 +238,11 @@ else {
     Write-Host "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
     Write-Host "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
     Write-Host "  9) forrestchang / andrej-karpathy-skills (FOLDER, Andrej Karpathy's skills/workflows)"
-    Write-Host " 10) All of the above"
-    Write-Host " 11) Skip (add your own later)"
+    Write-Host " 10) obra / superpowers                   (FOLDER, advanced agent skills)"
+    Write-Host " 11) All of the above"
+    Write-Host " 12) Skip (add your own later)"
     Write-Host ""
-    $choice = Read-Host "Choose [1-11]"
+    $choice = Read-Host "Choose [1-12]"
 
     switch ($choice) {
         "1" { Install-Skill -Key "antigravity" }
@@ -250,8 +254,9 @@ else {
         "7" { Install-Skill -Key "othmanadi" }
         "8" { Install-Skill -Key "scientific" }
         "9" { Install-Skill -Key "karpathy" }
-        "10" { Install-Skill -Key "all" }
-        "11" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
+        "10" { Install-Skill -Key "superpowers" }
+        "11" { Install-Skill -Key "all" }
+        "12" { Write-Host "Skipping skill source installation." -ForegroundColor DarkGray }
         default { Write-Host "Invalid choice, skipping skill source installation." -ForegroundColor DarkGray }
     }
 }

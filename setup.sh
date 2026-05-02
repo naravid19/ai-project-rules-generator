@@ -125,14 +125,19 @@ install_skill() {
       target_suffix="andrej-karpathy-skills"
       label="forrestchang/andrej-karpathy-skills"
       ;;
+    superpowers)
+      repo_url="https://github.com/obra/superpowers.git"
+      target_suffix="superpowers-skills"
+      label="obra/superpowers"
+      ;;
     all)
-      for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi scientific karpathy; do
+      for k in antigravity claude anthropic techleads jeffallan ui-ux-pro-max othmanadi scientific karpathy superpowers; do
         install_skill "$k"
       done
       return
       ;;
     *)
-      echo "Unknown skill source: $key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, karpathy, all"
+      echo "Unknown skill source: $key. Options: antigravity, claude, anthropic, techleads, jeffallan, ui-ux-pro-max, othmanadi, scientific, karpathy, superpowers, all"
       return 1
       ;;
   esac
@@ -265,10 +270,11 @@ else
   echo "  7) OthmanAdi / planning-with-files       (FOLDER, planning persistence)"
   echo "  8) K-Dense-AI / claude-scientific-skills (FOLDER, scientific/research workflows)"
   echo "  9) forrestchang / andrej-karpathy-skills (FOLDER, Andrej Karpathy's skills/workflows)"
-  echo " 10) All of the above"
-  echo " 11) Skip (add your own later)"
+  echo " 10) obra / superpowers                   (FOLDER, advanced agent skills)"
+  echo " 11) All of the above"
+  echo " 12) Skip (add your own later)"
   echo
-  read -r -p "Choose [1-11]: " choice < /dev/tty
+  read -r -p "Choose [1-12]: " choice < /dev/tty
 
   case "$choice" in
     1) install_skill "antigravity" ;;
@@ -280,8 +286,9 @@ else
     7) install_skill "othmanadi" ;;
     8) install_skill "scientific" ;;
     9) install_skill "karpathy" ;;
-    10) install_skill "all" ;;
-    11) echo "Skipping skill source installation." ;;
+    10) install_skill "superpowers" ;;
+    11) install_skill "all" ;;
+    12) echo "Skipping skill source installation." ;;
     *) echo "Invalid choice, skipping skill source installation." ;;
   esac
 fi
