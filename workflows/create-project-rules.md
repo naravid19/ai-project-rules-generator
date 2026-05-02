@@ -412,7 +412,14 @@ Add traceability metadata near the top of the generated file:
 <!-- Confirmed_Skill_Source: true -->
 ```
 
-### 3.1 Required Sections
+### 3.1 Pre-Write Reasoning (Think Before Coding)
+
+Before writing any content for `.cursorrules`, perform a brief **Surgical Analysis**:
+1. **Assumptions**: List 2-3 key assumptions about the project (e.g., "Assumed Tailwind v4 due to package.json dependencies").
+2. **Tradeoffs**: Briefly explain why you chose specific rules over others (e.g., "Prioritized Strict Typing over flexibility for API stability").
+3. **Success Criteria**: Define 1-2 ways the AI can verify these rules are working (e.g., "Agent must push back if a new route is added without a Zod schema").
+
+### 3.2 Required Sections
 
 ```markdown
 # Project Rules: {PROJECT_NAME}
@@ -557,35 +564,11 @@ If "modify" - return to Stage 0 to adjust preferences.
 
 Create `AGENTS.md` (or the appropriate file for the target AI tool) at the project root.
 
-### 4.0 Apply `template_style`
+### 4.1 Pre-Write Reasoning (Think Before Coding)
 
-Use the same style choice from Stage 0:
-
-| `template_style` | Behavior |
-| ---------------- | -------- |
-| `progressive` | Default. Overview first, then operational detail and examples. |
-| `flat` | Same content scope with fewer nested subsections. |
-| `minimal` | Keep project context, available skills, core patterns, constraints, and verification guidance. Target `60-120` lines. |
-
-> Required sections still remain present in every style. The style only changes formatting density and example length.
-
-### 4.1 Determine Output Files
-
-Based on the AI tools detected in Stage 1.4 (via Self-Awareness, Config, or Existing Files):
-
-| Detected Tool | Primary File | Additional Files |
-| ------------------ | --------------------------------- | -------------------------------- |
-| Cursor | `.cursorrules` | `.cursor/rules/*.mdc` (optional) |
-| Claude Code | `CLAUDE.md` | `.claude/skills/*/SKILL.md` |
-| Antigravity IDE | `.agent/skills/*/SKILL.md` | `.agent/workflows/*.md` |
-| Gemini CLI | `GEMINI.md` | |
-| Codex CLI | `AGENTS.md` | |
-| Kiro IDE/CLI | `AGENTS.md` + `.kiro/steering/` | `.kiro/workflows/*.md` |
-| GitHub Copilot | `.github/copilot-instructions.md` | `.github/prompts/*.prompt.md` |
-| OpenCode | `AGENTS.md` | |
-| AdaL CLI | `AGENTS.md` | |
-
-> **Default**: If unknown, generate `.cursorrules` + `AGENTS.md` (most universal).
+Before writing `AGENTS.md`, define the **Goal-Driven Execution** plan:
+1. **Orchestration Logic**: How should the agent prioritize local skills vs MCP tools?
+2. **Success Criteria**: "Agent can successfully discover and read the top 5 relevant skills without user intervention."
 
 ### 4.2 High-Fidelity Agentic Template (ref: 9-Pillar Architecture)
 
