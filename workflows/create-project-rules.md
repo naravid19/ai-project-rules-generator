@@ -414,10 +414,11 @@ Add traceability metadata near the top of the generated file:
 
 ### 3.1 Pre-Write Reasoning (Think Before Coding)
 
-Before writing any content for `.cursorrules`, perform a brief **Surgical Analysis**:
-1. **Assumptions**: List 2-3 key assumptions about the project (e.g., "Assumed Tailwind v4 due to package.json dependencies").
+Before writing any content for `.cursorrules`, perform a brief **Surgical Analysis** inspired by Karpathy's guidelines:
+1. **Assumptions**: List 2-3 key assumptions about the project (e.g., "Assumed Tailwind v4 due to package.json dependencies"). Don't hide confusion. Surface tradeoffs.
 2. **Tradeoffs**: Briefly explain why you chose specific rules over others (e.g., "Prioritized Strict Typing over flexibility for API stability").
-3. **Success Criteria**: Define 1-2 ways the AI can verify these rules are working (e.g., "Agent must push back if a new route is added without a Zod schema").
+3. **Simplicity First**: Are you adding unnecessary abstractions or features? Write the minimum rules needed.
+4. **Success Criteria**: Define 1-2 ways the AI can verify these rules are working (e.g., "Agent must push back if a new route is added without a Zod schema").
 
 ### 3.2 Required Sections
 
@@ -440,7 +441,7 @@ Before writing any content for `.cursorrules`, perform a brief **Surgical Analys
 
 | Path | Purpose | When to Modify |
 | -------- | --------- | -------------- |
-| `{file}` | {purpose} | {when} |
+| `{file}` | {purpose} | Use when {trigger condition} |
 
 ---
 
@@ -467,9 +468,14 @@ Before writing any content for `.cursorrules`, perform a brief **Surgical Analys
 
 ## Critical Rules (Severity: Critical)
 
+> [!CAUTION]
+> **No Exceptions**: Violating the letter of these rules is violating the spirit of these rules.
+
 {Non-negotiable rules with code examples}
 
 ### Rule 1: {rule name}
+
+**Use when**: {Specific triggering conditions and symptoms. Do NOT summarize the workflow here.}
 
 {description with BAD / GOOD examples}
 
@@ -489,9 +495,16 @@ Before writing any content for `.cursorrules`, perform a brief **Surgical Analys
 
 ---
 
-## Testing Guidelines
+## Testing & Verification Guidelines
 
-{Testing requirements and patterns}
+**Verification Before Completion**:
+1. IDENTIFY: What command proves this code works?
+2. RUN: Execute the FULL command (e.g. `npm test`, `pytest`)
+3. READ: Full output, check exit code
+4. VERIFY: Does output confirm the claim?
+5. ONLY THEN: Claim the task is complete.
+
+{Other Testing requirements and patterns}
 ```
 
 ### 3.2 Optional Sections (Add as Needed)
@@ -826,9 +839,12 @@ async def get_task(task_id: int, db: AsyncSession):
 | If You Find | Search Method |
 | ------------------- | ---------------------------- |
 | `CATALOG.md` | Search table by keywords |
-| `SKILL.md` folders | Browse folder names |
+| `SKILL.md` folders | Scan the "Use when..." description |
 | `search.py` | Run with `--keywords` |
 | Workflow `.md` file | Read and follow instructions |
+
+> [!CAUTION]
+> **Superpowers Rule**: Description = When to Use, NOT What the Skill Does. Do not summarize workflows in the `SKILL.md` description.
 
 ### Helpful Keywords
 
