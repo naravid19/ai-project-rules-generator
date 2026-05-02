@@ -310,6 +310,7 @@ def load_jit_skill_contents(
     selected_paths: list[str],
     limit: int = 5,
     catalog_path: Path | None = None,
+    use_when_descriptions_only: bool = False,
 ) -> list[dict[str, str]]:
     resolved_paths = select_jit_skill_paths(
         project_root,
@@ -317,12 +318,26 @@ def load_jit_skill_contents(
         limit=limit,
         catalog_path=catalog_path,
     )
+    
+    effective_catalog_path = catalog_path or (Path(project_root).resolve() / ".agent" / "memory" / "skill_catalog.json")
+    catalog_entries = _load_catalog_entries(effective_catalog_path) if use_when_descriptions_only else []
+    desc_map = {str(entry.get("path", "")): str(entry.get("description", "")) for entry in catalog_entries}
+    
     payload: list[dict[str, str]] = []
     for path in resolved_paths:
+        normalized_path = _normalize_path_text(path)
+        
+        # Deep Context Savings: Extract only the description (trigger condition) if requested
+        if use_when_descriptions_only:
+            rel_path = _normalize_path_text(path.relative_to(Path(project_root).resolve()))
+            content = f"Description/Trigger Condition: {desc_map.get(rel_path, 'No description available.')}\n\n[Deep Context Savings Enabled: Use the read_file tool on the path '{normalized_path}' to read the full rules and code examples if you need to implement this skill.]"
+        else:
+            content = path.read_text(encoding="utf-8", errors="ignore")
+            
         payload.append(
             {
-                "path": _normalize_path_text(path),
-                "content": path.read_text(encoding="utf-8", errors="ignore"),
+                "path": normalized_path,
+                "content": content,
             }
         )
     return payload

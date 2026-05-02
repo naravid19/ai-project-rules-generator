@@ -9,7 +9,7 @@ PRIMARY_ENTRY_FILES = ("SKILL.md", "AGENTS.md", "CLAUDE.md")
 PRIMARY_ENTRY_SET = set(PRIMARY_ENTRY_FILES)
 COMPANION_DOC_FILES = (*PRIMARY_ENTRY_FILES, "README.md")
 REFERENCE_DIR_NAMES = ("references", "rules")
-SUMMARY_SECTION_NAMES = {"overview", "abstract", "summary"}
+SUMMARY_SECTION_NAMES = {"when to use", "use when", "trigger", "overview", "abstract", "summary"}
 
 
 @dataclass(frozen=True)

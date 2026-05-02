@@ -344,9 +344,9 @@ Resolve discovery roots in this order before classifying formats:
 
 ---
 
-### 2.4 Two-Stage JIT Retrieval (Context Overload Prevention)
+### 2.4 Two-Stage JIT Retrieval & Deep Context Savings
 
-To prevent context window bloat, follow this two-stage process:
+To prevent context window bloat and adhere to the **Superpowers Flat Namespace** principle, follow this two-stage process:
 
 **Stage 1: Intent Matching (Max 5 Paths)**
 1. Scan the confirmed skill root and build a mental index of available skills by reading **ONLY** the frontmatter (title/description) and directory names.
@@ -354,10 +354,10 @@ To prevent context window bloat, follow this two-stage process:
 3. Select a strict **MAXIMUM of 5** relevant skill paths.
 4. Output these 5 paths to the user before proceeding to Stage 2.
 
-**Stage 2: Just-In-Time Loading**
-1. Read the **FULL** markdown content (SKILL.md) **ONLY** for the 5 selected paths.
-2. Extract the specific code patterns and rules from these files.
-3. NEVER inject raw, unread skill trees or unselected content into the final rule-generation prompt.
+**Stage 2: Deep Context Savings (Pointer System)**
+1. Do **NOT** inject the full markdown content (`SKILL.md`) into your prompts or the final output files prematurely.
+2. Extract **ONLY** the specific triggering conditions ("Use when...") and the file paths for the 5 selected skills.
+3. Heavy references (>100 lines) must remain in their original files. You will provide pointers (paths) to these files so that future AIs can use the `read_file` tool to load them Just-In-Time.
 
 ---
 
@@ -519,15 +519,14 @@ Before writing any content for `.cursorrules`, perform a brief **Surgical Analys
 | **Debugging Strategies** | Complex debugging scenarios |
 | **API Design** | Projects that expose APIs |
 
-### 3.3 Integrate Skills
+### 3.3 Integrate Skills (Deep Context Savings)
 
-For each relevant skill from Stage 2:
+Instead of dumping massive code examples into `.cursorrules`, use the **Pointer System**:
 
-1. Extract **key patterns and rules** from the skill
-2. **Adapt** them to the project's context and conventions
-3. Include **concrete code examples** (not abstract principles)
-4. Mark critical rules as Critical and important rules as Important
-5. **Don't credit the skill** - integrate naturally into the rules file
+1. **Extract Core Rules**: Extract only the highest-value, fundamental patterns from the matched skills.
+2. **Adapt Context**: Apply them strictly to the project's current context.
+3. **Use Pointers**: Do NOT include heavy (>10 lines) code examples or abstract principles. Instead, create a direct reference (e.g., `[Read detailed guide at: .agent/skills/skill-name/SKILL.md]`).
+4. **Don't credit the skill** - write the rules natively as if they are the project's own guidelines.
 
 ---
 
