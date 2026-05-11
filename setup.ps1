@@ -16,7 +16,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRaw = "https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main"
-$WorkflowFile = ".agent/workflows/create-project-rules.md"
+$WorkflowFile = "SKILL.md"
 
 function Write-Log([string]$msg) {
     if ($Verbose) {
@@ -28,12 +28,9 @@ function Get-WorkflowVersion {
     param([string]$Path)
 
     $version = "unknown"
-    $versionRows = Select-String -Path $Path -Pattern '^\|\s*\d+\.\d+(\.\d+)?\s*\|' | ForEach-Object { $_.Line }
-    if ($versionRows) {
-        $lastRow = $versionRows[-1]
-        if ($lastRow -match '^\|\s*(\d+\.\d+(\.\d+)?)\s*\|') {
-            $version = "v$($Matches[1])"
-        }
+    $match = Select-String -Path $Path -Pattern '^version:\s*(\d+\.\d+(\.\d+)?)' | Select-Object -First 1
+    if ($match -and $match.Line -match '^version:\s*(\d+\.\d+(\.\d+)?)') {
+        $version = "v$($Matches[1])"
     }
     return $version
 }
@@ -147,11 +144,11 @@ if ($Uninstall) {
         }
     }
 
-    # Check if .agent/workflows is empty
-    if ((Test-Path ".agent/workflows") -and
-        (Get-ChildItem ".agent/workflows" -ErrorAction SilentlyContinue).Count -eq 0) {
-        Remove-Item ".agent/workflows" -Force
-        Write-Host "  Removed empty: .agent/workflows/" -ForegroundColor Yellow
+    # Check if .agent is empty
+    if ((Test-Path ".agent") -and
+        (Get-ChildItem ".agent" -ErrorAction SilentlyContinue).Count -eq 0) {
+        Remove-Item ".agent" -Force
+        Write-Host "  Removed empty: .agent/" -ForegroundColor Yellow
     }
 
     Write-Host ""
@@ -180,7 +177,7 @@ if ($Update) {
     Write-Host "Backed up current workflow to $WorkflowFile.backup" -ForegroundColor Yellow
 
     Write-Host "Downloading latest workflow..." -ForegroundColor Yellow
-    Invoke-WebRequest -Uri "$RepoRaw/workflows/create-project-rules.md" -OutFile $WorkflowFile
+    Invoke-WebRequest -Uri "$RepoRaw/SKILL.md" -OutFile $WorkflowFile
 
     $version = Get-WorkflowVersion -Path $WorkflowFile
     Write-Host "✅ Workflow updated successfully." -ForegroundColor Green
@@ -201,7 +198,6 @@ Write-Host ""
 Test-Prerequisites
 
 Write-Host "Creating .agent/ directory structure..." -ForegroundColor Yellow
-New-Item -ItemType Directory -Force -Path ".agent/workflows" | Out-Null
 New-Item -ItemType Directory -Force -Path $SkillRoot | Out-Null
 
 if ($SkillRoot -ne ".agent") {
@@ -210,7 +206,7 @@ if ($SkillRoot -ne ".agent") {
 }
 
 Write-Host "Downloading workflow..." -ForegroundColor Yellow
-Invoke-WebRequest -Uri "$RepoRaw/workflows/create-project-rules.md" -OutFile $WorkflowFile
+Invoke-WebRequest -Uri "$RepoRaw/SKILL.md" -OutFile $WorkflowFile
 
 $version = Get-WorkflowVersion -Path $WorkflowFile
 Write-Host "✅ Workflow installed at $WorkflowFile (version: $version)" -ForegroundColor Green

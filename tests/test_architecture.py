@@ -172,10 +172,23 @@ class ArchitectureTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+            registry_path = project_root / "mcp_registry.yaml"
+            registry_path.write_text(
+                textwrap.dedent(
+                    """
+                    github:
+                      - github-mcp
+                    terminal:
+                      - terminal-mcp
+                    """
+                ).strip(),
+                encoding="utf-8"
+            )
+
             detected = config_runtime.detect_native_mcp_servers(project_root)
             self.assertEqual(detected, ["github-mcp", "terminal-mcp"])
 
-            registry = config_runtime.load_mcp_registry(ROOT / "templates" / "mcp_registry.yaml")
+            registry = config_runtime.load_mcp_registry(registry_path)
             routed = config_runtime.route_mcp_servers(
                 "Need github automation and terminal access",
                 ["python", "api"],
@@ -285,6 +298,9 @@ class ArchitectureTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+            registry_path = project_root / "mcp_registry.yaml"
+            registry_path.write_text("github:\n  - github-mcp\n", encoding="utf-8")
+
             prompt = runtime_module.build_stage1_selection_prompt(
                 "Need github workflow help",
                 ["python", "api"],
@@ -299,7 +315,7 @@ class ArchitectureTests(unittest.TestCase):
                 "Need github workflow help",
                 ["python", "api"],
                 catalog_path=catalog_path,
-                registry_path=ROOT / "templates" / "mcp_registry.yaml",
+                registry_path=registry_path,
                 limit=5,
             )
             self.assertIn(".agent/github/SKILL.md", routed["selected_skill_paths"])
@@ -471,6 +487,34 @@ class ArchitectureTests(unittest.TestCase):
 
             self.assertFalse(is_valid)
             self.assertEqual(len(missing), 0)
+
+    def test_detect_tech_stack_manifest(self) -> None:
+        runtime_module = load_module(
+            SCRIPTS_DIR / "project_rules_runtime.py", "runtime_manifest_module"
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            
+            # Create apps/web with package.json
+            web_dir = project_root / "apps" / "web"
+            web_dir.mkdir(parents=True)
+            (web_dir / "package.json").write_text('{"dependencies": {"react": "^18"}}', encoding="utf-8")
+            
+            # Create apps/api with pyproject.toml
+            api_dir = project_root / "apps" / "api"
+            api_dir.mkdir(parents=True)
+            (api_dir / "pyproject.toml").write_text('[tool.poetry]\nname = "api"', encoding="utf-8")
+
+            manifest = runtime_module.generate_monorepo_manifest(project_root)
+            
+            self.assertEqual(len(manifest), 2)
+            
+            web_info = next(item for item in manifest if item["path"] == "apps/web")
+            self.assertIn("node", web_info["inferred_stack"].lower())
+            
+            api_info = next(item for item in manifest if item["path"] == "apps/api")
+            self.assertIn("python", api_info["inferred_stack"].lower())
 
 
 if __name__ == "__main__":

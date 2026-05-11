@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.4][1.9.4] - 2026-05-11
+
+### Added
+- **Core Workflow Migration**: Migrated the core agent workflow from `.agent/workflows/create-project-rules.md` to the root-level `SKILL.md` to conform to standard agent skill structure and improve discoverability.
+- **Superpowers Integration**: Enforced Superpowers framework verification strategies and subagent orchestration throughout setup scripts and documentation.
+
+### Changed
+- **Setup Scripts**: Updated `setup.sh` and `setup.ps1` to download and install `SKILL.md` directly into the project root instead of the nested `.agent/workflows/` directory.
+- **README Updates**: Revised `README.md` to explain the new `SKILL.md` usage, updated paths, and installation instructions for version 1.9.4.
+
 ## [1.9.3][1.9.3] - 2026-05-02
 
 ### Added

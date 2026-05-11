@@ -38,3 +38,7 @@ prompt.txt
 .cursorrules
 AGENTS.md
 /docs
+/generating-project-rules/example/.agent
+/generating-project-rules/example/.shared
+/generating-project-rules/references/docs
+/references

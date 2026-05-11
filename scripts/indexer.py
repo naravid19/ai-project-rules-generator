@@ -7,6 +7,12 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
+import sys
+from pathlib import Path
+
+# Ensure local imports work when imported from tests/
+sys.path.insert(0, str(Path(__file__).parent.resolve()))
+
 from audit import audit_logger
 from project_rules_runtime import ProjectRulesRuntimeError, resolve_confirmed_skill_source
 from skill_metadata import extract_summary, parse_frontmatter, resolve_skill_entry

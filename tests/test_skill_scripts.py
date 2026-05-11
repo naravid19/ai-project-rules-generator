@@ -5,6 +5,7 @@ import io
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -14,6 +15,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
 FIXTURES = ROOT / "tests" / "fixtures"
+SCRIPTS_DIR = ROOT / "scripts"
 
 
 def run_python(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -266,6 +268,22 @@ class SkillScriptTests(unittest.TestCase):
         self.assertIn("    confirmed: false", config_text)
         self.assertIn("logging:", config_text)
         self.assertIn("memory:", config_text)
+
+    def test_wizard_monorepo_manifest_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            (project_root / "frontend").mkdir()
+            (project_root / "frontend" / "package.json").write_text("{}", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPTS_DIR / "wizard.py"), "--monorepo-manifest"],
+                cwd=temp_dir,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("frontend", result.stdout)
+            self.assertIn("Node", result.stdout)
 
 
 if __name__ == "__main__":

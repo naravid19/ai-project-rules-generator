@@ -9,7 +9,7 @@
 set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/naravid19/ai-project-rules-generator/main"
-WORKFLOW_FILE=".agent/workflows/create-project-rules.md"
+WORKFLOW_FILE="SKILL.md"
 VERBOSE=false
 NON_INTERACTIVE=false
 SKILL_SOURCE=""
@@ -38,18 +38,7 @@ log_debug() {
 
 get_workflow_version() {
   local path="$1"
-  awk -F'|' '
-    /^\|[[:space:]]*[0-9]+\.[0-9]+(\.[0-9]+)?[[:space:]]*\|/ {
-      gsub(/[[:space:]]/, "", $2);
-      latest=$2;
-    }
-    END {
-      if (latest != "") {
-        print "v" latest;
-      } else {
-        print "unknown";
-      }
-    }' "$path"
+  awk '/^version:[[:space:]]*/ { print "v" $2; found=1; exit } END { if (!found) print "unknown" }' "$path"
 }
 
 
@@ -185,9 +174,9 @@ if $UNINSTALL; then
   done
 
   # Remove empty directories
-  if [[ -d ".agent/workflows" ]] && [[ -z "$(ls -A .agent/workflows 2>/dev/null)" ]]; then
-    rmdir ".agent/workflows"
-    echo "  Removed empty: .agent/workflows/"
+  if [[ -d ".agent" ]] && [[ -z "$(ls -A .agent 2>/dev/null)" ]]; then
+    rmdir ".agent"
+    echo "  Removed empty: .agent/"
   fi
 
   echo
@@ -216,7 +205,7 @@ if [[ "$ACTION" == "update" ]]; then
   echo "Backed up current workflow to ${WORKFLOW_FILE}.backup"
 
   echo "Downloading latest workflow..."
-  curl -sL -o "$WORKFLOW_FILE" "${REPO_RAW}/workflows/create-project-rules.md"
+  curl -sL -o "$WORKFLOW_FILE" "${REPO_RAW}/SKILL.md"
 
   version="$(get_workflow_version "$WORKFLOW_FILE")"
   echo "✅ Workflow updated successfully."
@@ -237,7 +226,7 @@ echo
 check_prerequisites
 
 echo "Creating .agent/ directory structure..."
-mkdir -p .agent/workflows "$SKILL_ROOT"
+mkdir -p "$SKILL_ROOT"
 
 if [[ "$SKILL_ROOT" != ".agent" ]]; then
   echo "Using shared skill root: $SKILL_ROOT"
@@ -245,7 +234,7 @@ if [[ "$SKILL_ROOT" != ".agent" ]]; then
 fi
 
 echo "Downloading workflow..."
-curl -sL -o "$WORKFLOW_FILE" "${REPO_RAW}/workflows/create-project-rules.md"
+curl -sL -o "$WORKFLOW_FILE" "${REPO_RAW}/SKILL.md"
 
 version="$(get_workflow_version "$WORKFLOW_FILE")"
 echo "✅ Workflow installed at $WORKFLOW_FILE (version: $version)"

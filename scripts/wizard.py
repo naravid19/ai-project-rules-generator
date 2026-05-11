@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Any
@@ -344,6 +345,22 @@ class ConfigWizard:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="AI Project Rules Generator Wizard")
+    parser.add_argument(
+        "--monorepo-manifest",
+        action="store_true",
+        help="Output JSON manifest of monorepo sub-projects",
+    )
+    args, unknown = parser.parse_known_args()
+
+    if args.monorepo_manifest:
+        from project_rules_runtime import generate_monorepo_manifest
+        import json
+
+        manifest = generate_monorepo_manifest(Path.cwd())
+        print(json.dumps(manifest, indent=2))
+        sys.exit(0)
+
     wizard = ConfigWizard()
     wizard.run()
 

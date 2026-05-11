@@ -655,6 +655,37 @@ def _collect_sub_project_dirs(root: Path) -> list[str]:
     return sub_dirs
 
 
+def _infer_tech_stack(sub_dir: Path) -> str:
+    """Infer primary tech stack based on manifest files."""
+    if (sub_dir / "package.json").exists():
+        return "Node/JavaScript"
+    if (sub_dir / "pyproject.toml").exists() or (sub_dir / "requirements.txt").exists():
+        return "Python"
+    if (sub_dir / "go.mod").exists():
+        return "Go"
+    if (sub_dir / "Cargo.toml").exists():
+        return "Rust"
+    if (sub_dir / "pom.xml").exists() or (sub_dir / "build.gradle").exists():
+        return "Java"
+    return "Unknown"
+
+def generate_monorepo_manifest(project_root: Path) -> list[dict[str, str]]:
+    """Generate a manifest of sub-projects and their inferred tech stack."""
+    root = Path(project_root).resolve()
+    sub_dirs = _collect_sub_project_dirs(root)
+    
+    manifest: list[dict[str, str]] = []
+    for rel_dir in sub_dirs:
+        sub_dir_path = root / rel_dir
+        stack = _infer_tech_stack(sub_dir_path)
+        manifest.append({
+            "path": rel_dir,
+            "inferred_stack": stack
+        })
+        
+    return manifest
+
+
 def _auto_detect_local_rules(root: Path, sub_dirs: list[str]) -> dict[str, str]:
     """Read existing local rule files (.cursorrules or AGENTS.md) from sub-project dirs."""
     local_map: dict[str, str] = {}
