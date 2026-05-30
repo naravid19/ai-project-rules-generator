@@ -70,6 +70,76 @@ def build_skill_catalog(project_root: Path, output_path: Path | None = None, inc
     return catalog_path
 
 
+def build_unified_catalog(
+    project_root: Path,
+    sources: list | None = None,
+    output_path: Path | None = None,
+    incremental: bool = False,
+) -> Path:
+    """Build a single unified catalog from multiple skill sources.
+
+    If sources is None, loads all sources from .rulesrc.yaml.
+    Each entry is tagged with source_type and source_name.
+    """
+    root = Path(project_root).resolve()
+    catalog_path = output_path or (root / ".agent" / "memory" / "skill_catalog.json")
+    catalog_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if sources is None:
+        from rules_config import load_all_skill_sources
+        config_path = root / ".rulesrc.yaml"
+        sources = load_all_skill_sources(config_path)
+
+    existing_catalog: list[dict[str, Any]] = []
+    if incremental and catalog_path.exists():
+        try:
+            existing_catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    all_entries: list[CatalogEntry] = []
+    for source in sources:
+        resolved = _resolve_source_path(root, source)
+        if resolved is None or not resolved.exists():
+            continue
+
+        entries = _collect_catalog_entries(
+            root,
+            resolved,
+            existing_catalog,
+            source_type=source.type,
+            source_name=source.source_name or resolved.name,
+        )
+        all_entries.extend(entries)
+
+    all_entries.sort(key=lambda item: (item.source_type, item.id.lower(), item.path.lower()))
+    catalog_path.write_text(
+        json.dumps([e.to_dict() for e in all_entries], indent=2),
+        encoding="utf-8",
+    )
+    return catalog_path
+
+
+def _resolve_source_path(project_root: Path, source: Any) -> Path | None:
+    """Resolve a SkillSourceConfig to a local filesystem path."""
+    import os
+
+    if source.type == "remote":
+        try:
+            from remote_source import resolve_remote_source
+            cache_dir = project_root / ".agent" / ".cache" / "remote-skills"
+            return resolve_remote_source(source.path, cache_dir)
+        except RuntimeError:
+            return None
+
+    candidate = Path(os.path.expanduser(source.path))
+    if candidate.is_absolute():
+        return candidate
+    return (project_root / candidate).resolve()
+
+
+
+
 def validate_catalog(project_root: Path, output_path: Path | None = None) -> tuple[bool, list[str], list[str]]:
     root = Path(project_root).resolve()
     confirmed = resolve_confirmed_skill_source(root)
