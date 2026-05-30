@@ -32,16 +32,25 @@ sections:
 # --- Multi-Root Skill Sources -------------------------------------------------
 # The engine will scan these roots in order. 
 # Confirmed roots skip the interactive path confirmation step.
+# Supports type: local | global | remote (default 'local').
+# Optional: source_name provides a friendly name/label for the source.
 skill_sources:
-  - path: ".agent/skills"
+  - path: ".agent"
     confirmed: true
     format: FOLDER
-  - path: "C:/shared/team-skills/.agent"
-    confirmed: true
-    format: CATALOG
-  - path: ".agent/andrej-karpathy-skills"
-  - path: ".agent/superpowers-skills"
-    confirmed: true
+    type: local
+    source_name: project-local
+
+  # Global skills from user's machine (e.g., Gemini, Cursor, Claude)
+  - path: "~/.gemini/config/skills"
+    type: global
+    source_name: gemini-skills
+    format: FOLDER
+
+  # Remote skill sources (git repos — cloned and updated on demand)
+  - path: "https://github.com/naravid19/ai-project-rules-generator.git"
+    type: remote
+    source_name: rules-generator-skills
     format: FOLDER
 
 # --- Orchestration Settings ---------------------------------------------------

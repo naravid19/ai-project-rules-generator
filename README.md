@@ -146,7 +146,47 @@ For the most advanced experience, ensure you have the [Superpowers Skills](https
 2.  **JIT Retrieval**: The AI will scan the `.agent` directory, select up to 5 relevant skills using Semantic Match, and load their contents.
 3.  **Audit & Output**: The AI will draft `.cursorrules` and `AGENTS.md` and log its reasoning in `.agent/logs/`.
 
+### 🗺️ Multi-Source Skill Mapping (v1.9.4)
+
+You can now configure, index, and query skills from multiple scopes: **local** (project-level), **global** (machine-level, e.g., standard tools or global configs), and **remote** (git repositories cloned on demand).
+
+This ensures maximum reuse of team-wide skills while keeping the local repository clean and avoiding token-limit bloat.
+
+#### 1. Configuration in `.rulesrc.yaml`
+Add your sources under `skill_sources` specifying `type: local | global | remote` and a friendly `source_name`:
+```yaml
+skill_sources:
+  - path: ".agent"
+    confirmed: true
+    type: local
+    source_name: project-local
+
+  - path: "~/.gemini/config/skills"
+    type: global
+    source_name: gemini-skills
+
+  - path: "https://github.com/obra/superpowers.git"
+    type: remote
+    source_name: community-skills
+```
+
+#### 2. Run the Multi-Source Indexer
+Execute the indexer script with the `--unified` and `--skill-map` flags to scan all configured sources and output a readable markdown map:
+```bash
+python scripts/indexer.py --unified --skill-map
+```
+This produces:
+-   **Unified JSON Catalog** (`.agent/memory/skill_catalog.json`): A single lightweight lookup mapping for the JIT retrieval engine.
+-   **Human-Readable Skill Map** (`.agent/memory/skill_map.md`): A grouped, searchable markdown table of all available skills categorized by scope.
+
+#### 3. Automatic Source-Priority Weighting
+When routing developer intent, the runtime engine automatically balances semantic relevance with source proximity. Local skills are prioritized to ensure project-specific guidelines override global ones:
+-   **Local sources**: `1.2x` scoring multiplier.
+-   **Global sources**: `1.0x` scoring multiplier.
+-   **Remote sources**: `0.8x` scoring multiplier.
+
 ---
+
 
 ## Architecture
 
