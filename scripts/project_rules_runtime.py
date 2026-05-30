@@ -216,25 +216,33 @@ def route_intent_resources(
     scored_catalog: list[tuple[float, dict[str, Any]]] = []
     reasoning_parts = []
 
+    SOURCE_PRIORITY_WEIGHTS = {"local": 1.2, "global": 1.0, "remote": 0.8}
+
     for entry in catalog_entries:
         tags = [str(tag).lower() for tag in entry.get("tags", [])]
         description = str(entry.get("description", "")).lower()
-        
+
         # 1. Literal score (Primary)
         literal_matches = [tag for tag in tags if tag.replace("-", " ") in haystack]
         literal_score = float(len(literal_matches))
-        
+
         # 2. Semantic score (Fallback)
         semantic_score = matcher.score(user_intent, tags)
-        
+
         total_score = literal_score + (semantic_score * 0.5)
-        
+
+        # 3. Source-priority weighting: local > global > remote
+        source_type = str(entry.get("source_type", "local"))
+        priority_weight = SOURCE_PRIORITY_WEIGHTS.get(source_type, 1.0)
+        total_score *= priority_weight
+
         if total_score > 0:
             scored_catalog.append((total_score, entry))
             match_type = "literal" if literal_score > 0 else "semantic"
-            reasoning_parts.append(f"Matched '{entry['id']}' ({match_type}, score={total_score:.1f})")
+            reasoning_parts.append(f"Matched '{entry['id']}' ({match_type}, src={source_type}, score={total_score:.1f})")
 
     scored_catalog.sort(key=lambda item: (-item[0], str(item[1].get("path", "")).lower()))
+
     selected_paths = [str(entry["path"]) for _, entry in scored_catalog[:limit]]
 
     detected_mcps = detect_native_mcp_servers(root)

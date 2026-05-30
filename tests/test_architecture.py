@@ -69,7 +69,7 @@ class ArchitectureTests(unittest.TestCase):
             payload = json.loads(catalog_path.read_text(encoding="utf-8"))
             self.assertEqual(len(payload), 1)
             item = payload[0]
-            self.assertEqual(set(item.keys()), {"id", "path", "tags", "description", "mtime"})
+            self.assertEqual(set(item.keys()), {"id", "path", "tags", "description", "mtime", "source_type", "source_name"})
             self.assertEqual(item["id"], "planning-skill")
             self.assertEqual(item["description"], "Planning workflow for API projects")
             self.assertIn("planning", item["tags"])
