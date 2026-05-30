@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.9.5] - 2026-05-30
+
+### Added
+- **Multi-Source Fault Tolerance**: Implemented robust fallback logic for remote git sources, resolving to offline caches when clones or pulls time out.
+- **Graceful Degradation**: Added safe recovery for JSON decode failures and dynamic fallback for unknown source types in `.rulesrc.yaml`.
+- **E2E Edge-Case Coverage**: Achieved 100% verified test coverage for multi-source fallback scenarios using mock-driven `pytest` scenarios.
+
+### Fixed
+- **Cache Discovery Bug**: Fixed an issue in `_iter_entrypoints` where hidden directories (like `.cache`) erroneously blocked the indexing of valid remote skills. The path evaluation is now appropriately relative to the source root.
+
 ## [1.9.4][1.9.4] - 2026-05-11
 
 ### Added
