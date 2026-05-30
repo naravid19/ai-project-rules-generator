@@ -46,12 +46,14 @@ skill_sources:
     type: global
     source_name: gemini-skills
     format: FOLDER
+    confirmed: true
 
   # Remote skill sources (git repos — cloned and updated on demand)
-  - path: "https://github.com/naravid19/ai-project-rules-generator.git"
+  - path: "https://github.com/naravid19/superpowers-skills.git"
     type: remote
-    source_name: rules-generator-skills
-    format: FOLDER
+    source_name: superpowers-skills
+    format: GIT
+    confirmed: true
 
 # --- Orchestration Settings ---------------------------------------------------
 template_style: progressive   # Options: progressive (layered), flat, minimal

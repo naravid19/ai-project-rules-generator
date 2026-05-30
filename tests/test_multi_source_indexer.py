@@ -309,3 +309,91 @@ def test_source_priority_weighting():
     global_score = base * SOURCE_PRIORITY_WEIGHTS["global"]
     remote_score = base * SOURCE_PRIORITY_WEIGHTS["remote"]
     assert local_score > global_score > remote_score
+
+
+# ---------------------------------------------------------------------------
+# Edge Cases & Fault Tolerance
+# ---------------------------------------------------------------------------
+
+
+def test_generate_skill_map_md_invalid_json(tmp_path):
+    """If catalog.json is corrupted, generate_skill_map_md should default to empty list."""
+    from indexer import generate_skill_map_md
+
+    catalog_path = tmp_path / "catalog.json"
+    catalog_path.write_text("{ invalid json ", encoding="utf-8")
+
+    md_path = generate_skill_map_md(catalog_path, output_path=tmp_path / "skill_map.md")
+    content = md_path.read_text(encoding="utf-8")
+    
+    assert "Total: 0 skills" in content
+    assert "Local Skills" in content
+
+
+def test_generate_skill_map_md_unknown_source_type(tmp_path):
+    """Unknown source_type should be grouped and titled correctly (capitalized)."""
+    from indexer import generate_skill_map_md, CatalogEntry
+
+    entries = [
+        CatalogEntry(
+            id="weird-skill",
+            path="skills/weird/SKILL.md",
+            tags=[],
+            description="Unknown scope.",
+            source_type="enterprise",
+            source_name="corp",
+        )
+    ]
+    catalog_path = tmp_path / "catalog.json"
+    catalog_path.write_text(json.dumps([e.to_dict() for e in entries]), encoding="utf-8")
+
+    md_path = generate_skill_map_md(catalog_path, output_path=tmp_path / "skill_map.md")
+    content = md_path.read_text(encoding="utf-8")
+
+    assert "## Enterprise Skills (1)" in content
+    assert "weird-skill" in content
+
+
+def test_resolve_remote_source_pull_failure_fallback(tmp_path, monkeypatch):
+    """If a cached repo exists but git pull fails, it should fallback to using the cache."""
+    from remote_source import resolve_remote_source
+    import subprocess
+
+    cache_dir = tmp_path / "cache"
+    repo_dir = cache_dir / "my-skills"
+    repo_dir.mkdir(parents=True)
+    (repo_dir / "SKILL.md").write_text("# Test", encoding="utf-8")
+
+    # Mock subprocess.run to simulate network timeout on pull
+    def mock_run(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="git pull", timeout=30)
+    
+    monkeypatch.setattr(subprocess, "run", mock_run)
+
+    result = resolve_remote_source(
+        "https://example.com/user/my-skills.git",
+        cache_dir,
+        offline=False,
+    )
+    assert result == repo_dir
+
+
+def test_resolve_remote_source_clone_failure(tmp_path, monkeypatch):
+    """If clone fails (no cache exists), it should raise RuntimeError."""
+    from remote_source import resolve_remote_source
+    import subprocess
+
+    cache_dir = tmp_path / "cache"
+    
+    def mock_run(*args, **kwargs):
+        raise subprocess.CalledProcessError(returncode=128, cmd="git clone")
+    
+    monkeypatch.setattr(subprocess, "run", mock_run)
+
+    with pytest.raises(RuntimeError, match="Failed to clone remote skill source"):
+        resolve_remote_source(
+            "https://example.com/user/my-skills.git",
+            cache_dir,
+            offline=False,
+        )
+

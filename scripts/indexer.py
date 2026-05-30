@@ -331,7 +331,11 @@ def _collect_catalog_entries(
 def _iter_entrypoints(confirmed_root: Path):
     for file_name in ("SKILL.md", "AGENTS.md", "CLAUDE.md"):
         for path in confirmed_root.rglob(file_name):
-            if any(part.startswith(".") and part != ".agent" for part in path.parts):
+            try:
+                rel_parts = path.relative_to(confirmed_root).parts
+            except ValueError:
+                rel_parts = path.parts
+            if any(part.startswith(".") and part != ".agent" for part in rel_parts):
                 continue
             yield path
 
