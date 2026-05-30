@@ -25,6 +25,8 @@ class CatalogEntry:
     tags: list[str]
     description: str
     mtime: float = 0.0
+    source_type: str = "local"   # local | global | remote
+    source_name: str = ""        # human-readable source label
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -105,7 +107,7 @@ def validate_catalog(project_root: Path, output_path: Path | None = None) -> tup
 
 
 def _process_single_entrypoint(args):
-    entrypoint, project_root, existing_map = args
+    entrypoint, project_root, existing_map, source_type, source_name = args
     from skill_metadata import resolve_skill_entry, parse_frontmatter, extract_summary
     from indexer import CatalogEntry, _serialize_catalog_path, _one_sentence, _extract_tags, PREDEFINED_TAGS
     resolved = resolve_skill_entry(entrypoint.parent if entrypoint.is_file() else entrypoint)
@@ -123,7 +125,9 @@ def _process_single_entrypoint(args):
                 path=existing.get("path", ""),
                 tags=existing.get("tags", []),
                 description=existing.get("description", ""),
-                mtime=existing.get("mtime", 0.0)
+                mtime=existing.get("mtime", 0.0),
+                source_type=existing.get("source_type", source_type),
+                source_name=existing.get("source_name", source_name),
             )
 
     content = resolved.primary_path.read_text(encoding="utf-8", errors="ignore")
@@ -142,20 +146,28 @@ def _process_single_entrypoint(args):
         path=relative_path,
         tags=tags,
         description=description,
-        mtime=mtime
+        mtime=mtime,
+        source_type=source_type,
+        source_name=source_name,
     )
 
 
-def _collect_catalog_entries(project_root: Path, confirmed_root: Path, existing_catalog: list[dict[str, Any]] | None = None) -> list[CatalogEntry]:
+def _collect_catalog_entries(
+    project_root: Path,
+    confirmed_root: Path,
+    existing_catalog: list[dict[str, Any]] | None = None,
+    source_type: str = "local",
+    source_name: str = "",
+) -> list[CatalogEntry]:
     import concurrent.futures
     entries: list[CatalogEntry] = []
     existing_map = {e["path"]: e for e in (existing_catalog or [])}
 
     entrypoints = list(_iter_entrypoints(confirmed_root))
-    
+
     # Prepare arguments for multiprocessing/threading
-    args_list = [(ep, project_root, existing_map) for ep in entrypoints]
-    
+    args_list = [(ep, project_root, existing_map, source_type, source_name) for ep in entrypoints]
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         results = executor.map(_process_single_entrypoint, args_list)
         for res in results:
