@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,9 +15,11 @@ class SkillSourceConfig:
     path: str
     format: str = ""
     confirmed: bool = False
+    type: str = "local"       # local | global | remote
+    source_name: str = ""    # human-readable label for this source
 
     def resolved_path(self, project_root: Path) -> Path:
-        candidate = Path(self.path)
+        candidate = Path(os.path.expanduser(self.path))
         if candidate.is_absolute():
             return candidate
         return (project_root / candidate).resolve()
@@ -81,6 +84,11 @@ def load_confirmed_skill_sources(config_path: Path) -> list[SkillSourceConfig]:
     return [entry for entry in load_skill_sources(config_path) if entry.confirmed]
 
 
+def load_all_skill_sources(config_path: Path) -> list[SkillSourceConfig]:
+    """Load all skill sources (not just confirmed ones)."""
+    return [entry for entry in load_skill_sources(config_path) if entry.path]
+
+
 def normalize_config_path(path_value: str) -> str:
     normalized = path_value.replace("\\", "/")
     return normalized.rstrip("/") or normalized
@@ -119,6 +127,8 @@ def _build_skill_source(raw_entry: dict[str, Any]) -> SkillSourceConfig:
         path=str(raw_entry.get("path") or "").strip(),
         format=str(raw_entry.get("format") or "").strip(),
         confirmed=bool(raw_entry.get("confirmed") is True),
+        type=str(raw_entry.get("type") or "local").strip(),
+        source_name=str(raw_entry.get("source_name") or "").strip(),
     )
 
 
