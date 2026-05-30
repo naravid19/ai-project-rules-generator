@@ -140,7 +140,88 @@ def _resolve_source_path(project_root: Path, source: Any) -> Path | None:
 
 
 
+def generate_skill_map_md(
+    catalog_path: Path,
+    output_path: Path | None = None,
+) -> Path:
+    """Generate a human+AI-readable Markdown skill map from the catalog.
+
+    Groups skills by source_type (local → global → remote) and writes
+    a Markdown table to output_path (defaults to catalog_path/../skill_map.md).
+    """
+    catalog_path = Path(catalog_path)
+    md_path = output_path or catalog_path.with_name("skill_map.md")
+
+    try:
+        entries = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        entries = []
+
+    # Group by source_type
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        source_type = entry.get("source_type", "local")
+        groups.setdefault(source_type, []).append(entry)
+
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    total = len(entries)
+    source_count = len(groups)
+
+    lines = [
+        "# 🗺️ Skill Map (Auto-Generated)",
+        f"> Generated: {now} | Total: {total} skills | Sources: {source_count}",
+        "",
+    ]
+
+    type_labels = {
+        "local": "Local Skills",
+        "global": "Global Skills",
+        "remote": "Remote Skills",
+    }
+
+    for source_type in ("local", "global", "remote"):
+        group = groups.pop(source_type, [])
+        label = type_labels[source_type]
+        source_names = sorted({e.get("source_name", "") for e in group} - {""})
+        source_suffix = f" — `{'`, `'.join(source_names)}`" if source_names else ""
+
+        lines.append(f"## {label} ({len(group)}){source_suffix}")
+        lines.append("")
+
+        if not group:
+            lines.append(f"_No {source_type} skill sources configured._")
+            lines.append("")
+            continue
+
+        lines.append("| ID | Description | Tags |")
+        lines.append("|----|-------------|------|")
+        for entry in sorted(group, key=lambda e: e.get("id", "").lower()):
+            skill_id = entry.get("id", "")
+            description = entry.get("description", "").replace("|", "\\|")
+            tags = ", ".join(entry.get("tags", []))
+            lines.append(f"| {skill_id} | {description} | {tags} |")
+        lines.append("")
+
+    # Handle any unexpected source_types not in the predefined order
+    for source_type, group in sorted(groups.items()):
+        lines.append(f"## {source_type.title()} Skills ({len(group)})")
+        lines.append("")
+        lines.append("| ID | Description | Tags |")
+        lines.append("|----|-------------|------|")
+        for entry in sorted(group, key=lambda e: e.get("id", "").lower()):
+            skill_id = entry.get("id", "")
+            description = entry.get("description", "").replace("|", "\\|")
+            tags = ", ".join(entry.get("tags", []))
+            lines.append(f"| {skill_id} | {description} | {tags} |")
+        lines.append("")
+
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+    return md_path
+
+
 def validate_catalog(project_root: Path, output_path: Path | None = None) -> tuple[bool, list[str], list[str]]:
+
     root = Path(project_root).resolve()
     confirmed = resolve_confirmed_skill_source(root)
     catalog_path = output_path or (root / ".agent" / "memory" / "skill_catalog.json")
@@ -322,13 +403,30 @@ def main() -> None:
     parser.add_argument("--output", help="Optional output path override for skill_catalog.json")
     parser.add_argument("--validate", action="store_true", help="Validate existing catalog against filesystem")
     parser.add_argument("--incremental", action="store_true", help="Only index changed files based on mtime")
+    parser.add_argument("--skill-map", action="store_true", help="Also generate skill_map.md human+AI readable summary")
+    parser.add_argument("--unified", action="store_true", help="Scan all skill_sources from .rulesrc.yaml (not just confirmed)")
     args = parser.parse_args()
 
     try:
         project_root = Path(args.project_root)
         output_path = Path(args.output).resolve() if args.output else None
 
-        _run_indexer(project_root, output_path, args.validate, args.incremental)
+        if args.unified:
+            root = project_root.resolve()
+            catalog_path = build_unified_catalog(
+                project_root=root,
+                output_path=output_path,
+                incremental=args.incremental,
+            )
+            print(catalog_path)
+        else:
+            _run_indexer(project_root, output_path, args.validate, args.incremental)
+            catalog_path = output_path or (project_root.resolve() / ".agent" / "memory" / "skill_catalog.json")
+
+        if args.skill_map:
+            md_path = generate_skill_map_md(catalog_path)
+            print(f"Skill map: {md_path}")
+
     except ProjectRulesRuntimeError as exc:
         raise SystemExit(str(exc))
 
