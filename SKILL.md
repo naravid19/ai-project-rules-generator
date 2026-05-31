@@ -64,6 +64,24 @@ It is essential to determine your execution mode first to provide a seamless use
 
 ### 0.1 Load User Preferences
 
+> [!CAUTION]
+> ⏸️ **USER CHECKPOINT — Preferences Review**
+> Before proceeding, you MUST present the wizard choices to the user and wait
+> for their response. Do NOT auto-select defaults. Present these as
+> multiple-choice questions using the IDE's native question UI:
+>
+> 1. **Target platforms** — which AI tools do they use?
+> 2. **Severity level** — strict / balanced / relaxed
+> 3. **Output language** — especially important if user communicates in non-English
+> 4. **Optional sections** — security, a11y, i18n, perf, git, api-design
+>
+> **Include a recommendation** based on project analysis:
+> - If README is in Thai → recommend `th` output language
+> - If project has APIs → recommend `api-design` section
+> - If project has auth → recommend `security` section
+>
+> You MUST wait for user response before running wizard.py or proceeding.
+
 Check for `.rulesrc.yaml` in the target project root. If found, parse and apply all fields as source of truth:
 
 | Field | Behavior |
@@ -154,6 +172,17 @@ Score the detected project signals:
 **Mode A**: Run `python scripts/wizard.py` to auto-calculate.
 **Mode B**: Compute manually using the table above.
 
+> [!CAUTION]
+> ⏸️ **USER CHECKPOINT — Project Analysis Confirmation**
+> After scoring confidence, ALWAYS present the detected project profile to the
+> user for confirmation:
+>
+> "ระบบตรวจพบ: [tech stack], [frameworks], [project type].
+> ถูกต้องหรือไม่? หากไม่ กรุณาระบุรายละเอียดที่ถูกต้อง"
+>
+> This applies even if confidence_score ≥ 80. The user deserves to validate
+> what the AI detected before rules are generated based on it.
+
 > [!IMPORTANT]
 > If `confidence_score < 80`, please pause and ask the user to clarify the project type with multiple-choice options. Guessing or using broad defaults when confidence is low often leads to irrelevant project rules.
 
@@ -190,6 +219,15 @@ Exactly ONE root must be `confirmed: true` before proceeding.
 2. Match against project tech stack and user intent.
 3. Select a strict **MAXIMUM of 5** relevant skill paths.
 4. Output the 5 paths to the user before proceeding.
+
+> [!CAUTION]
+> ⏸️ **USER CHECKPOINT — Skill Selection Review**
+> After Stage 1 intent matching, present the top 5 selected skill paths to the
+> user with a brief description of each. Ask:
+>
+> "ระบบเลือก Skill เหล่านี้ เหมาะสมหรือไม่? ต้องการเพิ่มหรือลดออก?"
+>
+> Wait for user confirmation before Stage 2 deep loading.
 
 **Stage 2 — Deep Context Savings (Pointer System)**:
 1. Read the FULL content of ONLY the 5 selected skill files.
@@ -322,6 +360,15 @@ Include:
 > **Verification Before Completion**: Always verify your generated rules before claiming the task is complete. Confirming that your rules match the actual project architecture prevents errors and ensures a high-quality result.
 
 ### 5.1 Quality Scoring
+
+> [!CAUTION]
+> ⏸️ **USER CHECKPOINT — Output Review**
+> After verification scoring, present a summary of generated files with
+> quality scores and any warnings. Ask the user to review before
+> finalizing:
+>
+> "ไฟล์ที่สร้าง: .cursorrules (48/50), AGENTS.md (48/50). ต้องการ
+> ตรวจสอบหรือแก้ไขเพิ่มเติมหรือไม่?"
 
 **Mode A**: Run `scripts/validate-output.ps1` (Windows) or `scripts/validate-output.sh` (Unix).
 **Mode B**: Score manually using this heuristic:

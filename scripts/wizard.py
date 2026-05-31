@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -343,6 +344,105 @@ class ConfigWizard:
 
         return "\n".join(lines)
 
+    def generate_questions_json(self) -> str:
+        """Output all wizard questions as JSON for AI to present to user."""
+        try:
+            from project_rules_runtime import generate_smart_recommendations
+            recommendations = generate_smart_recommendations(Path.cwd())
+        except ImportError:
+            recommendations = {}
+
+        questions = [
+            {
+                "id": "target_platforms",
+                "question": "Which AI tools do you use?",
+                "type": "multi_choice",
+                "options": self.PLATFORMS,
+                "default": ["cursor", "codex"],
+            },
+            {
+                "id": "severity_level",
+                "question": "Select severity level for rules:",
+                "type": "single_choice",
+                "options": self.SEVERITIES,
+                "default": "balanced",
+            },
+            {
+                "id": "output_language",
+                "question": "Select output language:",
+                "type": "single_choice",
+                "options": self.LANGUAGES,
+                "default": recommendations.get("output_language", {}).get("value", "en"),
+                "recommendation": recommendations.get("output_language", {}).get("reason", ""),
+            },
+            {
+                "id": "include_sections",
+                "question": "Select optional sections to include:",
+                "type": "multi_choice",
+                "options": self.OPTIONAL_SECTIONS,
+                "default": recommendations.get("include_sections", {}).get("add", []),
+                "recommendation": recommendations.get("include_sections", {}).get("reason", ""),
+            },
+            {
+                "id": "template_style",
+                "question": "Select template style:",
+                "type": "single_choice",
+                "options": self.STYLES,
+                "default": "progressive",
+            },
+            {
+                "id": "preview_mode",
+                "question": "Show preview before writing files?",
+                "type": "boolean",
+                "default": False,
+            },
+            {
+                "id": "confirmed_skill_source",
+                "question": "Confirmed skill source path:",
+                "type": "string",
+                "default": ".agent",
+            },
+            {
+                "id": "quality_threshold",
+                "question": "Set quality threshold (0-50)",
+                "type": "number",
+                "default": 38,
+            },
+            {
+                "id": "confidence_threshold",
+                "question": "Set confidence threshold (0-100) for human-in-the-loop clarification",
+                "type": "number",
+                "default": self.DEFAULT_CONFIDENCE_THRESHOLD,
+            },
+            {
+                "id": "skill_match_limit",
+                "question": "Set skill match limit to avoid context overload",
+                "type": "number",
+                "default": self.DEFAULT_SKILL_MATCH_LIMIT,
+            },
+        ]
+        return json.dumps({"wizard_questions": questions}, indent=2)
+
+    @audit_logger(action="wizard-config", platform="cli")
+    def apply_config(self, config_dict: dict[str, Any]) -> dict[str, Any]:
+        """Apply pre-selected configuration (from JSON) directly."""
+        self.config = config_dict
+        
+        # Ensure we have a confirmed skill source if not provided or provided as string
+        source_path = self.config.get("confirmed_skill_source", ".agent")
+        if isinstance(source_path, str):
+            self.config["confirmed_skill_source"] = SkillSourceConfig(path=source_path, confirmed=True)
+        self.config["fallback_skill_sources"] = []
+
+        self._handle_confidence_gate(
+            Path("."),
+            int(self.config.get("confidence_threshold", self.DEFAULT_CONFIDENCE_THRESHOLD)),
+        )
+
+        self._generate_yaml()
+        print("\nSuccess: .rulesrc.yaml has been created in your project root.")
+        return {"output_files": [".rulesrc.yaml"], "verification_status": "success"}
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="AI Project Rules Generator Wizard")
@@ -351,19 +451,40 @@ def main() -> None:
         action="store_true",
         help="Output JSON manifest of monorepo sub-projects",
     )
+    parser.add_argument(
+        "--json-output",
+        action="store_true",
+        help="Output wizard questions as JSON for AI-mediated interaction",
+    )
+    parser.add_argument(
+        "--apply-config",
+        type=str,
+        help="JSON string of user-selected config values",
+    )
     args, unknown = parser.parse_known_args()
 
     if args.monorepo_manifest:
         from project_rules_runtime import generate_monorepo_manifest
-        import json
-
         manifest = generate_monorepo_manifest(Path.cwd())
         print(json.dumps(manifest, indent=2))
         sys.exit(0)
 
     wizard = ConfigWizard()
-    wizard.run()
+    
+    if args.json_output:
+        print(wizard.generate_questions_json())
+        sys.exit(0)
+        
+    if args.apply_config:
+        try:
+            config_dict = json.loads(args.apply_config)
+            wizard.apply_config(config_dict)
+            sys.exit(0)
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON provided to --apply-config", file=sys.stderr)
+            sys.exit(1)
 
+    wizard.run()
 
 if __name__ == "__main__":
     main()

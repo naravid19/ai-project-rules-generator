@@ -198,6 +198,12 @@ def parse_stage1_selection_response(raw_response: str, limit: int = 5) -> list[s
     return payload
 
 
+def _word_match(tag: str, haystack: str) -> bool:
+    pattern = r'\b' + re.escape(tag.replace("-", " ")) + r'\b'
+    return bool(re.search(pattern, haystack))
+
+# ...
+
 @audit_logger(action="route-intent", platform="generic")
 def route_intent_resources(
     project_root: Path,
@@ -223,7 +229,7 @@ def route_intent_resources(
         description = str(entry.get("description", "")).lower()
 
         # 1. Literal score (Primary)
-        literal_matches = [tag for tag in tags if tag.replace("-", " ") in haystack]
+        literal_matches = [tag for tag in tags if _word_match(tag, haystack)]
         literal_score = float(len(literal_matches))
 
         # 2. Semantic score (Fallback)
@@ -470,9 +476,9 @@ def _normalize_path_text(path_value: Path | str) -> str:
 def _find_named_paths(root: Path, candidates: dict[str, Any]) -> list[Path]:
     found: list[Path] = []
     for name in candidates:
-        matches = list(root.rglob(name))
-        if matches:
-            found.extend(matches[:1])
+        candidate = root / name
+        if candidate.exists():
+            found.append(candidate)
     return found
 
 
@@ -735,6 +741,34 @@ def extract_design_tokens(project_root: Path) -> dict:
     to extract actual design tokens."""
     engine = DesignTokenEngine(project_root)
     return engine.extract()
+
+
+def generate_smart_recommendations(project_root: Path) -> dict[str, Any]:
+    """Analyze project and generate recommendations for wizard choices."""
+    recommendations = {}
+    
+    # 1. Check for Thai language in README
+    readme = project_root / "README.md"
+    if readme.exists():
+        content = readme.read_text(encoding="utf-8", errors="ignore")
+        thai_chars = sum(1 for c in content if '\u0e00' <= c <= '\u0e7f')
+        if thai_chars > 50:
+            recommendations["output_language"] = {
+                "value": "th", 
+                "reason": "README contains Thai text"
+            }
+    
+    # 2. Check for API frameworks
+    manifests = _find_named_paths(project_root, PRIMARY_MANIFESTS)
+    frameworks = _detect_framework_signals(project_root, manifests)
+    
+    if any(fw in frameworks for fw in ("express", "fastapi", "django", "flask", "gin", "axum")):
+        recommendations["include_sections"] = {
+            "add": ["api-design"],
+            "reason": f"Detected API framework: {', '.join(frameworks)}"
+        }
+    
+    return recommendations
 
 if __name__ == "__main__":
     import argparse
